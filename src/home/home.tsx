@@ -516,20 +516,22 @@ const Portfolio = () => {
                     </div>
                 </section>
 
+                <hr style={{ border: 0, height: 1 }} className="bg-gray-700 mt-20" />
+
                 {/* Projects with Real Images */}
                 <section id="projects" className="py-24 relative">
                     <div className="absolute inset-0 bg-gradient-to-b from-black via-purple-950/10 to-black" />
                     <div className="container mx-auto px-4 relative z-10">
                         <div className="text-center mb-12">
-                            <div className="inline-block px-4 py-2 bg-gradient-to-r from-purple-600/20 to-cyan-600/20 rounded-full text-sm font-bold text-purple-300 border border-purple-500/30 mb-6">
+                            {/* <div className="inline-block px-4 py-2 bg-gradient-to-r from-purple-600/20 to-cyan-600/20 rounded-full text-sm font-bold text-purple-300 border border-purple-500/30 mb-6">
                                 PORTFOLIO
-                            </div>
+                            </div> */}
                             <h3 className="text-5xl md:text-6xl font-black mb-6 bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">
                                 Featured Projects
                             </h3>
-                            <p className="text-gray-400 text-lg max-w-2xl mx-auto mb-12">
+                            {/* <p className="text-gray-400 text-lg max-w-2xl mx-auto mb-12">
                                 Innovative solutions that push boundaries
-                            </p>
+                            </p> */}
                         </div>
 
                         <div className="flex flex-wrap justify-center gap-4 mb-16">
@@ -541,7 +543,7 @@ const Portfolio = () => {
                                 <button
                                     key={tab.id}
                                     onClick={() => setActiveTab(tab.id)}
-                                    className={`group relative px-8 py-4 rounded-2xl font-bold transition-all transform hover:scale-105 flex items-center space-x-2 ${activeTab === tab.id
+                                    className={`group relative px-4 py-4 rounded-2xl font-bold transition-all transform hover:scale-105 flex items-center space-x-2 ${activeTab === tab.id
                                         ? 'bg-gradient-to-r from-purple-600 to-cyan-600 shadow-2xl shadow-purple-500/50'
                                         : 'bg-black/40 border border-white/10 hover:border-white/30 backdrop-blur-xl'
                                         }`}
@@ -552,7 +554,7 @@ const Portfolio = () => {
                             ))}
                         </div>
 
-                        <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                        <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                             {filteredProjects.map((project, idx) => (
                                 <div
                                     key={project.id}
@@ -580,7 +582,7 @@ const Portfolio = () => {
                                             />
                                         </div>
 
-                                        <div className="p-6">
+                                        <div className="p-2">
                                             <h4 className="text-xl font-bold mb-3 text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-cyan-400 transition-all">
                                                 {project.title}
                                             </h4>
@@ -611,12 +613,14 @@ const Portfolio = () => {
                     </div>
                 </section>
 
+                <hr style={{ border: 0, height: 1 }} className="bg-gray-700" />
+
                 {/* Testimonials */}
                 <section className="py-24 container mx-auto px-4">
                     <div className="text-center mb-16">
-                        <div className="inline-block px-4 py-2 bg-gradient-to-r from-purple-600/20 to-cyan-600/20 rounded-full text-sm font-bold text-purple-300 border border-purple-500/30 mb-6">
+                        {/* <div className="inline-block px-4 py-2 bg-gradient-to-r from-purple-600/20 to-cyan-600/20 rounded-full text-sm font-bold text-purple-300 border border-purple-500/30 mb-6">
                             TESTIMONIALS
-                        </div>
+                        </div> */}
                         <h3 className="text-5xl md:text-6xl font-black mb-6 bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">
                             Client Success Stories
                         </h3>
@@ -657,9 +661,9 @@ const Portfolio = () => {
                     <div className="absolute inset-0 bg-gradient-to-b from-black via-purple-950/10 to-black" />
                     <div className="container mx-auto px-4 relative z-10">
                         <div className="text-center mb-16">
-                            <div className="inline-block px-4 py-2 bg-gradient-to-r from-purple-600/20 to-cyan-600/20 rounded-full text-sm font-bold text-purple-300 border border-purple-500/30 mb-6">
+                            {/* <div className="inline-block px-4 py-2 bg-gradient-to-r from-purple-600/20 to-cyan-600/20 rounded-full text-sm font-bold text-purple-300 border border-purple-500/30 mb-6">
                                 GET IN TOUCH
-                            </div>
+                            </div> */}
                             <h3 className="text-5xl md:text-6xl font-black mb-6 bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">
                                 Let's Create Together
                             </h3>
@@ -766,7 +770,7 @@ const Portfolio = () => {
                                         </div>
                                     </div>
                                     <span className="text-2xl font-black bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent">
-                                        DevPro Studio
+                                        DevBeast
                                     </span>
                                 </div>
                                 <p className="text-gray-400 mb-6 max-w-md leading-relaxed">
@@ -818,7 +822,7 @@ const Portfolio = () => {
                         <div className="border-t border-white/5 pt-8">
                             <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
                                 <p className="text-gray-400 text-sm">
-                                    © 2025 DevPro Studio. All rights reserved.
+                                    © 2026 DevBeast. All rights reserved.
                                 </p>
                                 <div className="flex items-center space-x-6 text-sm text-gray-400">
                                     <a href="#" className="hover:text-purple-400 transition-all">Privacy Policy</a>
