@@ -75,3 +75,81 @@ export default defineConfig([
 # demo image
 <img src="demo/1.png">
 
+
+## Installation
+
+### Create a Simple Project
+
+To create a new React project, you can use one of the following methods:
+
+- **Using Create React App:**
+  ```bash
+  npx create-react-app projectName
+  ```
+
+- **Using Vite + React (Recommended):**
+  ```bash
+  npm create vite@latest projectName
+  ```
+
+### Upgrade React
+
+To upgrade React to the latest version:
+
+```bash
+npm install react@latest react-dom@latest
+```
+
+## Usage
+
+### Run the Development Server
+
+```bash
+npm run dev
+```
+
+### Build for Production
+
+```bash
+npm run build
+```
+
+## Permissions and File Access
+
+If you encounter permission issues when changing or adding folders and files:
+
+1. Change permissions:
+   ```bash
+   sudo chmod -R 755 /path/to/your/project/src
+   ```
+
+2. Change ownership:
+   ```bash
+   sudo chown -R $(whoami):$(id -gn) /path/to/your/project/src
+   ```
+
+## Cache and Dependencies
+
+### Clear NPM Cache
+
+```bash
+sudo chown -R $(whoami):$(id -gn) ~/.npm
+npm cache clean --force
+```
+
+### Fix Audit Issues
+
+```bash
+sudo chown -R $(whoami):$(id -gn) ~/.npm
+npm audit fix --force
+```
+
+## Environment Variables
+
+If you encounter issues with environment variables, try:
+
+```bash
+export NODE_OPTIONS=--openssl-legacy-provider
+```
+
+
