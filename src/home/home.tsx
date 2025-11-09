@@ -1,8 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Github, Linkedin, Twitter, Mail, Phone, MapPin, ExternalLink, Code2, Smartphone, Globe, Database, Brain, Cloud, Star, Award, Users, Zap, Download, Send, ArrowRight, CheckCircle, Menu, X, Sparkles, ArrowBigRightDashIcon, Divide, } from 'lucide-react';
+import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
 import person1 from '../assets/person1.png';
+import ContactSection from './contact';
+import BringSection from './bring';
 
 const Portfolio = () => {
+    const navigate = useNavigate();
+
     const [activeTab, setActiveTab] = useState('all');
     const [formData, setFormData] = useState({ name: '', email: '', message: '' });
     const [scrolled, setScrolled] = useState(false);
@@ -192,50 +197,6 @@ const Portfolio = () => {
         }
     ];
 
-    const features = [
-        {
-            icon: <Smartphone className="w-8 h-8" />,
-            title: 'Cross-Platform Magic',
-            desc: 'Beautiful native experiences across iOS, Android, and Web from a single codebase with 60fps animations',
-            color: 'from-blue-500 to-cyan-400',
-            delay: '0'
-        },
-        {
-            icon: <Code2 className="w-8 h-8" />,
-            title: 'Clean Architecture',
-            desc: 'Enterprise-grade code following SOLID principles, DDD patterns, and microservices architecture',
-            color: 'from-purple-500 to-pink-400',
-            delay: '100'
-        },
-        {
-            icon: <Database className="w-8 h-8" />,
-            title: 'Backend Mastery',
-            desc: 'Scalable APIs with Laravel, GraphQL, WebSockets, and real-time data synchronization',
-            color: 'from-green-500 to-teal-400',
-            delay: '200'
-        },
-        {
-            icon: <Brain className="w-8 h-8" />,
-            title: 'AI/ML Integration',
-            desc: 'Cutting-edge machine learning with TensorFlow, computer vision, and predictive analytics',
-            color: 'from-orange-500 to-red-400',
-            delay: '300'
-        },
-        {
-            icon: <Globe className="w-8 h-8" />,
-            title: 'Modern Web Apps',
-            desc: 'Lightning-fast React applications with Next.js, SSR, ISR, and edge computing',
-            color: 'from-cyan-500 to-blue-400',
-            delay: '400'
-        },
-        {
-            icon: <Cloud className="w-8 h-8" />,
-            title: 'Cloud Native',
-            desc: 'DevOps excellence with Docker, Kubernetes, CI/CD pipelines, and multi-cloud deployment',
-            color: 'from-indigo-500 to-purple-400',
-            delay: '500'
-        }
-    ];
 
     const testimonials = [
         {
@@ -379,7 +340,7 @@ const Portfolio = () => {
                         />
                     </div>
 
-                    <div className="container mx-auto px-4 relative z-20 flex">
+                    <div className="container mx-auto px-0 relative z-20 flex">
                         <div className="text-center max-w-5xl mx-auto pt-20">
 
                             <h2 className="text-6xl md:text-6xl font-black mb-4 leading-tight">
@@ -480,48 +441,13 @@ const Portfolio = () => {
 
                 </section>
                 <hr style={{ border: 0, height: 1 }} className="bg-gray-700" />
-                {/* Skills 3D Cards */}
-                <section id="skills" className="py-1 container mx-auto px-4 pt-20">
-                    <div className="text-center mb-16">
-                        {/* <div className="inline-block px-4 py-2 bg-gradient-to-r from-purple-600/20 to-cyan-600/20 rounded-full text-sm font-bold text-purple-300 border border-purple-500/30 mb-6">
-                            EXPERTISE
-                        </div> */}
-                        <h3 className="text-5xl md:text-6xl font-black mb-6 bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">
-                            What I Bring
-                        </h3>
-                        <p className="text-gray-400 text-lg max-w-2xl mx-auto">
-                            Full-stack expertise with cutting-edge technologies
-                        </p>
-                    </div>
-
-                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {features.map((feature, idx) => (
-                            <div
-                                key={idx}
-                                className="group relative"
-                                style={{ animationDelay: `${feature.delay}ms` }}
-                            >
-                                <div className={`absolute inset-0 bg-gradient-to-r ${feature.color} rounded-3xl blur-xl opacity-0 group-hover:opacity-30 transition-all duration-500`} />
-                                <div className="relative p-8 rounded-3xl bg-black/40 backdrop-blur-xl border border-white/10 hover:border-white/30 transition-all transform hover:scale-105 hover:-translate-y-2 duration-500">
-                                    <div className={`w-16 h-16 bg-gradient-to-r ${feature.color} rounded-2xl flex items-center justify-center mb-6 shadow-2xl group-hover:scale-110 group-hover:rotate-6 transition-all duration-500`}>
-                                        {feature.icon}
-                                    </div>
-                                    <h4 className="text-2xl font-bold mb-4 text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-cyan-400 transition-all">
-                                        {feature.title}
-                                    </h4>
-                                    <p className="text-gray-400 leading-relaxed">{feature.desc}</p>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </section>
-
+                <BringSection />
                 <hr style={{ border: 0, height: 1 }} className="bg-gray-700 mt-20" />
 
                 {/* Projects with Real Images */}
                 <section id="projects" className="py-24 relative">
                     <div className="absolute inset-0 bg-gradient-to-b from-black via-purple-950/10 to-black" />
-                    <div className="container mx-auto px-4 relative z-10">
+                    <div className="container mx-auto px-2 relative z-10">
                         <div className="text-center mb-12">
                             {/* <div className="inline-block px-4 py-2 bg-gradient-to-r from-purple-600/20 to-cyan-600/20 rounded-full text-sm font-bold text-purple-300 border border-purple-500/30 mb-6">
                                 PORTFOLIO
@@ -552,11 +478,18 @@ const Portfolio = () => {
                                     <span>{tab.label}</span>
                                 </button>
                             ))}
+                            <button
+                                onClick={() => navigate('/allitems')} // passing full data
+                                className="flex items-center space-x-2 text-purple-400 hover:text-cyan-400 transition-all group/btn">
+                                <span className="text-sm font-bold">View All</span>
+                                <ExternalLink className="w-4 h-4 group-hover/btn:translate-x-1 group-hover/btn:-translate-y-1 transition-transform" />
+                            </button>
                         </div>
 
                         <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                             {filteredProjects.map((project, idx) => (
                                 <div
+                                    onClick={() => navigate('/item', { state: project })} // passing full data
                                     key={project.id}
                                     className="group relative rounded-3xl overflow-hidden transform hover:scale-105 transition-all duration-500"
                                     style={{ animationDelay: `${idx * 100}ms` }}
@@ -566,14 +499,14 @@ const Portfolio = () => {
                                     <div className="relative bg-black/40 backdrop-blur-xl border border-white/10 hover:border-white/30 transition-all rounded-3xl overflow-hidden">
                                         {project.live && (
                                             <div className="absolute top-4 right-4 z-20">
-                                                <div className="flex items-center space-x-2 px-4 py-2 bg-green-500/90 backdrop-blur-xl rounded-full text-xs font-bold shadow-lg">
+                                                <div className="flex items-center space-x-2 px-2 py-1 bg-purple-500/90 opacity-70 backdrop-blur-xl rounded-full text-xs font-bold shadow-lg">
                                                     <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
-                                                    <span>Live</span>
+                                                    <span>Open</span>
                                                 </div>
                                             </div>
                                         )}
 
-                                        <div className="relative h-64 overflow-hidden">
+                                        <div className="relative h-50 overflow-hidden">
                                             <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent z-10" />
                                             <img
                                                 src={project.image}
@@ -590,21 +523,23 @@ const Portfolio = () => {
                                                 {project.description}
                                             </p>
 
-                                            <div className="flex flex-wrap gap-2 mb-6">
+                                            <div className="flex flex-wrap gap-1 mb-2">
                                                 {project.tags.map((tag, tagIdx) => (
                                                     <span
                                                         key={tagIdx}
-                                                        className="px-3 py-1 bg-white/5 border border-white/10 rounded-full text-xs font-medium hover:bg-white/10 hover:border-white/20 transition-all cursor-pointer"
+                                                        className="px-2 py-1 bg-white/5 border border-white/10 rounded-full text-xs font-medium hover:bg-white/10 hover:border-white/20 transition-all cursor-pointer"
                                                     >
                                                         {tag}
                                                     </span>
                                                 ))}
                                             </div>
 
-                                            <button className="flex items-center space-x-2 text-purple-400 hover:text-cyan-400 transition-all group/btn">
+                                            {/* <button
+                                                onClick={() => navigate('/item', { state: project })} // passing full data
+                                                className="flex items-center space-x-2 text-purple-400 hover:text-cyan-400 transition-all group/btn">
                                                 <span className="text-sm font-bold">View Details</span>
                                                 <ExternalLink className="w-4 h-4 group-hover/btn:translate-x-1 group-hover/btn:-translate-y-1 transition-transform" />
-                                            </button>
+                                            </button> */}
                                         </div>
                                     </div>
                                 </div>
@@ -657,105 +592,8 @@ const Portfolio = () => {
                 </section>
 
                 {/* Contact Section */}
-                <section id="contact" className="py-24 relative">
-                    <div className="absolute inset-0 bg-gradient-to-b from-black via-purple-950/10 to-black" />
-                    <div className="container mx-auto px-4 relative z-10">
-                        <div className="text-center mb-16">
-                            {/* <div className="inline-block px-4 py-2 bg-gradient-to-r from-purple-600/20 to-cyan-600/20 rounded-full text-sm font-bold text-purple-300 border border-purple-500/30 mb-6">
-                                GET IN TOUCH
-                            </div> */}
-                            <h3 className="text-5xl md:text-6xl font-black mb-6 bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">
-                                Let's Create Together
-                            </h3>
-                            <p className="text-gray-400 text-lg max-w-2xl mx-auto">
-                                Have an exciting project? Let's bring your vision to life
-                            </p>
-                        </div>
+                <ContactSection></ContactSection>
 
-                        <div className="grid md:grid-cols-2 gap-12 max-w-6xl mx-auto">
-                            <div className="space-y-6">
-                                <h4 className="text-3xl font-bold mb-8 text-white">Contact Information</h4>
-
-                                {[
-                                    { icon: <Mail className="w-6 h-6" />, label: 'Email', value: 'hello@devprostudio.com', color: 'from-purple-500 to-pink-500' },
-                                    { icon: <Phone className="w-6 h-6" />, label: 'Phone', value: '+1 (555) 123-4567', color: 'from-blue-500 to-cyan-500' },
-                                    { icon: <MapPin className="w-6 h-6" />, label: 'Location', value: 'San Francisco, CA', color: 'from-green-500 to-emerald-500' }
-                                ].map((item, idx) => (
-                                    <div key={idx} className="group relative">
-                                        <div className={`absolute inset-0 bg-gradient-to-r ${item.color} rounded-2xl blur-xl opacity-0 group-hover:opacity-30 transition-all duration-500`} />
-                                        <div className="relative flex items-start space-x-4 p-6 rounded-2xl bg-black/40 backdrop-blur-xl border border-white/10 hover:border-white/30 transition-all transform hover:scale-105 duration-300">
-                                            <div className={`w-14 h-14 bg-gradient-to-r ${item.color} rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg`}>
-                                                {item.icon}
-                                            </div>
-                                            <div>
-                                                <p className="text-gray-400 text-sm mb-1">{item.label}</p>
-                                                <p className="font-bold text-white text-lg">{item.value}</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))}
-
-                                <div className="pt-8">
-                                    <h5 className="text-xl font-bold mb-6 text-white">Connect With Me</h5>
-                                    <div className="flex space-x-4">
-                                        {[
-                                            { icon: <Github className="w-6 h-6" />, color: 'from-gray-600 to-gray-800' },
-                                            { icon: <Linkedin className="w-6 h-6" />, color: 'from-blue-600 to-blue-800' },
-                                            { icon: <Twitter className="w-6 h-6" />, color: 'from-cyan-500 to-blue-600' },
-                                            { icon: <Mail className="w-6 h-6" />, color: 'from-purple-600 to-pink-600' }
-                                        ].map((social, idx) => (
-                                            <a
-                                                key={idx}
-                                                href="#"
-                                                className="group relative w-14 h-14 rounded-xl overflow-hidden transform hover:scale-110 transition-all duration-300"
-                                            >
-                                                <div className={`absolute inset-0 bg-gradient-to-r ${social.color} opacity-80 group-hover:opacity-100 transition-all`} />
-                                                <div className="relative w-full h-full flex items-center justify-center text-white">
-                                                    {social.icon}
-                                                </div>
-                                            </a>
-                                        ))}
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="space-y-6">
-                                <input
-                                    type="text"
-                                    placeholder="Your Name"
-                                    value={formData.name}
-                                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                    className="w-full px-6 py-4 rounded-2xl bg-black/40 backdrop-blur-xl border border-white/10 focus:border-purple-500 outline-none transition-all text-white placeholder-gray-500"
-                                />
-                                <input
-                                    type="email"
-                                    placeholder="Your Email"
-                                    value={formData.email}
-                                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                    className="w-full px-6 py-4 rounded-2xl bg-black/40 backdrop-blur-xl border border-white/10 focus:border-purple-500 outline-none transition-all text-white placeholder-gray-500"
-                                />
-                                <textarea
-                                    placeholder="Your Message"
-                                    value={formData.message}
-                                    onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                                    // rows="6"
-                                    className="w-full px-6 py-4 rounded-2xl bg-black/40 backdrop-blur-xl border border-white/10 focus:border-purple-500 outline-none transition-all resize-none text-white placeholder-gray-500"
-                                ></textarea>
-                                <button
-                                    onClick={handleSubmit}
-                                    className="group relative w-full py-4 rounded-2xl font-bold overflow-hidden transform hover:scale-105 transition-all duration-300"
-                                >
-                                    <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-cyan-600" />
-                                    <div className="absolute inset-0 bg-gradient-to-r from-cyan-600 to-purple-600 opacity-0 group-hover:opacity-100 transition-all duration-300" />
-                                    <span className="relative flex items-center justify-center space-x-2 text-white">
-                                        <Send className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                                        <span>Send Message</span>
-                                    </span>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </section>
 
                 {/* Modern Footer */}
                 <footer className="border-t border-white/5 bg-black/60 backdrop-blur-xl py-12">
