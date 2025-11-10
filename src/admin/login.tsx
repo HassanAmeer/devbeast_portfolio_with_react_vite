@@ -1,4 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { db } from '../config/fbconfig';
+import { getAuth, signInWithEmailAndPassword, sendPasswordResetEmail } from "firebase/auth";
+
+
 import {
     Lock,
     Mail,
