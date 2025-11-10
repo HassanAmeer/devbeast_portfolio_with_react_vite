@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { Github, Linkedin, Twitter, Mail, Phone, MapPin, ExternalLink, Code2, Smartphone, Globe, Database, Brain, Cloud, Star, Award, Users, Zap, Download, Send, ArrowRight, CheckCircle, Menu, X, Sparkles, ArrowBigRightDashIcon, Divide, } from 'lucide-react';
-import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Github, Linkedin, Twitter, Mail, Code2, Smartphone, Globe, Star, Award, Users, CheckCircle, Menu, X, ArrowRight, Download, ExternalLink } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import person1 from '../assets/person1.png';
 import ContactSection from './contact';
 import BringSection from './bring';
@@ -9,9 +9,9 @@ const Portfolio = () => {
     const navigate = useNavigate();
 
     const [activeTab, setActiveTab] = useState('all');
-    const [formData, setFormData] = useState({ name: '', email: '', message: '' });
-    const [scrolled, setScrolled] = useState(false);
-    const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+    // const [formData, setFormData] = useState({ name: '', email: '', message: '' });
+    const [scrolled] = useState(false);
+    const [mousePosition] = useState({ x: 0, y: 0 });
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     useEffect(() => {
@@ -226,14 +226,14 @@ const Portfolio = () => {
         ? projects
         : projects.filter(p => p.category === activeTab);
 
-    const handleSubmit = () => {
-        if (formData.name && formData.email && formData.message) {
-            alert('✨ Thank you! Your message has been sent successfully.');
-            setFormData({ name: '', email: '', message: '' });
-        } else {
-            alert('⚠️ Please fill in all fields.');
-        }
-    };
+    // const handleSubmit = () => {
+    //     if (formData.name && formData.email && formData.message) {
+    //         alert('✨ Thank you! Your message has been sent successfully.');
+    //         setFormData({ name: '', email: '', message: '' });
+    //     } else {
+    //         alert('⚠️ Please fill in all fields.');
+    //     }
+    // };
 
     return (
         <div className="min-h-screen bg-black text-white overflow-hidden relative">
@@ -414,7 +414,7 @@ const Portfolio = () => {
                 <section className="py-8 relative inline-flex ">
                     {/* <div className="absolute inset-0 bg-gradient-to-r from-black via-purple-950/20 to-black" /> */}
                     <div className="mb-2 inline-flex items-center space-x-2 px-6 py-3  rounded-half backdrop-blur-xl">
-                        <ArrowBigRightDashIcon className="w-5 h-5 text-purple-400 animate-pulse" />
+                        <ArrowRight className="w-5 h-5 text-purple-400 animate-pulse" />
                         <span className="text-sm font-bold bg-gradient-to-r from-purple-300 to-cyan-300 bg-clip-text text-transparent">
                             Services
                         </span>

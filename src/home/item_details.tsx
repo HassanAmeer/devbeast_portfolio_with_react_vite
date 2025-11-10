@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
     ArrowLeft,
@@ -60,7 +60,7 @@ const ItemDetails = () => {
         window.open(`https://wa.me/${whatsappNumber.replace(/[^0-9]/g, '')}`, '_blank');
     };
 
-    const opacity = Math.min(scrollY / 300, 1);
+    // const opacity = Math.min(scrollY / 300, 1);
     const imageScale = 1 - (scrollY / 2000);
 
     return (

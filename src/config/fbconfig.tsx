@@ -5,12 +5,12 @@ import { getStorage } from "firebase/storage";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-    apiKey: "AIzaSyBlp5hxn8uHFGEqhkDroq_khz8RpCQ-K7A",
-    authDomain: "emergencyapp786.firebaseapp.com",
-    projectId: "emergencyapp786",
-    storageBucket: "emergencyapp786.appspot.com", // Make sure this is correct
-    messagingSenderId: "714485189721",
-    appId: "1:714485189721:web:a552df09f28327e698f548"
+    apiKey: "AIzaSyAszbKYottwfK0JK5edCgm-np7ew7-ykrU",
+    authDomain: "devbeast-786.firebaseapp.com",
+    projectId: "devbeast-786",
+    storageBucket: "devbeast-786.firebasestorage.app",
+    messagingSenderId: "116777321215",
+    appId: "1:116777321215:web:8f6ba3e6327d1d5e7182ca"
 };
 
 // Initialize Firebase
@@ -19,3 +19,4 @@ const db = getFirestore(app);
 const storage = getStorage(app);
 
 export { db, storage };
+

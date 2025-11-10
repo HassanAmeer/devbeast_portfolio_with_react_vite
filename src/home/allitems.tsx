@@ -1,20 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
     Github,
     Linkedin,
     Twitter,
-    Mail,
     Code2,
     Smartphone,
     Globe,
-    ExternalLink,
     Menu,
     X,
     Home,
     Briefcase,
     User,
     MessageCircle,
-    ArrowRight,
     Filter
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -24,7 +21,7 @@ const AllItems = () => {
     const [activeTab, setActiveTab] = useState('all');
     const [scrolled, setScrolled] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-    const [selectedProject, setSelectedProject] = useState<any>(null);
+    // const [selectedProject] = useState<any>(null);
 
     useEffect(() => {
         const handleScroll = () => setScrolled(window.scrollY > 50);

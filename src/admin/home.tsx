@@ -1,14 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
-    Settings,
     Edit3,
     Save,
     X,
     Plus,
     Trash2,
-    Upload,
     Eye,
-    EyeOff,
     Mail,
     Phone,
     MapPin,
@@ -17,27 +14,11 @@ import {
     Twitter,
     Globe,
     Code2,
-    Smartphone,
-    Database,
-    Brain,
-    Cloud,
-    Star,
-    Award,
-    Users,
-    Zap,
-    Download,
-    Send,
-    ArrowRight,
-    CheckCircle,
-    Menu,
     Shield,
     User,
     Key,
-    Palette,
-    FileText,
     Link,
     MessageSquare,
-    Sparkles,
     Instagram,
     Facebook,
     Youtube,
@@ -205,22 +186,6 @@ const AdminHomePage = () => {
         setProjects(projects.filter(p => p.id !== id));
     };
 
-    const updateProject = (id: number, field: keyof Project, value: any) => {
-        setProjects(projects.map(p => p.id === id ? { ...p, [field]: value } : p));
-    };
-
-    const addSocialLink = () => {
-        setSocialLinks([...socialLinks, {
-            id: Date.now().toString(),
-            platform: 'New Platform',
-            url: 'https://',
-            icon: 'globe'
-        }]);
-    };
-
-    const deleteSocialLink = (id: string) => {
-        setSocialLinks(socialLinks.filter(l => l.id !== id));
-    };
 
     const deleteMessage = (id: string) => {
         setMessages(messages.filter(m => m.id !== id));
