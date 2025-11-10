@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
-
+import { db } from '../config/fbconfig';
+import { doc, getDoc } from "firebase/firestore";
+import { useNavigate } from 'react-router-dom';
 
 import {
     Lock,
@@ -15,6 +17,7 @@ import {
 } from 'lucide-react';
 
 const AdminLogin = () => {
+    const navigate = useNavigate();
     const [formData, setFormData] = useState({ email: '', password: '' });
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -52,18 +55,41 @@ const AdminLogin = () => {
             return;
         }
 
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        try {
+            // Get admin credentials from Firestore
+            const docRef = doc(db, 'dev1', 'admin');
+            const docSnap = await getDoc(docRef);
 
-        // Demo login (replace with actual API call)
-        if (formData.email === 'admin@devpro.com' && formData.password === 'admin123') {
-            setSuccess(true);
-            setTimeout(() => {
-                // Redirect to admin home page
-                window.location.href = '/home';
-            }, 1500);
-        } else {
-            setError('Invalid credentials. Please try again.');
+            if (docSnap.exists()) {
+                const adminData = docSnap.data();
+                const storedEmail = adminData.email;
+                const storedPassword = adminData.pass;
+
+                // console.log('storedEmail: ' + storedEmail);
+                // console.log('storedPassword: ' + storedPassword);
+                // console.log('adminData: ' + adminData);
+                // for each loop adminData
+                // for (const key in adminData) {
+                //     console.log(key + ': ' + adminData[key]);
+                // }
+
+                // Check if credentials match
+                if (formData.email === storedEmail && formData.password === storedPassword) {
+                    setSuccess(true);
+                    setTimeout(() => {
+                        navigate('/home');
+                    }, 1500);
+                } else {
+                    setError('Invalid credentials. Please try again.');
+                    setIsLoading(false);
+                }
+            } else {
+                setError('Admin credentials not found.');
+                setIsLoading(false);
+            }
+        } catch (error: any) {
+            console.error('Login error:', error);
+            setError('Login failed. Please try again.');
             setIsLoading(false);
         }
     };
@@ -227,7 +253,7 @@ const AdminLogin = () => {
                                 </button>
 
                                 {/* Demo Credentials */}
-                                <div className="pt-4 border-t border-white/10">
+                                {/* <div className="pt-4 border-t border-white/10">
                                     <div className="flex items-center space-x-2 text-xs text-gray-500 mb-2">
                                         <Sparkles className="w-3 h-3" />
                                         <span>Demo Credentials</span>
@@ -240,7 +266,7 @@ const AdminLogin = () => {
                                             <span className="text-purple-400 font-semibold">Password:</span> admin123
                                         </p>
                                     </div>
-                                </div>
+                                </div> */}
                             </div>
                         )}
                     </div>

@@ -24,6 +24,8 @@ import {
     Youtube,
     Music2Icon
 } from 'lucide-react';
+import { db } from '../config/fbconfig';
+import { doc, updateDoc, getDoc } from "firebase/firestore";
 
 interface Project {
     id: number;
@@ -67,6 +69,7 @@ const AdminHomePage = () => {
     const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
     const [editingProject, setEditingProject] = useState<Project | null>(null);
     const [showAddProject, setShowAddProject] = useState(false);
+    const [adminSettingLoader, setAdminSettingLoader] = useState(false);
 
     // Editable data states
     const [heroData, setHeroData] = useState({
@@ -153,9 +156,13 @@ const AdminHomePage = () => {
     ]);
 
     const [adminCredentials, setAdminCredentials] = useState({
-        email: 'admin@devpro.com',
-        password: 'admin123'
+        currentPassword: '',
+        newEmail: '',
+        newPassword: '',
+        confirmPassword: ''
     });
+    const [isLoadingData, setIsLoadingData] = useState(true);
+    const [currentAdminData, setCurrentAdminData] = useState<{ email: string, pass: string } | null>(null);
 
     useEffect(() => {
         const handleMouseMove = (e: MouseEvent) => {
@@ -169,9 +176,93 @@ const AdminHomePage = () => {
         return () => window.removeEventListener('mousemove', handleMouseMove);
     }, []);
 
+    // Load current admin data
+    useEffect(() => {
+        const loadAdminData = async () => {
+            try {
+                const docRef = doc(db, 'dev1', 'admin');
+                const docSnap = await getDoc(docRef);
+
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    setCurrentAdminData({
+                        email: data.email || '',
+                        pass: data.pass || ''
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading admin data:', error);
+            } finally {
+                setIsLoadingData(false);
+            }
+        };
+
+        loadAdminData();
+    }, []);
+
     const handleSave = () => {
         setIsEditing(false);
         alert('All changes saved successfully!');
+    };
+
+    const handleUpdateCredentials = async () => {
+        if (!adminCredentials.currentPassword || !adminCredentials.newPassword || !adminCredentials.confirmPassword) {
+            alert('Please fill in all password fields');
+            return;
+        }
+
+        if (adminCredentials.newPassword !== adminCredentials.confirmPassword) {
+            alert('New passwords do not match');
+            return;
+        }
+
+        if (adminCredentials.newPassword.length < 3) {
+            alert('Password must be at least 3 characters long');
+            return;
+        }
+
+        try {
+            // First verify current password
+            const docRef = doc(db, 'dev1', 'admin');
+            setAdminSettingLoader(true);
+            const docSnap = await getDoc(docRef);
+
+            if (docSnap.exists()) {
+                const adminData = docSnap.data();
+                const storedPassword = adminData.pass;
+
+                if (adminCredentials.currentPassword === storedPassword) {
+                    // Update password in Firestore
+                    await updateDoc(docRef, {
+                        pass: adminCredentials.newPassword,
+                        email: adminCredentials.newEmail
+                    });
+
+                    // Clear form
+                    setAdminCredentials({
+                        currentPassword: '',
+                        newEmail: '',
+                        newPassword: '',
+                        confirmPassword: ''
+                    });
+
+                    alert('Password updated successfully! Please log in again with your new password.');
+                    // Redirect to login
+                    window.location.href = '/login';
+                } else {
+                    alert('Current password is incorrect');
+                }
+                setAdminSettingLoader(false);
+
+            } else {
+                setAdminSettingLoader(false);
+                alert('Admin credentials not found');
+            }
+        } catch (error) {
+            setAdminSettingLoader(false);
+            console.error('Password update error:', error);
+            alert('Failed to update password. Please try again.');
+        }
     };
 
     const addProject = (newProject: Project) => {
@@ -742,31 +833,78 @@ const AdminHomePage = () => {
                                             <h3 className="text-lg font-bold text-red-400">Security Warning</h3>
                                         </div>
                                         <p className="text-sm text-gray-300">
-                                            Changing admin credentials will require you to log in again with the new credentials.
+                                            Changing admin credentials will update the data in Firestore and require you to log in again.
                                         </p>
                                     </div>
-                                    <div className="space-y-4">
-                                        <div>
-                                            <label className="block text-sm font-semibold text-gray-300 mb-2">Admin Email</label>
-                                            <input
-                                                type="email"
-                                                value={adminCredentials.email}
-                                                onChange={(e) => setAdminCredentials({ ...adminCredentials, email: e.target.value })}
-                                                disabled={!isEditing}
-                                                className="w-full px-4 py-3 rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 focus:border-purple-500 outline-none transition-all text-white disabled:opacity-50"
-                                            />
+
+                                    {isLoadingData ? (
+                                        <div className="flex items-center justify-center py-12">
+                                            <div className="w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
+                                            <span className="ml-3 text-gray-300">Loading current data...</span>
                                         </div>
-                                        <div>
-                                            <label className="block text-sm font-semibold text-gray-300 mb-2">Admin Password</label>
-                                            <input
-                                                type="password"
-                                                value={adminCredentials.password}
-                                                onChange={(e) => setAdminCredentials({ ...adminCredentials, password: e.target.value })}
-                                                disabled={!isEditing}
-                                                className="w-full px-4 py-3 rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 focus:border-purple-500 outline-none transition-all text-white disabled:opacity-50"
-                                            />
+                                    ) : (
+                                        <div className="space-y-4">
+                                            <div className="p-4 rounded-xl bg-white/5 border border-white/10">
+                                                <h4 className="text-sm font-semibold text-gray-300 mb-2">Current Credentials</h4>
+                                                <p className="text-xs text-gray-400">Email: {currentAdminData?.email}</p>
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-semibold text-gray-300 mb-2">Current Password</label>
+                                                <input
+                                                    type="password"
+                                                    placeholder="Enter current password"
+                                                    value={adminCredentials.currentPassword}
+                                                    onChange={(e) => setAdminCredentials({ ...adminCredentials, currentPassword: e.target.value })}
+                                                    disabled={adminSettingLoader}
+                                                    className="w-full px-4 py-3 rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 focus:border-purple-500 outline-none transition-all text-white disabled:opacity-50"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-semibold text-gray-300 mb-2">New Email (Optional)</label>
+                                                <input
+                                                    type="email"
+                                                    placeholder="Enter new email address"
+                                                    value={adminCredentials.newEmail}
+                                                    onChange={(e) => setAdminCredentials({ ...adminCredentials, newEmail: e.target.value })}
+                                                    disabled={adminSettingLoader}
+                                                    className="w-full px-4 py-3 rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 focus:border-purple-500 outline-none transition-all text-white disabled:opacity-50"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-semibold text-gray-300 mb-2">New Password (Optional)</label>
+                                                <input
+                                                    type="password"
+                                                    placeholder="Enter new password"
+                                                    value={adminCredentials.newPassword}
+                                                    onChange={(e) => setAdminCredentials({ ...adminCredentials, newPassword: e.target.value })}
+                                                    disabled={adminSettingLoader}
+                                                    className="w-full px-4 py-3 rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 focus:border-purple-500 outline-none transition-all text-white disabled:opacity-50"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-semibold text-gray-300 mb-2">Confirm New Password</label>
+                                                <input
+                                                    type="password"
+                                                    placeholder="Confirm new password"
+                                                    value={adminCredentials.confirmPassword}
+                                                    onChange={(e) => setAdminCredentials({ ...adminCredentials, confirmPassword: e.target.value })}
+                                                    disabled={adminSettingLoader}
+                                                    className="w-full px-4 py-3 rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 focus:border-purple-500 outline-none transition-all text-white disabled:opacity-50"
+                                                />
+                                            </div>
+
+                                            <button
+                                                onClick={handleUpdateCredentials}
+                                                disabled={adminSettingLoader}
+                                                className="w-full px-6 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-700 hover:to-cyan-700 transition-all font-semibold disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+                                            >
+                                                {adminSettingLoader === true ?
+                                                    <div className="w-8 h-8 border-4 border-purple-200 border-t-transparent rounded-full animate-spin" />
+                                                    : <span>Update Credentials</span>}
+                                            </button>
+
                                         </div>
-                                    </div>
+                                    )}
                                 </div>
                             </div>
                         )}
