@@ -22,16 +22,19 @@ import {
     Instagram,
     Facebook,
     Youtube,
-    Music2Icon
+    Music2Icon,
+    Subtitles
 } from 'lucide-react';
-import { db } from '../config/fbconfig';
-import { doc, updateDoc, getDoc } from "firebase/firestore";
+import {
+    collection, doc, setDoc, updateDoc, deleteDoc, onSnapshot,
+    query, orderBy, serverTimestamp, addDoc, getDoc, writeBatch
+} from "firebase/firestore";
+import { db, storage } from '../config/fbconfig';
 
 interface Project {
     id: number;
     title: string;
     description: string;
-    image: string;
     tags: string[];
     projectLink: string;
     totalTeams: number;
@@ -43,8 +46,6 @@ interface ContactInfo {
     email: string;
     phone: string;
     location: string;
-    headerName: string;
-    headerLogo: string;
 }
 
 interface SocialLink {
@@ -63,13 +64,19 @@ interface ContactMessage {
     read: boolean;
 }
 
+interface HeaderData {
+    title: string;
+    subtitle: string;
+    logo: string;
+}
+
 const AdminHomePage = () => {
     const [activeSection, setActiveSection] = useState('overview');
     const [isEditing, setIsEditing] = useState(false);
     const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
     const [editingProject, setEditingProject] = useState<Project | null>(null);
     const [showAddProject, setShowAddProject] = useState(false);
-    const [adminSettingLoader, setAdminSettingLoader] = useState(false);
+    const [loader, setLoader] = useState(false);
 
     // Editable data states
     const [heroData, setHeroData] = useState({
@@ -94,7 +101,6 @@ const AdminHomePage = () => {
             id: 1,
             title: 'FinTech Mobile Banking',
             description: 'Advanced banking platform with AI-powered fraud detection, biometric authentication, and real-time cryptocurrency trading.',
-            image: 'https://images.unsplash.com/photo-1563986768609-322da13575f3?w=800&q=80',
             tags: ['Flutter', 'Dart', 'Firebase', 'TensorFlow'],
             projectLink: '',
             totalTeams: 0,
@@ -105,7 +111,6 @@ const AdminHomePage = () => {
             id: 2,
             title: 'AI Healthcare Platform',
             description: 'Revolutionary telemedicine app with AI diagnosis, ML-powered health predictions, and secure patient data management.',
-            image: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&q=80',
             tags: ['Flutter', 'Laravel', 'MySQL', 'AI'],
             projectLink: '',
             totalTeams: 0,
@@ -114,26 +119,30 @@ const AdminHomePage = () => {
         }
     ]);
 
+    const [headerData, setHeaderData] = useState<HeaderData>({
+        title: 'DeavBeast',
+        subtitle: 'Senio Flutter Developer',
+        logo: '',
+    });
+
     const [contactInfo, setContactInfo] = useState<ContactInfo>({
-        email: 'hello@devprostudio.com',
-        phone: '+1 (555) 123-4567',
-        location: 'San Francisco, CA',
-        headerName: 'Akash Ameer',
-        headerLogo: 'https://via.placeholder.com/150x50/6366f1/ffffff?text=LOGO'
+        email: 'devbeast143@gmail.com',
+        phone: '+921234567',
+        location: 'Lahore Pakistan',
     });
 
     const [socialLinks, setSocialLinks] = useState<SocialLink[]>([
-        { id: '1', platform: 'Github', url: '', icon: 'github' },
-        { id: '2', platform: 'Linkedin', url: '', icon: 'linkedin' },
-        { id: '3', platform: 'Twitter', url: '', icon: 'twitter' },
-        { id: '4', platform: 'Instagram', url: '', icon: 'instagram' },
-        { id: '5', platform: 'Facebook', url: '', icon: 'facebook' },
-        { id: '6', platform: 'Youtube', url: '', icon: 'youtube' },
-        { id: '7', platform: 'Tiktok', url: '', icon: 'tiktok' },
-        { id: '8', platform: 'Telegram', url: '', icon: 'telegram' },
-        { id: '9', platform: 'Discord', url: '', icon: 'discord' },
-        { id: '10', platform: 'Snapchat', url: '', icon: 'snapchat' },
-        { id: '12', platform: 'Globe', url: '', icon: 'globe' }
+        { id: '1', platform: 'Github', url: 'github.com', icon: 'github' },
+        { id: '2', platform: 'Linkedin', url: 'linkedin.com', icon: 'linkedin' },
+        { id: '3', platform: 'Twitter', url: 'twitter.com', icon: 'twitter' },
+        { id: '4', platform: 'Instagram', url: 'instagram.com', icon: 'instagram' },
+        { id: '5', platform: 'Facebook', url: 'facebook.com', icon: 'facebook' },
+        { id: '6', platform: 'Youtube', url: 'youtube.com', icon: 'youtube' },
+        { id: '7', platform: 'Tiktok', url: 'tiktok.com', icon: 'tiktok' },
+        { id: '8', platform: 'Telegram', url: 'telegram.com', icon: 'telegram' },
+        { id: '9', platform: 'Discord', url: 'discord.com', icon: 'discord' },
+        { id: '10', platform: 'Snapchat', url: 'snapchat.com', icon: 'snapchat' },
+        { id: '12', platform: 'Globe', url: 'globe.com', icon: 'globe' }
     ]);
 
     const [messages, setMessages] = useState<ContactMessage[]>([
@@ -197,12 +206,136 @@ const AdminHomePage = () => {
             }
         };
 
+        const loadProjectsData = async () => {
+            try {
+                // CORRECT: Reference the SUBCOLLECTION
+                const projectsCollectionRef = collection(
+                    db,
+                    'dev1',
+                    'all_projects_id',
+                    'projects'
+                );
+
+                // CORRECT: Fetch ALL documents in the collection
+                const querySnapshot = await getDoc(projectsCollectionRef);
+
+                // CORRECT: Map each document to plain object with ID
+                const fetchedProjects = querySnapshot.docs.map((doc) => {
+                    const data = doc.data();
+                    return {
+                        id: doc.id, // Firestore auto-generated ID (string)
+                        title: data.title || 'Untitled Project',
+                        description: data.desc || data.description || '',
+                        tags: data.tags || [],
+                        projectImages: data.projectImages || [],
+                        githubLink: data.githubLink || '',
+                        projectLink: data.projectLink || '',
+                        totalTeams: data.totalTeams || 0,
+                        // Add any other fields
+                    };
+                });
+
+                // CORRECT: Update your state (assuming setProjects is from useState)
+                setProjects(fetchedProjects);
+
+                console.log("Projects loaded:", fetchedProjects);
+            } catch (error) {
+                console.error('Error loading admin data:', error);
+            } finally {
+                setIsLoadingData(false);
+            }
+        };
+
         loadAdminData();
+        loadProjectsData();
     }, []);
 
-    const handleSave = () => {
-        setIsEditing(false);
-        alert('All changes saved successfully!');
+    const handleSave = async () => {
+        try {
+            if (activeSection === 'social') {
+                setLoader(true);
+                const social_links = doc(db, 'dev1', 'social_links');
+                await updateDoc(social_links, {
+                    title: headerData.title,
+                    subtitle: headerData.subtitle,
+                    email: contactInfo.email,
+                    phone: contactInfo.phone,
+                    location: contactInfo.location,
+                    telegram: socialLinks.find(link => link.icon === 'telegram')?.url,
+                    snapchat: socialLinks.find(link => link.icon === 'snapchat')?.url,
+                    tiktok: socialLinks.find(link => link.icon === 'tiktok')?.url,
+                    discord: socialLinks.find(link => link.icon === 'discord')?.url,
+                    facebook: socialLinks.find(link => link.icon === 'facebook')?.url,
+                    instagram: socialLinks.find(link => link.icon === 'instagram')?.url,
+                    twitter: socialLinks.find(link => link.icon === 'twitter')?.url,
+                    linkedin: socialLinks.find(link => link.icon === 'linkedin')?.url,
+                    github: socialLinks.find(link => link.icon === 'github')?.url,
+                    youtube: socialLinks.find(link => link.icon === 'youtube')?.url,
+                    globe: socialLinks.find(link => link.icon === 'globe')?.url,
+                });
+                setLoader(false);
+            } else if (activeSection === 'hero') {
+                setLoader(true);
+                const hero_data = doc(db, 'dev1', 'hero_section');
+                await updateDoc(hero_data, {
+                    title: heroData.name,
+                    subtitle: heroData.title,
+                    desc: heroData.description,
+                    image: heroData.image,
+                    btn_name_1: heroData.btn1Name,
+                    btn_link_1: heroData.btn1Link,
+                    btn_name_2: heroData.btn2Name,
+                    btn_link_2: heroData.btn2Link,
+                    card_subtitle_1: heroData.stats.find(stat => stat.label === 'Years Experience')?.label,
+                    card_subtitle_2: heroData.stats.find(stat => stat.label === 'Projects Completed')?.label,
+                    card_subtitle_3: heroData.stats.find(stat => stat.label === 'Happy Clients')?.label,
+                    card_subtitle_4: heroData.stats.find(stat => stat.label === 'Average Rating')?.label,
+                    card_title_1: heroData.stats.find(stat => stat.label === 'Years Experience')?.number,
+                    card_title_2: heroData.stats.find(stat => stat.label === 'Projects Completed')?.number,
+                    card_title_3: heroData.stats.find(stat => stat.label === "Happy Clients")?.number,
+                    card_title_4: heroData.stats.find(stat => stat.label === "Average Rating")?.number
+                });
+                setLoader(false);
+            } else if (activeSection === 'projects') {
+                setLoader(true);
+                if (!editingProject?.id) {
+                    console.error("No project ID provided for update");
+                    setLoader(false);
+                    return;
+                }
+
+                // Convert ID to string — THIS IS THE FIX
+                const projectId = String(editingProject.id);
+
+                // Correct Firestore document reference
+                const projectRef = doc(db, 'dev1', 'all_projects_id', 'projects', projectId);
+
+                const updatedProject = projects.find(project => project.id === editingProject.id);
+
+                if (!updatedProject) {
+                    console.error("Project not found in local state");
+                    setLoader(false);
+                    return;
+                }
+
+                await updateDoc(projectRef, {
+                    projectImages: updatedProject.projectImages,
+                    title: updatedProject.title,
+                    desc: updatedProject.description,
+                    totalTeams: updatedProject.totalTeams,
+                    githubLink: updatedProject.githubLink,
+                    tags: updatedProject.tags,
+                });
+                console.log("Project updated successfully!");
+                setLoader(false);
+            }
+        } catch (error) {
+            setLoader(false);
+            console.error('Error saving data:', error);
+            alert('Failed to save changes. Please check the console for details.');
+        } finally {
+            setLoader(false);
+        }
     };
 
     const handleUpdateCredentials = async () => {
@@ -224,7 +357,7 @@ const AdminHomePage = () => {
         try {
             // First verify current password
             const docRef = doc(db, 'dev1', 'admin');
-            setAdminSettingLoader(true);
+            setLoader(true);
             const docSnap = await getDoc(docRef);
 
             if (docSnap.exists()) {
@@ -245,21 +378,20 @@ const AdminHomePage = () => {
                         newPassword: '',
                         confirmPassword: ''
                     });
-
                     alert('Password updated successfully! Please log in again with your new password.');
                     // Redirect to login
-                    window.location.href = '/login';
+                    // window.location.href = '/login';
                 } else {
                     alert('Current password is incorrect');
                 }
-                setAdminSettingLoader(false);
+                setLoader(false);
 
             } else {
-                setAdminSettingLoader(false);
+                setLoader(false);
                 alert('Admin credentials not found');
             }
         } catch (error) {
-            setAdminSettingLoader(false);
+            setLoader(false);
             console.error('Password update error:', error);
             alert('Failed to update password. Please try again.');
         }
@@ -379,10 +511,13 @@ const AdminHomePage = () => {
                                 <>
                                     <button
                                         onClick={handleSave}
+                                        disabled={loader}
                                         className="flex items-center space-x-2 px-6 py-3 rounded-xl bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 transition-all"
                                     >
                                         <Save className="w-5 h-5" />
-                                        <span>Save Changes</span>
+                                        {loader === true ?
+                                            <div className="w-8 h-8 border-4 border-purple-200 border-t-transparent rounded-full animate-spin" />
+                                            : <span>Save Changes</span>}
                                     </button>
                                     <button
                                         onClick={() => setIsEditing(false)}
@@ -646,8 +781,8 @@ const AdminHomePage = () => {
                                                 <label className="block text-sm font-semibold text-gray-300 mb-2">Header Title</label>
                                                 <input
                                                     type="text"
-                                                    value={contactInfo.headerName}
-                                                    onChange={(e) => setContactInfo({ ...contactInfo, headerName: e.target.value })}
+                                                    value={headerData.title}
+                                                    onChange={(e) => setHeaderData({ ...headerData, title: e.target.value })}
                                                     disabled={!isEditing}
                                                     className="w-full px-4 py-3 rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 focus:border-purple-500 outline-none transition-all text-white disabled:opacity-50"
                                                 />
@@ -656,8 +791,8 @@ const AdminHomePage = () => {
                                                 <label className="block text-sm font-semibold text-gray-300 mb-2">Header subtitle</label>
                                                 <input
                                                     type="text"
-                                                    value={contactInfo.headerName}
-                                                    onChange={(e) => setContactInfo({ ...contactInfo, headerName: e.target.value })}
+                                                    value={headerData.subtitle}
+                                                    onChange={(e) => setHeaderData({ ...headerData, subtitle: e.target.value })}
                                                     disabled={!isEditing}
                                                     className="w-full px-4 py-3 rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 focus:border-purple-500 outline-none transition-all text-white disabled:opacity-50"
                                                 />
@@ -674,7 +809,7 @@ const AdminHomePage = () => {
                                                         if (file) {
                                                             const reader = new FileReader();
                                                             reader.onload = (event) => {
-                                                                setContactInfo({ ...contactInfo, headerLogo: event.target?.result as string });
+                                                                setHeaderData({ ...headerData, logo: event.target?.result as string });
                                                             };
                                                             reader.readAsDataURL(file);
                                                         }
@@ -682,10 +817,10 @@ const AdminHomePage = () => {
                                                     disabled={!isEditing}
                                                     className="w-full px-4 py-3 rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 focus:border-purple-500 outline-none transition-all text-white disabled:opacity-50 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-purple-600 file:text-white hover:file:bg-purple-700"
                                                 />
-                                                {contactInfo.headerLogo && (
+                                                {headerData.logo && (
                                                     <div className="mt-4">
                                                         <img
-                                                            src={contactInfo.headerLogo}
+                                                            src={headerData.logo}
                                                             alt="Hero Preview"
                                                             className="w-32 h-32 object-contain rounded-xl border border-white/20"
                                                         />
@@ -855,7 +990,7 @@ const AdminHomePage = () => {
                                                     placeholder="Enter current password"
                                                     value={adminCredentials.currentPassword}
                                                     onChange={(e) => setAdminCredentials({ ...adminCredentials, currentPassword: e.target.value })}
-                                                    disabled={adminSettingLoader}
+                                                    disabled={loader}
                                                     className="w-full px-4 py-3 rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 focus:border-purple-500 outline-none transition-all text-white disabled:opacity-50"
                                                 />
                                             </div>
@@ -866,7 +1001,7 @@ const AdminHomePage = () => {
                                                     placeholder="Enter new email address"
                                                     value={adminCredentials.newEmail}
                                                     onChange={(e) => setAdminCredentials({ ...adminCredentials, newEmail: e.target.value })}
-                                                    disabled={adminSettingLoader}
+                                                    disabled={loader}
                                                     className="w-full px-4 py-3 rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 focus:border-purple-500 outline-none transition-all text-white disabled:opacity-50"
                                                 />
                                             </div>
@@ -877,7 +1012,7 @@ const AdminHomePage = () => {
                                                     placeholder="Enter new password"
                                                     value={adminCredentials.newPassword}
                                                     onChange={(e) => setAdminCredentials({ ...adminCredentials, newPassword: e.target.value })}
-                                                    disabled={adminSettingLoader}
+                                                    disabled={loader}
                                                     className="w-full px-4 py-3 rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 focus:border-purple-500 outline-none transition-all text-white disabled:opacity-50"
                                                 />
                                             </div>
@@ -888,17 +1023,17 @@ const AdminHomePage = () => {
                                                     placeholder="Confirm new password"
                                                     value={adminCredentials.confirmPassword}
                                                     onChange={(e) => setAdminCredentials({ ...adminCredentials, confirmPassword: e.target.value })}
-                                                    disabled={adminSettingLoader}
+                                                    disabled={loader}
                                                     className="w-full px-4 py-3 rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 focus:border-purple-500 outline-none transition-all text-white disabled:opacity-50"
                                                 />
                                             </div>
 
                                             <button
                                                 onClick={handleUpdateCredentials}
-                                                disabled={adminSettingLoader}
+                                                disabled={loader}
                                                 className="w-full px-6 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-700 hover:to-cyan-700 transition-all font-semibold disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
                                             >
-                                                {adminSettingLoader === true ?
+                                                {loader === true ?
                                                     <div className="w-8 h-8 border-4 border-purple-200 border-t-transparent rounded-full animate-spin" />
                                                     : <span>Update Credentials</span>}
                                             </button>
