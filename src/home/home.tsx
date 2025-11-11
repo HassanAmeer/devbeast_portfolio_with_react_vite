@@ -50,6 +50,18 @@ interface HeaderData {
     logo: string;
 }
 
+
+interface Review {
+    id: string;
+    name: string;
+    role: string;
+    text: string;
+    rating: number;
+    avatar: string;
+    createdAt?: any;
+    updatedAt?: any;
+}
+
 const Portfolio = () => {
     const navigate = useNavigate();
 
@@ -276,12 +288,70 @@ const Portfolio = () => {
                 setIsLoadingData(false);
             }
         };
+        const loadReviewsData = async () => {
+            try {
+                const reviewsCollectionRef = collection(db, 'dev1', 'all_reviews_id', 'reviews');
+                const q = query(reviewsCollectionRef, orderBy('createdAt', 'desc'));
+                const querySnapshot = await getDocs(q);
 
+                const fetchedReviews: Review[] = querySnapshot.docs.map((doc) => {
+                    const data = doc.data();
+                    return {
+                        id: doc.id,
+                        name: data.name || '',
+                        role: data.role || '',
+                        text: data.text || '',
+                        rating: data.rating || 5,
+                        avatar: data.avatar || '',
+                    } as Review;
+                });
+
+                setReviews(fetchedReviews);
+                console.log("Reviews loaded:", fetchedReviews);
+            } catch (error) {
+                console.error('Error loading reviews:', error);
+            } finally {
+                setIsLoadingData(false);
+            }
+        };
+
+        loadReviewsData();
         loadAdminData();
         loadHeroData();
         loadSocialLinsData();
         loadProjectsData();
     }, []);
+
+
+    // Reviews state
+    const [reviews, setReviews] = useState<Review[]>([
+        {
+            id: '1',
+            name: 'Sarah Johnson',
+            role: 'CEO, TechStart Inc',
+            text: 'Exceptional work! The app exceeded all expectations. Professional, fast, and delivered a product that our users absolutely love.',
+            rating: 5,
+            avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&q=80'
+        },
+        {
+            id: '2',
+            name: 'Michael Chen',
+            role: 'CTO, FinanceHub',
+            text: 'Best developer we have worked with. Clean code, great architecture, and outstanding communication throughout the project.',
+            rating: 5,
+            avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&q=80'
+        },
+        {
+            id: '3',
+            name: 'Emma Davis',
+            role: 'Product Lead, Innovate',
+            text: 'Transformed our vision into reality. The attention to detail and user experience is phenomenal. Highly recommend!',
+            rating: 5,
+            avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&q=80'
+        }
+    ]);
+
+
 
     const platforms = [
         {
@@ -779,27 +849,27 @@ const Portfolio = () => {
                     </div>
 
                     <div className="grid md:grid-cols-3 gap-8">
-                        {testimonials.map((testimonial, idx) => (
+                        {reviews.map((r, idx) => (
                             <div key={idx} className="group relative">
                                 <div className="absolute inset-0 bg-gradient-to-r from-purple-600/20 to-cyan-600/20 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-all duration-500" />
                                 <div className="relative p-8 rounded-3xl bg-black/40 backdrop-blur-xl border border-white/10 hover:border-white/30 transition-all transform hover:scale-105 hover:-translate-y-2 duration-500">
                                     <div className="flex mb-4">
-                                        {[...Array(testimonial.rating)].map((_, i) => (
+                                        {[...Array(r.rating)].map((_, i) => (
                                             <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />
                                         ))}
                                     </div>
                                     <p className="text-gray-300 mb-6 italic leading-relaxed text-sm">
-                                        "{testimonial.text}"
+                                        "{r.text}"
                                     </p>
                                     <div className="flex items-center space-x-4">
                                         <img
-                                            src={testimonial.avatar}
-                                            alt={testimonial.name}
+                                            src={r.avatar}
+                                            alt={r.name}
                                             className="w-14 h-14 rounded-full object-cover border-2 border-purple-500/50"
                                         />
                                         <div>
-                                            <div className="font-bold text-white">{testimonial.name}</div>
-                                            <div className="text-sm text-gray-400">{testimonial.role}</div>
+                                            <div className="font-bold text-white">{r.name}</div>
+                                            <div className="text-sm text-gray-400">{r.role}</div>
                                         </div>
                                     </div>
                                 </div>
