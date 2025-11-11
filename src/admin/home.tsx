@@ -25,6 +25,7 @@ import {
     Facebook,
     Youtube,
     Music2Icon,
+    Star,
 
 } from 'lucide-react';
 import {
@@ -73,6 +74,17 @@ interface HeaderData {
     title: string;
     subtitle: string;
     logo: string;
+}
+
+interface Review {
+    id: string;
+    name: string;
+    role: string;
+    text: string;
+    rating: number;
+    avatar: string;
+    createdAt?: any;
+    updatedAt?: any;
 }
 
 const AdminHomePage = () => {
@@ -191,6 +203,44 @@ const AdminHomePage = () => {
     });
     const [isLoadingData, setIsLoadingData] = useState(true);
     const [currentAdminData, setCurrentAdminData] = useState<{ email: string, pass: string } | null>(null);
+
+    // Reviews state
+    const [reviews, setReviews] = useState<Review[]>([
+        {
+            id: '1',
+            name: 'Sarah Johnson',
+            role: 'CEO, TechStart Inc',
+            text: 'Exceptional work! The app exceeded all expectations. Professional, fast, and delivered a product that our users absolutely love.',
+            rating: 5,
+            avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&q=80'
+        },
+        {
+            id: '2',
+            name: 'Michael Chen',
+            role: 'CTO, FinanceHub',
+            text: 'Best developer we have worked with. Clean code, great architecture, and outstanding communication throughout the project.',
+            rating: 5,
+            avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&q=80'
+        },
+        {
+            id: '3',
+            name: 'Emma Davis',
+            role: 'Product Lead, Innovate',
+            text: 'Transformed our vision into reality. The attention to detail and user experience is phenomenal. Highly recommend!',
+            rating: 5,
+            avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&q=80'
+        }
+    ]);
+
+    const [editingReview, setEditingReview] = useState<Review | null>(null);
+    const [showAddReview, setShowAddReview] = useState(false);
+    const [newReviewData, setNewReviewData] = useState<Partial<Review>>({
+        name: '',
+        role: '',
+        text: '',
+        rating: 5,
+        avatar: ''
+    });
 
     useEffect(() => {
         const handleMouseMove = (e: MouseEvent) => {
@@ -328,6 +378,33 @@ const AdminHomePage = () => {
                 setIsLoadingData(false);
             }
         };
+
+        const loadReviewsData = async () => {
+            try {
+                const reviewsCollectionRef = collection(db, 'dev1', 'all_reviews_id', 'reviews');
+                const q = query(reviewsCollectionRef, orderBy('createdAt', 'desc'));
+                const querySnapshot = await getDocs(q);
+
+                const fetchedReviews: Review[] = querySnapshot.docs.map((doc) => {
+                    const data = doc.data();
+                    return {
+                        id: doc.id,
+                        name: data.name || '',
+                        role: data.role || '',
+                        text: data.text || '',
+                        rating: data.rating || 5,
+                        avatar: data.avatar || '',
+                    } as Review;
+                });
+
+                setReviews(fetchedReviews);
+                console.log("Reviews loaded:", fetchedReviews);
+            } catch (error) {
+                console.error('Error loading reviews:', error);
+            } finally {
+                setIsLoadingData(false);
+            }
+        };
         const loadContactUsMessages = async () => {
             try {
                 const contactUsCollectionRef = collection(db, 'dev1', 'contact_us_id', 'contact_us');
@@ -359,6 +436,7 @@ const AdminHomePage = () => {
         loadHeroData();
         loadSocialLinsData();
         loadProjectsData();
+        loadReviewsData();
         loadContactUsMessages();
     }, []);
 
@@ -678,6 +756,89 @@ const AdminHomePage = () => {
         }
     };
 
+    const addReview = async (newReview: Omit<Review, 'id'>) => {
+        try {
+            setLoader(true);
+            const reviewsCollectionRef = collection(db, 'dev1', 'all_reviews_id', 'reviews');
+
+            const reviewData = {
+                name: newReview.name,
+                role: newReview.role,
+                text: newReview.text,
+                rating: newReview.rating,
+                avatar: newReview.avatar,
+                createdAt: serverTimestamp(),
+                updatedAt: serverTimestamp(),
+            };
+
+            const docRef = await addDoc(reviewsCollectionRef, reviewData);
+
+            const fullReview: Review = {
+                ...newReview,
+                id: docRef.id,
+            };
+
+            setReviews(prev => [...prev, fullReview]);
+            console.log("Review added successfully:", docRef.id);
+            alert('Review added successfully!');
+        } catch (error) {
+            console.error("Error adding review:", error);
+            alert('Failed to add review. Please try again.');
+        } finally {
+            setLoader(false);
+        }
+    };
+
+    const updateReviewData = async (updatedReview: Review) => {
+        try {
+            setLoader(true);
+
+            let avatarToUpdate = updatedReview.avatar;
+            if (updatedReview.avatar && updatedReview.avatar.startsWith('data:image/')) {
+                avatarToUpdate = await uploadFileByBase64(updatedReview.avatar);
+            }
+
+            const reviewRef = doc(db, 'dev1', 'all_reviews_id', 'reviews', updatedReview.id);
+
+            const updateData: any = {
+                name: updatedReview.name,
+                role: updatedReview.role,
+                text: updatedReview.text,
+                rating: updatedReview.rating,
+                updatedAt: serverTimestamp(),
+            };
+
+            if (avatarToUpdate !== "") {
+                updateData.avatar = avatarToUpdate;
+            }
+            await updateDoc(reviewRef, updateData);
+
+            setReviews(reviews.map(r => r.id === updatedReview.id ? updatedReview : r));
+            alert('Review updated successfully!');
+        } catch (error) {
+            console.error('Error updating review:', error);
+            alert('Failed to update review. Please try again.');
+        } finally {
+            setLoader(false);
+        }
+    };
+
+    const deleteReview = async (id: string) => {
+        try {
+            setLoader(true);
+            const reviewRef = doc(db, 'dev1', 'all_reviews_id', 'reviews', id);
+            await deleteDoc(reviewRef);
+
+            setReviews(reviews.filter(r => r.id !== id));
+            alert('Review deleted successfully!');
+        } catch (error) {
+            console.error('Error deleting review:', error);
+            alert('Failed to delete review. Please try again.');
+        } finally {
+            setLoader(false);
+        }
+    };
+
 
     const deleteMessage = async (id: string) => {
         try {
@@ -784,6 +945,7 @@ const AdminHomePage = () => {
                             { id: 'projects', label: 'Projects', icon: <Code2 className="w-5 h-5" /> },
                             { id: 'hero', label: 'Hero Section', icon: <User className="w-5 h-5" /> },
                             { id: 'social', label: 'Social Setting', icon: <Link className="w-5 h-5" /> },
+                            { id: 'reviews', label: 'Reviews', icon: <Star className="w-5 h-5" /> },
                             { id: 'credentials', label: 'Admin Settings', icon: <Key className="w-5 h-5" /> },
                             { id: 'messages', label: 'Messages', icon: <MessageSquare className="w-5 h-5" />, badge: messages.filter(m => !m.read).length },
                         ].map((item) => (
@@ -1299,6 +1461,73 @@ const AdminHomePage = () => {
                             </div>
                         )}
 
+                        {/* Reviews */}
+                        {activeSection === 'reviews' && (
+                            <div className="space-y-6">
+                                <div className="flex justify-between items-center">
+                                    <h3 className="text-xl font-bold">Reviews ({reviews.length})</h3>
+                                    <button
+                                        onClick={() => {
+                                            setNewReviewData({
+                                                name: '',
+                                                role: '',
+                                                text: '',
+                                                rating: 5,
+                                                avatar: ''
+                                            });
+                                            setShowAddReview(true);
+                                        }}
+                                        disabled={loader}
+                                        className="flex items-center space-x-2 px-4 py-2 rounded-xl bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                        {loader === true ?
+                                            <div className="w-8 h-8 border-4 border-purple-200 border-t-transparent rounded-full animate-spin" />
+                                            : <Plus className="w-4 h-4" />}
+                                        <span>Add Review</span>
+                                    </button>
+                                </div>
+                                <div className="space-y-4">
+                                    {reviews.map((review) => (
+                                        <div key={review.id} className="flex items-center justify-between p-4 rounded-2xl bg-black/40 backdrop-blur-xl border border-white/10 hover:border-white/30 transition-all">
+                                            <div className="flex items-center space-x-4">
+                                                <img
+                                                    src={review.avatar}
+                                                    alt={review.name}
+                                                    className="w-16 h-16 object-cover rounded-lg border border-white/20"
+                                                />
+                                                <div>
+                                                    <h4 className="font-bold text-white">{review.name}</h4>
+                                                    <p className="text-sm text-gray-400">{review.role}</p>
+                                                    <div className="flex items-center space-x-1 mt-1">
+                                                        {[...Array(review.rating)].map((_, i) => (
+                                                            <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                                                        ))}
+                                                    </div>
+                                                    <p className="text-sm text-gray-400 line-clamp-1 mt-1">{review.text}</p>
+                                                </div>
+                                            </div>
+                                            <div className="flex items-center space-x-2">
+                                                <button
+                                                    onClick={() => setEditingReview(review)}
+                                                    disabled={loader}
+                                                    className="p-2 bg-blue-600/20 hover:bg-blue-600/40 rounded-lg transition-all disabled:opacity-50"
+                                                >
+                                                    <Edit3 className="w-4 h-4 text-blue-400" />
+                                                </button>
+                                                <button
+                                                    onClick={() => deleteReview(review.id)}
+                                                    disabled={loader}
+                                                    className="p-2 bg-red-600/20 hover:bg-red-600/40 rounded-lg transition-all disabled:opacity-50"
+                                                >
+                                                    <Trash2 className="w-4 h-4 text-red-400" />
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
                         {/* Messages (Contact Us) */}
                         {activeSection === 'messages' && (
                             <div className="space-y-6">
@@ -1443,6 +1672,188 @@ const AdminHomePage = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Add/Edit Review Modal */}
+            {(showAddReview || editingReview) && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+                    <div className="bg-black/80 backdrop-blur-2xl border border-white/20 rounded-2xl p-8 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+                        <div className="flex justify-between items-center mb-6">
+                            <h2 className="text-2xl font-bold text-white">
+                                {editingReview ? 'Edit Review' : 'Add New Review'}
+                            </h2>
+                            <button
+                                onClick={() => {
+                                    setShowAddReview(false);
+                                    setEditingReview(null);
+                                    setNewReviewData({
+                                        name: '',
+                                        role: '',
+                                        text: '',
+                                        rating: 5,
+                                        avatar: ''
+                                    });
+                                }}
+                                className="p-2 bg-red-600/20 hover:bg-red-600/40 rounded-lg transition-all"
+                            >
+                                <X className="w-5 h-5 text-red-400" />
+                            </button>
+                        </div>
+
+                        <div className="space-y-6">
+                            <input
+                                type="text"
+                                placeholder="Enter reviewer name"
+                                value={editingReview?.name || newReviewData.name || ''}
+                                onChange={(e) => {
+                                    if (editingReview) {
+                                        setEditingReview({ ...editingReview, name: e.target.value });
+                                    } else {
+                                        setNewReviewData({ ...newReviewData, name: e.target.value });
+                                    }
+                                }}
+                                className="w-full px-3 py-2 rounded-lg bg-white/5 backdrop-blur-xl border border-white/10 focus:border-purple-500 outline-none transition-all text-white font-bold"
+                            />
+
+                            <input
+                                type="text"
+                                placeholder="Enter reviewer role/company"
+                                value={editingReview?.role || newReviewData.role || ''}
+                                onChange={(e) => {
+                                    if (editingReview) {
+                                        setEditingReview({ ...editingReview, role: e.target.value });
+                                    } else {
+                                        setNewReviewData({ ...newReviewData, role: e.target.value });
+                                    }
+                                }}
+                                className="w-full px-3 py-2 rounded-lg bg-white/5 backdrop-blur-xl border border-white/10 focus:border-purple-500 outline-none transition-all text-white text-sm"
+                            />
+
+                            <textarea
+                                placeholder="Enter review text"
+                                value={editingReview?.text || newReviewData.text || ''}
+                                onChange={(e) => {
+                                    if (editingReview) {
+                                        setEditingReview({ ...editingReview, text: e.target.value });
+                                    } else {
+                                        setNewReviewData({ ...newReviewData, text: e.target.value });
+                                    }
+                                }}
+                                rows={3}
+                                className="w-full px-3 py-2 rounded-lg bg-white/5 backdrop-blur-xl border border-white/10 focus:border-purple-500 outline-none transition-all text-white resize-none text-sm"
+                            />
+
+                            <div className="flex items-center space-x-3">
+                                <label className="text-sm text-gray-300">Rating:</label>
+                                <div className="flex space-x-1">
+                                    {[1, 2, 3, 4, 5].map((star) => (
+                                        <button
+                                            key={star}
+                                            onClick={() => {
+                                                if (editingReview) {
+                                                    setEditingReview({ ...editingReview, rating: star });
+                                                } else {
+                                                    setNewReviewData({ ...newReviewData, rating: star });
+                                                }
+                                            }}
+                                            className="focus:outline-none"
+                                        >
+                                            <Star
+                                                className={`w-6 h-6 ${star <= (editingReview?.rating || newReviewData.rating || 5)
+                                                    ? 'fill-yellow-400 text-yellow-400'
+                                                    : 'text-gray-400'
+                                                    }`}
+                                            />
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="block text-sm text-gray-300 mb-2">Avatar Image</label>
+                                <input
+                                    type='file'
+                                    accept="image/*"
+                                    onChange={(e) => {
+                                        const file = e.target.files?.[0];
+                                        if (file) {
+                                            const reader = new FileReader();
+                                            reader.onload = (event) => {
+                                                if (editingReview) {
+                                                    setEditingReview({ ...editingReview, avatar: event.target?.result as string });
+                                                } else {
+                                                    setNewReviewData({ ...newReviewData, avatar: event.target?.result as string });
+                                                }
+                                            };
+                                            reader.readAsDataURL(file);
+                                        }
+                                    }}
+                                    className="w-full px-4 py-3 rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 focus:border-purple-500 outline-none transition-all text-white disabled:opacity-50 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-purple-600 file:text-white hover:file:bg-purple-700"
+                                />
+                                {((editingReview?.avatar && editingReview.avatar.startsWith('data:image/')) || (newReviewData.avatar && newReviewData.avatar.startsWith('data:image/'))) && (
+                                    <div className="mt-4">
+                                        <img
+                                            src={editingReview?.avatar || newReviewData.avatar}
+                                            alt="Avatar Preview"
+                                            className="w-16 h-16 object-cover rounded-full border border-white/20"
+                                        />
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className="flex justify-end space-x-3 pt-4">
+                                <button
+                                    onClick={() => {
+                                        setShowAddReview(false);
+                                        setEditingReview(null);
+                                        setNewReviewData({
+                                            name: '',
+                                            role: '',
+                                            text: '',
+                                            rating: 5,
+                                            avatar: ''
+                                        });
+                                    }}
+                                    className="px-6 py-3 rounded-xl bg-gray-600/20 hover:bg-gray-600/40 border border-gray-500/30 transition-all"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        const reviewData = editingReview || newReviewData;
+                                        if (reviewData.name && reviewData.role && reviewData.text && reviewData.avatar) {
+                                            if (showAddReview) {
+                                                // Adding new review
+                                                addReview(reviewData as Omit<Review, 'id'>);
+                                            } else {
+                                                // Updating existing review
+                                                updateReviewData(editingReview!);
+                                            }
+                                            setShowAddReview(false);
+                                            setEditingReview(null);
+                                            setNewReviewData({
+                                                name: '',
+                                                role: '',
+                                                text: '',
+                                                rating: 5,
+                                                avatar: ''
+                                            });
+                                        } else {
+                                            alert('Please fill in all fields');
+                                        }
+                                    }}
+                                    disabled={loader}
+                                    className="px-6 py-3 rounded-xl bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+                                >
+                                    {loader ? (
+                                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                    ) : null}
+                                    <span>{showAddReview ? 'Add Review' : 'Update Review'}</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Add/Edit Project Modal */}
             {(showAddProject || editingProject) && (
