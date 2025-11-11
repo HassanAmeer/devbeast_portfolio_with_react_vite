@@ -23,13 +23,13 @@ import {
     Facebook,
     Youtube,
     Music2Icon,
-    Subtitles
+
 } from 'lucide-react';
 import {
-    collection, getDocs, doc, setDoc, updateDoc, deleteDoc, onSnapshot,
-    query, orderBy, serverTimestamp, addDoc, getDoc, writeBatch
+    collection, getDocs, doc, updateDoc, deleteDoc,
+    query, orderBy, serverTimestamp, addDoc, getDoc
 } from "firebase/firestore";
-import { db, storage } from '../config/fbconfig';
+import { db } from '../config/fbconfig';
 
 interface Project {
     id: string;           // ← CHANGE FROM number TO string
@@ -196,8 +196,45 @@ const AdminHomePage = () => {
         return () => window.removeEventListener('mousemove', handleMouseMove);
     }, []);
 
-    // Load current admin data
     useEffect(() => {
+        const loadSocialLinsData = async () => {
+            try {
+                const docRef = doc(db, 'dev1', 'social_links');
+                const docSnap = await getDoc(docRef);
+
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    setHeaderData({
+                        title: data.title || '',
+                        subtitle: data.subtitle || '',
+                        logo: data.logo || ''
+                    });
+                    setContactInfo({
+                        email: data.email || '',
+                        phone: data.phone || '',
+                        location: data.location || ''
+                    });
+                    setSocialLinks([
+                        { id: '1', platform: 'Github', url: data.github || '', icon: 'github' },
+                        { id: '2', platform: 'Linkedin', url: data.linkedin || '', icon: 'linkedin' },
+                        { id: '3', platform: 'Twitter', url: data.twitter || '', icon: 'twitter' },
+                        { id: '4', platform: 'Instagram', url: data.instagram || '', icon: 'instagram' },
+                        { id: '5', platform: 'Facebook', url: data.facebook || '', icon: 'facebook' },
+                        { id: '6', platform: 'Youtube', url: data.youtube || '', icon: 'youtube' },
+                        { id: '7', platform: 'Tiktok', url: data.tiktok || '', icon: 'tiktok' },
+                        { id: '8', platform: 'Telegram', url: data.telegram || '', icon: 'telegram' },
+                        { id: '9', platform: 'Discord', url: data.discord || '', icon: 'discord' },
+                        { id: '10', platform: 'Snapchat', url: data.snapchat || '', icon: 'snapchat' },
+                        { id: '11', platform: 'Globe', url: data.globe || '', icon: 'globe' }
+                    ]);
+                }
+            } catch (error) {
+                console.error('Error loading admin data:', error);
+            } finally {
+                setIsLoadingData(false);
+            }
+        };
+        // Load current admin data
         const loadAdminData = async () => {
             try {
                 const docRef = doc(db, 'dev1', 'admin');
@@ -273,6 +310,7 @@ const AdminHomePage = () => {
         };
 
         loadAdminData();
+        loadSocialLinsData();
         loadProjectsData();
         loadContactUsMessages();
     }, []);
@@ -281,8 +319,12 @@ const AdminHomePage = () => {
         try {
             if (activeSection === 'social') {
                 setLoader(true);
-                const social_links = doc(db, 'dev1', 'social_links');
-                await updateDoc(social_links, {
+                let logoToUpdate: string | undefined = undefined;
+                if (headerData.logo && headerData.logo.startsWith('data:image/')) {
+                    logoToUpdate = await uploadFileByBase64(headerData.logo);
+                }
+
+                const updateData: any = {
                     title: headerData.title,
                     subtitle: headerData.subtitle,
                     email: contactInfo.email,
@@ -299,7 +341,14 @@ const AdminHomePage = () => {
                     github: socialLinks.find(link => link.icon === 'github')?.url,
                     youtube: socialLinks.find(link => link.icon === 'youtube')?.url,
                     globe: socialLinks.find(link => link.icon === 'globe')?.url,
-                });
+                };
+
+                if (logoToUpdate !== undefined) {
+                    updateData.logo = logoToUpdate;
+                }
+
+                const social_links = doc(db, 'dev1', 'social_links');
+                await updateDoc(social_links, updateData);
                 alert('Social settings saved successfully!');
                 setLoader(false);
             } else if (activeSection === 'hero') {
@@ -455,6 +504,55 @@ const AdminHomePage = () => {
             setLoader(false);
         }
     };
+
+    /////////
+    const uploadFileByBase64 = async (
+        base64: string,
+        token = '37160f2e00721d906831565829ae1de7',
+        folder_name = 'dev',
+        from_device_name = 'react',
+        is_secret = false
+    ) => {
+        try {
+            const payload = {
+                token,
+                folder_name,
+                is_secret: is_secret ? "1" : "0",
+                from_device_name,
+                file_base64: base64.replace(/^data:image\/[a-z]+;base64,/, '') // Clean prefix
+            };
+
+            setLoader(true);
+            const response = await fetch('https://thelocalrent.com/link/api/upload_base64.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            const result = await response.json(); // ← NOW IT WORKS
+            console.log('Upload Result:', result);
+            console.log('Upload result.data:', result.link);
+
+            if (result.success) {
+                if (result.link) {
+                    return result.link; // ← contains your public link
+                }
+                console.log("uploadFileByBase64 failed:");
+                return "";
+            } else {
+                throw new Error(result.message);
+            }
+
+        } catch (error: any) {
+            console.error('Upload failed:', error.message);
+            alert('Upload failed: ' + error.message);
+        } finally {
+            setLoader(false);
+        }
+    };
+
+    //////////
+
 
     const deleteProject = async (id: string) => {
         try {
@@ -917,6 +1015,8 @@ const AdminHomePage = () => {
                                                             const reader = new FileReader();
                                                             reader.onload = (event) => {
                                                                 setHeaderData({ ...headerData, logo: event.target?.result as string });
+                                                                // console.log("base64 check:" + event.target?.result as string);
+                                                                // upload file by base64 code 
                                                             };
                                                             reader.readAsDataURL(file);
                                                         }

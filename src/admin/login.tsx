@@ -10,7 +10,7 @@ import {
     EyeOff,
     ArrowRight,
     Shield,
-    Sparkles,
+    // Sparkles,
     AlertCircle,
     CheckCircle2,
     Loader2

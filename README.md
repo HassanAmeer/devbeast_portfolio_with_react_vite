@@ -347,7 +347,6 @@ const LoginComp = () => {
 }
 
 export default LoginComp;
-
 ```
 
 # --------------------------    firebase setup end -------------------------
