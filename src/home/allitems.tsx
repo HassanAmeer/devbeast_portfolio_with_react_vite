@@ -2,15 +2,15 @@ import { useState, useEffect } from 'react';
 import {
     Github,
     Linkedin,
-    Twitter,
+    // Twitter,
     Code2,
     Smartphone,
     Globe,
     Menu,
     X,
     Home,
-    Briefcase,
-    User,
+    // Briefcase,
+    // User,
     MessageCircle,
     Filter,
     Instagram
@@ -49,11 +49,11 @@ interface SocialLink {
 //     read: boolean;
 // }
 
-interface HeaderData {
-    title: string;
-    subtitle: string;
-    logo: string;
-}
+// interface HeaderData {
+//     title: string;
+//     subtitle: string;
+//     logo: string;
+// }
 
 interface ContactInfo {
     email: string;
@@ -77,7 +77,7 @@ const AllItems = () => {
     //     logo: '',
     // });
 
-    const [contactInfo, setContactInfo] = useState<ContactInfo>({
+    const [contactInfo] = useState<ContactInfo>({
         email: 'devbeast143@gmail.com',
         phone: '+921234567',
         location: 'Lahore Pakistan',

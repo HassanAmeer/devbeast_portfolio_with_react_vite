@@ -91,7 +91,7 @@ interface Review {
 const AdminHomePage = () => {
     const [activeSection, setActiveSection] = useState('overview');
     const [isEditing, setIsEditing] = useState(false);
-    const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+    // const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
     const [editingProject, setEditingProject] = useState<Project | null>(null);
     const [showAddProject, setShowAddProject] = useState(false);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -244,17 +244,17 @@ const AdminHomePage = () => {
         avatar: ''
     });
 
-    useEffect(() => {
-        const handleMouseMove = (e: MouseEvent) => {
-            setMousePosition({
-                x: (e.clientX / window.innerWidth) * 100,
-                y: (e.clientY / window.innerHeight) * 100
-            });
-        };
+    // useEffect(() => {
+    //     const handleMouseMove = (e: MouseEvent) => {
+    //         setMousePosition({
+    //             x: (e.clientX / window.innerWidth) * 100,
+    //             y: (e.clientY / window.innerHeight) * 100
+    //         });
+    //     };
 
-        window.addEventListener('mousemove', handleMouseMove);
-        return () => window.removeEventListener('mousemove', handleMouseMove);
-    }, []);
+    //     window.addEventListener('mousemove', handleMouseMove);
+    //     return () => window.removeEventListener('mousemove', handleMouseMove);
+    // }, []);
 
     useEffect(() => {
 
