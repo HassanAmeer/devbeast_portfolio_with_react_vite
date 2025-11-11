@@ -1,57 +1,134 @@
-import { useState } from 'react';
-import { Mail, Phone, MapPin, Send, Github, Linkedin, Twitter, MessageCircle, CheckCircle } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Mail, Phone, MapPin, Send, Github, Linkedin, Twitter, MessageCircle, CheckCircle, Globe, Instagram, Facebook, Youtube, Music2Icon, Camera, DessertIcon } from 'lucide-react';
+import { doc, getDoc, collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { db } from '../config/fbconfig';
 
 const ContactSection = () => {
-    const [formData, setFormData] = useState({ name: '', email: '', message: '' });
+    const [formData, setFormData] = useState({ name: '', phone: '', email: '', message: '' });
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitted, setSubmitted] = useState(false);
+    const [contactInfo, setContactInfo] = useState<any[]>([]);
+    const [socialLinks, setSocialLinks] = useState<any[]>([]);
+    const [isLoadingData, setIsLoadingData] = useState(true);
 
     const handleSubmit = async () => {
-        if (formData.name && formData.email && formData.message) {
+        if (formData.name && formData.phone && formData.email && formData.message) {
             setIsSubmitting(true);
-            // Simulate API call
-            await new Promise(resolve => setTimeout(resolve, 1500));
-            setIsSubmitting(false);
-            setSubmitted(true);
-            setTimeout(() => {
-                setSubmitted(false);
-                setFormData({ name: '', email: '', message: '' });
-            }, 3000);
+            try {
+                // Send data to Firebase
+                const contactUsCollectionRef = collection(db, 'dev1', 'contact_us_id', 'contact_us');
+                await addDoc(contactUsCollectionRef, {
+                    phone: formData.phone,
+                    email: formData.email,
+                    desc: `Name: ${formData.name}, \n\nMessage: ${formData.message}`,
+                    createdAt: serverTimestamp(),
+                    read: false
+                });
+
+                setIsSubmitting(false);
+                setSubmitted(true);
+                setTimeout(() => {
+                    setSubmitted(false);
+                    setFormData({ name: '', phone: '', email: '', message: '' });
+                }, 3000);
+            } catch (error) {
+                console.error('Error sending message:', error);
+                alert('Failed to send message. Please try again.');
+                setIsSubmitting(false);
+            }
         } else {
             alert('⚠️ Please fill in all fields.');
         }
     };
 
-    const contactInfo = [
-        {
-            icon: <Mail className="w-5 h-5" />,
-            label: 'Email',
-            value: 'hello@devprostudio.com',
-            color: 'from-purple-500 to-pink-500',
-            href: 'mailto:hello@devprostudio.com'
-        },
-        {
-            icon: <Phone className="w-5 h-5" />,
-            label: 'Phone',
-            value: '+1 (555) 123-4567',
-            color: 'from-blue-500 to-cyan-500',
-            href: 'tel:+15551234567'
-        },
-        {
-            icon: <MapPin className="w-5 h-5" />,
-            label: 'Location',
-            value: 'San Francisco, CA',
-            color: 'from-green-500 to-emerald-500',
-            href: 'https://maps.google.com'
-        }
-    ];
+    useEffect(() => {
+        const loadContactData = async () => {
+            try {
+                const docRef = doc(db, 'dev1', 'social_links');
+                const docSnap = await getDoc(docRef);
 
-    const socialLinks = [
-        { icon: <Github className="w-5 h-5" />, color: 'from-gray-600 to-gray-800', href: 'https://github.com', label: 'GitHub' },
-        { icon: <Linkedin className="w-5 h-5" />, color: 'from-blue-600 to-blue-800', href: 'https://linkedin.com', label: 'LinkedIn' },
-        { icon: <Twitter className="w-5 h-5" />, color: 'from-cyan-500 to-blue-600', href: 'https://twitter.com', label: 'Twitter' },
-        { icon: <MessageCircle className="w-5 h-5" />, color: 'from-purple-600 to-pink-600', href: 'https://wa.me/15551234567', label: 'WhatsApp' }
-    ];
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+
+                    // Set contact info
+                    const contactItems = [];
+                    if (data.email && data.email.trim()) {
+                        contactItems.push({
+                            icon: <Mail className="w-5 h-5" />,
+                            label: 'Email',
+                            value: data.email,
+                            color: 'from-purple-500 to-pink-500',
+                            href: `mailto:${data.email}`
+                        });
+                    }
+                    if (data.phone && data.phone.trim()) {
+                        contactItems.push({
+                            icon: <Phone className="w-5 h-5" />,
+                            label: 'Phone',
+                            value: data.phone,
+                            color: 'from-blue-500 to-cyan-500',
+                            href: `tel:${data.phone}`
+                        });
+                    }
+                    if (data.location && data.location.trim()) {
+                        contactItems.push({
+                            icon: <MapPin className="w-5 h-5" />,
+                            label: 'Location',
+                            value: data.location,
+                            color: 'from-green-500 to-emerald-500',
+                            href: 'https://maps.google.com'
+                        });
+                    }
+                    setContactInfo(contactItems);
+
+                    // Set social links
+                    const socialItems = [];
+                    const socialPlatforms = [
+                        { key: 'github', icon: Github, color: 'from-gray-600 to-gray-800', label: 'GitHub' },
+                        { key: 'linkedin', icon: Linkedin, color: 'from-blue-600 to-blue-800', label: 'LinkedIn' },
+                        { key: 'twitter', icon: Twitter, color: 'from-cyan-500 to-blue-600', label: 'Twitter' },
+                        { key: 'instagram', icon: Instagram, color: 'from-pink-500 to-purple-500', label: 'Instagram' },
+                        { key: 'facebook', icon: Facebook, color: 'from-blue-600 to-blue-800', label: 'Facebook' },
+                        { key: 'youtube', icon: Youtube, color: 'from-red-500 to-red-700', label: 'YouTube' },
+                        { key: 'tiktok', icon: Music2Icon, color: 'from-black to-gray-800', label: 'TikTok' },
+                        { key: 'telegram', icon: Send, color: 'from-blue-500 to-blue-700', label: 'Telegram' },
+                        { key: 'discord', icon: DessertIcon, color: 'from-indigo-500 to-purple-500', label: 'Discord' },
+                        { key: 'snapchat', icon: Camera, color: 'from-yellow-400 to-yellow-600', label: 'Snapchat' },
+                        { key: 'globe', icon: Globe, color: 'from-gray-500 to-gray-700', label: 'Website' }
+                    ];
+
+                    socialPlatforms.forEach(platform => {
+                        if (data[platform.key] && data[platform.key].trim()) {
+                            socialItems.push({
+                                icon: <platform.icon className="w-5 h-5" />,
+                                color: platform.color,
+                                href: data[platform.key],
+                                label: platform.label
+                            });
+                        }
+                    });
+
+                    // Add WhatsApp if phone exists
+                    if (data.phone && data.phone.trim()) {
+                        socialItems.push({
+                            icon: <MessageCircle className="w-5 h-5" />,
+                            color: 'from-green-500 to-green-700',
+                            href: `https://wa.me/${data.phone.replace(/\D/g, '')}`,
+                            label: 'WhatsApp'
+                        });
+                    }
+
+                    setSocialLinks(socialItems);
+                }
+            } catch (error) {
+                console.error('Error loading contact data:', error);
+            } finally {
+                setIsLoadingData(false);
+            }
+        };
+
+        loadContactData();
+    }, []);
 
     return (
         <section id="contact" className="py-16 relative overflow-hidden">
@@ -99,26 +176,28 @@ const ContactSection = () => {
                         </div>
 
                         {/* Social Links */}
-                        <div className="pt-4">
-                            <h5 className="text-lg font-bold mb-4 text-white">Connect With Me</h5>
-                            <div className="flex gap-3">
-                                {socialLinks.map((social, idx) => (
-                                    <a
-                                        key={idx}
-                                        href={social.href}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="group relative flex-1"
-                                        title={social.label}
-                                    >
-                                        <div className={`absolute inset-0 bg-gradient-to-r ${social.color} rounded-lg blur-md opacity-0 group-hover:opacity-30 transition-all`} />
-                                        <div className={`relative h-12 bg-gradient-to-r ${social.color} rounded-lg flex items-center justify-center transition-all hover:scale-105`}>
-                                            {social.icon}
-                                        </div>
-                                    </a>
-                                ))}
+                        {socialLinks.length > 0 && (
+                            <div className="pt-4">
+                                <h5 className="text-lg font-bold mb-4 text-white">Connect With Me</h5>
+                                <div className="flex flex-wrap gap-3">
+                                    {socialLinks.map((social, idx) => (
+                                        <a
+                                            key={idx}
+                                            href={social.href}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="group relative"
+                                            title={social.label}
+                                        >
+                                            <div className={`absolute inset-0 bg-gradient-to-r ${social.color} rounded-lg blur-md opacity-0 group-hover:opacity-30 transition-all`} />
+                                            <div className={`relative h-12 w-12 bg-gradient-to-r ${social.color} rounded-lg flex items-center justify-center transition-all hover:scale-105`}>
+                                                {social.icon}
+                                            </div>
+                                        </a>
+                                    ))}
+                                </div>
                             </div>
-                        </div>
+                        )}
 
                         {/* Quick Stats */}
                         <div className="hidden lg:block pt-4">
@@ -159,6 +238,19 @@ const ContactSection = () => {
                                                 placeholder="John Doe"
                                                 value={formData.name}
                                                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                                className="w-full px-5 py-3.5 rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 outline-none transition-all text-white placeholder-gray-500"
+                                            />
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-sm font-semibold text-gray-300 mb-2">
+                                                Your Phone
+                                            </label>
+                                            <input
+                                                type="tel"
+                                                placeholder="+1 (555) 123-4567"
+                                                value={formData.phone}
+                                                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                                                 className="w-full px-5 py-3.5 rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 outline-none transition-all text-white placeholder-gray-500"
                                             />
                                         </div>

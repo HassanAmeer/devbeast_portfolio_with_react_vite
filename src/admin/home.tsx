@@ -65,7 +65,7 @@ interface ContactMessage {
     phone: string;
     email: string;
     desc: string;
-    createdAt: string;
+    createdAt: any;
     read: boolean;
 }
 
@@ -1323,7 +1323,7 @@ const AdminHomePage = () => {
                                                         <div className="flex items-center space-x-3 mb-2">
                                                             {!msg.read && <div className="w-2 h-2 bg-purple-500 rounded-full animate-pulse" />}
                                                             <h4 className="font-bold text-lg">{msg.phone}</h4>
-                                                            <span className="text-sm text-gray-400">{msg.createdAt}</span>
+                                                            <span className="text-sm text-gray-400">{msg.createdAt?.toDate ? msg.createdAt.toDate().toLocaleDateString() : msg.createdAt}</span>
                                                         </div>
                                                         <p className="text-gray-300 mb-2">{msg.email}</p>
                                                         <p className="text-gray-400 mt-2 line-clamp-2">{msg.desc}</p>

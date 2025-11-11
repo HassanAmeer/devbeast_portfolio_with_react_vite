@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Github, Linkedin, Twitter, Mail, Code2, Smartphone, Globe, Star, Award, Users, CheckCircle, Menu, X, ArrowRight, Download, ExternalLink } from 'lucide-react';
+import { Github, Linkedin, Twitter, Mail, Code2, Smartphone, Globe, Star, Award, Users, CheckCircle, Menu, X, ArrowRight, Download, ExternalLink, Instagram, Facebook, Youtube, Music2, Send, DessertIcon, Camera } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import person1 from '../assets/person1.png';
 import ContactSection from './contact';
@@ -445,19 +445,22 @@ const Portfolio = () => {
                                 <div className="relative animate-pulse">
                                     <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-cyan-600 rounded-2xl blur-xl opacity-50 group-hover:opacity-100 transition-all" />
                                     <div className="relative w-14 h-14 bg-gradient-to-br from-purple-600 via-pink-600 to-cyan-600 rounded-2xl flex items-center justify-center text-2xl font-black shadow-2xl transform group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
-                                        <Code2 className="w-7 h-7 text-white" />
+                                        {/* <Code2 className="w-7 h-7 text-white" /> */}
+                                        <img src={headerData.logo} alt="" />
                                     </div>
                                 </div>
                                 <div>
                                     <h1 className="text-xl font-black bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">
-                                        Dev Beast
+                                        {headerData.title}
                                     </h1>
-                                    <p className="text-xs text-gray-400 font-medium">Senior Full-Stack Developer</p>
+                                    <p className="text-xs text-gray-400 font-medium">
+                                        {headerData.subtitle}
+                                    </p>
                                 </div>
                             </div>
 
                             <nav className="hidden md:flex items-center space-x-1">
-                                {['Home', 'About', 'Skills', 'Projects', 'Contact'].map((item) => (
+                                {['Home', 'Skills', 'Projects', 'Contact'].map((item) => (
                                     <a
                                         key={item}
                                         href={`#${item.toLowerCase()}`}
@@ -483,7 +486,7 @@ const Portfolio = () => {
                     {mobileMenuOpen && (
                         <div className="md:hidden absolute top-full left-0 w-full bg-black/95 backdrop-blur-2xl border-b border-white/5">
                             <nav className="container mx-auto px-4 py-6 flex flex-col space-y-2">
-                                {['Home', 'About', 'Skills', 'Projects', 'Contact'].map((item) => (
+                                {['Home', 'Skills', 'Projects', 'Contact'].map((item) => (
                                     <a
                                         key={item}
                                         href={`#${item.toLowerCase()}`}
@@ -524,7 +527,15 @@ const Portfolio = () => {
                             </h2>
 
                             <p className="text-xl md:text-2xl text-gray-300 mb-6 max-w-3xl mx-auto leading-relaxed font-light">
-                                {heroData.desc}
+                                {heroData.desc.split('--').map((part, index) =>
+                                    index % 2 === 1 ? (
+                                        <span key={index} className="bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent font-bold">
+                                            {part}
+                                        </span>
+                                    ) : (
+                                        part
+                                    )
+                                )}
                             </p>
 
 
@@ -581,21 +592,27 @@ const Portfolio = () => {
                                 </div>
                             </div>
                             <div className="flex flex-wrap justify-center gap-4 pt-8">
-                                <button className="group relative px-8 py-4 rounded-2xl font-bold overflow-hidden">
+                                {heroData.btn_link_1 ? <a
+                                    href={heroData.btn_link_1}
+                                    className="group relative px-8 py-4 rounded-2xl font-bold overflow-hidden">
                                     <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-cyan-600 transition-all duration-300" />
                                     <div className="absolute inset-0 bg-gradient-to-r from-cyan-600 to-purple-600 opacity-0 group-hover:opacity-100 transition-all duration-300" />
                                     <span className="relative flex items-center space-x-2 text-white">
-                                        <span>Explore Portfolio</span>
+                                        <span>{heroData.btn_name_1}</span>
                                         <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                                     </span>
-                                </button>
+                                </a> : ''}
 
-                                <button className="group relative px-8 py-4 rounded-2xl font-bold border-2 border-purple-500/30 hover:border-purple-500 backdrop-blur-xl bg-white/5 hover:bg-white/10 transition-all">
-                                    <span className="flex items-center space-x-2">
-                                        <Download className="w-5 h-5 group-hover:translate-y-1 transition-transform" />
-                                        <span>Download CV</span>
-                                    </span>
-                                </button>
+                                {heroData.btn_link_2 ?
+                                    <a
+                                        href={heroData.btn_link_2}
+                                        target="_blank"
+                                        className="group relative px-8 py-4 rounded-2xl font-bold border-2 border-purple-500/30 hover:border-purple-500 backdrop-blur-xl bg-white/5 hover:bg-white/10 transition-all">
+                                        <span className="flex items-center space-x-2">
+                                            <Download className="w-5 h-5 group-hover:translate-y-1 transition-transform" />
+                                            <span>{heroData.btn_name_2}</span>
+                                        </span>
+                                    </a> : ""}
                             </div>
                         </div>
 
@@ -804,38 +821,52 @@ const Portfolio = () => {
                                     <div className="relative">
                                         <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-cyan-600 rounded-2xl blur-lg opacity-50" />
                                         <div className="relative w-12 h-12 bg-gradient-to-br from-purple-600 via-pink-600 to-cyan-600 rounded-2xl flex items-center justify-center shadow-2xl">
-                                            <Code2 className="w-6 h-6 text-white" />
+                                            {/* <Code2 className="w-6 h-6 text-white" /> */}
+                                            <img src={headerData.logo} alt="" />
                                         </div>
                                     </div>
                                     <span className="text-2xl font-black bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent">
-                                        DevBeast
+                                        {headerData.title}
                                     </span>
                                 </div>
                                 <p className="text-gray-400 mb-6 max-w-md leading-relaxed">
                                     Senior Full-Stack Developer crafting exceptional digital experiences with cutting-edge technologies. Let's build something amazing together.
                                 </p>
                                 <div className="flex space-x-4">
-                                    {[
-                                        { icon: <Github className="w-5 h-5" />, href: '#' },
-                                        { icon: <Linkedin className="w-5 h-5" />, href: '#' },
-                                        { icon: <Twitter className="w-5 h-5" />, href: '#' },
-                                        { icon: <Mail className="w-5 h-5" />, href: '#' }
-                                    ].map((social, idx) => (
-                                        <a
-                                            key={idx}
-                                            href={social.href}
-                                            className="w-10 h-10 bg-white/5 hover:bg-white/10 rounded-xl flex items-center justify-center transition-all transform hover:scale-110 border border-white/10 hover:border-white/20"
-                                        >
-                                            {social.icon}
-                                        </a>
-                                    ))}
+                                    {socialLinks.filter(link => link.url && link.url.trim() !== '').map((link) => {
+                                        const Icon = {
+                                            github: Github,
+                                            linkedin: Linkedin,
+                                            twitter: Twitter,
+                                            instagram: Instagram,
+                                            facebook: Facebook,
+                                            youtube: Youtube,
+                                            tiktok: Music2,
+                                            telegram: Send,
+                                            discord: DessertIcon,
+                                            snapchat: Camera,
+                                            globe: Globe
+                                        }[link.icon] || Github;
+
+                                        return (
+                                            <a
+                                                key={link.id}
+                                                href={link.url}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="w-10 h-10 bg-white/5 hover:bg-white/10 rounded-xl flex items-center justify-center transition-all transform hover:scale-110 border border-white/10 hover:border-white/20"
+                                            >
+                                                <Icon className="w-5 h-5" />
+                                            </a>
+                                        );
+                                    })}
                                 </div>
                             </div>
 
                             <div>
                                 <h5 className="font-bold mb-4 text-lg text-white">Quick Links</h5>
                                 <ul className="space-y-2">
-                                    {['Home', 'About', 'Skills', 'Projects', 'Contact'].map((item) => (
+                                    {['Home', 'Skills', 'Projects', 'Contact'].map((item) => (
                                         <li key={item}>
                                             <a href={`#${item.toLowerCase()}`} className="text-gray-400 hover:text-purple-400 transition-all">
                                                 {item}
@@ -860,7 +891,7 @@ const Portfolio = () => {
                         <div className="border-t border-white/5 pt-8">
                             <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
                                 <p className="text-gray-400 text-sm">
-                                    © 2026 DevBeast. All rights reserved.
+                                    © 2026 {headerData.title}. All rights reserved.
                                 </p>
                                 <div className="flex items-center space-x-6 text-sm text-gray-400">
                                     <a href="#" className="hover:text-purple-400 transition-all">Privacy Policy</a>
