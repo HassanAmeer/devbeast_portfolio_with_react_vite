@@ -97,9 +97,9 @@ const Portfolio = () => {
 
     // Editable data states
     const [heroData, setHeroData] = useState({
-        title: 'Akash Ameerasd',
-        subtitle: 'Senior Developerasd',
-        desc: 'Senior Full-Stack Developer specializing in Flutter, Laravel, and React — transforming ideas into stunning realityasdsf',
+        title: 'FLUTTER, REACT, AND LARAVEL DEVELOPER',
+        subtitle: 'Senior Developer',
+        desc: 'Senior Full-Stack Developer specializing in -- Flutter, Laravel, and React -- transforming ideas into stunning reality',
         image: person1,
         btn_name_1: 'View Portfolio',
         btn_link_1: '#',
@@ -119,7 +119,7 @@ const Portfolio = () => {
 
     const [headerData, setHeaderData] = useState<HeaderData>({
         title: 'DeavBeast',
-        subtitle: 'Senio Flutter Developer',
+        subtitle: 'Senior Flutter Developer',
         logo: '',
     });
 
@@ -130,17 +130,17 @@ const Portfolio = () => {
     // });
 
     const [socialLinks, setSocialLinks] = useState<SocialLink[]>([
-        { id: '1', platform: 'Github', url: 'github.com', icon: 'github' },
-        { id: '2', platform: 'Linkedin', url: 'linkedin.com', icon: 'linkedin' },
-        { id: '3', platform: 'Twitter', url: 'twitter.com', icon: 'twitter' },
-        { id: '4', platform: 'Instagram', url: 'instagram.com', icon: 'instagram' },
-        { id: '5', platform: 'Facebook', url: 'facebook.com', icon: 'facebook' },
-        { id: '6', platform: 'Youtube', url: 'youtube.com', icon: 'youtube' },
-        { id: '7', platform: 'Tiktok', url: 'tiktok.com', icon: 'tiktok' },
-        { id: '8', platform: 'Telegram', url: 'telegram.com', icon: 'telegram' },
-        { id: '9', platform: 'Discord', url: 'discord.com', icon: 'discord' },
-        { id: '10', platform: 'Snapchat', url: 'snapchat.com', icon: 'snapchat' },
-        { id: '12', platform: 'Globe', url: 'globe.com', icon: 'globe' }
+        { id: '1', platform: 'Github', url: 'https://github.com', icon: 'github' },
+        { id: '2', platform: 'Linkedin', url: 'https://linkedin.com', icon: 'linkedin' },
+        { id: '3', platform: 'Twitter', url: 'https://twitter.com', icon: 'twitter' },
+        { id: '4', platform: 'Instagram', url: 'https://instagram.com', icon: 'instagram' },
+        { id: '5', platform: 'Facebook', url: 'https://facebook.com', icon: 'facebook' },
+        { id: '6', platform: 'Youtube', url: 'https://youtube.com', icon: 'youtube' },
+        { id: '7', platform: 'Tiktok', url: 'https://tiktok.com', icon: 'tiktok' },
+        { id: '8', platform: 'Telegram', url: 'https://telegram.com', icon: 'telegram' },
+        { id: '9', platform: 'Discord', url: 'https://discord.com', icon: 'discord' },
+        { id: '10', platform: 'Snapchat', url: 'https://snapchat.com', icon: 'snapchat' },
+        { id: '12', platform: 'Globe', url: 'https://globe.com', icon: 'globe' }
     ]);
 
 
@@ -198,9 +198,9 @@ const Portfolio = () => {
                 if (docSnap.exists()) {
                     const data = docSnap.data();
                     setHeroData({
-                        title: data.title || 'Akash Ameer',
+                        title: data.title || 'Flutter, React, Laravel',
                         subtitle: data.subtitle || 'Senior Developer',
-                        desc: data.desc || 'Senior Full-Stack Developer specializing in Flutter, Laravel, and React — transforming ideas into stunning reality',
+                        desc: data.desc || 'Senior Full-Stack Developer specializing in -- Flutter, Laravel, and React -- transforming ideas into stunning reality',
                         image: data.image || '',
                         btn_name_1: data.btn_name_1 || 'View Portfolio',
                         btn_link_1: data.btn_link_1 || '#',
