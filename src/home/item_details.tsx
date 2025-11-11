@@ -16,8 +16,8 @@ const ItemDetails = () => {
     const item = location.state;
     const [scrollY, setScrollY] = useState(0);
     const [contactInfo, setContactInfo] = useState<{ email: string; phone: string; location: string } | null>(null);
-    const [socialLinks, setSocialLinks] = useState<any[]>([]);
-    const [isLoadingData, setIsLoadingData] = useState(true);
+    // const [socialLinks, setSocialLinks] = useState<any[]>([]);
+    // const [isLoadingData, setIsLoadingData] = useState(true);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -43,24 +43,24 @@ const ItemDetails = () => {
                         phone: data.phone || '',
                         location: data.location || ''
                     });
-                    setSocialLinks([
-                        { id: '1', platform: 'Github', url: data.github || '', icon: 'github' },
-                        { id: '2', platform: 'Linkedin', url: data.linkedin || '', icon: 'linkedin' },
-                        { id: '3', platform: 'Twitter', url: data.twitter || '', icon: 'twitter' },
-                        { id: '4', platform: 'Instagram', url: data.instagram || '', icon: 'instagram' },
-                        { id: '5', platform: 'Facebook', url: data.facebook || '', icon: 'facebook' },
-                        { id: '6', platform: 'Youtube', url: data.youtube || '', icon: 'youtube' },
-                        { id: '7', platform: 'Tiktok', url: data.tiktok || '', icon: 'tiktok' },
-                        { id: '8', platform: 'Telegram', url: data.telegram || '', icon: 'telegram' },
-                        { id: '9', platform: 'Discord', url: data.discord || '', icon: 'discord' },
-                        { id: '10', platform: 'Snapchat', url: data.snapchat || '', icon: 'snapchat' },
-                        { id: '11', platform: 'Globe', url: data.globe || '', icon: 'globe' }
-                    ]);
+                    // setSocialLinks([
+                    //     { id: '1', platform: 'Github', url: data.github || '', icon: 'github' },
+                    //     { id: '2', platform: 'Linkedin', url: data.linkedin || '', icon: 'linkedin' },
+                    //     { id: '3', platform: 'Twitter', url: data.twitter || '', icon: 'twitter' },
+                    //     { id: '4', platform: 'Instagram', url: data.instagram || '', icon: 'instagram' },
+                    //     { id: '5', platform: 'Facebook', url: data.facebook || '', icon: 'facebook' },
+                    //     { id: '6', platform: 'Youtube', url: data.youtube || '', icon: 'youtube' },
+                    //     { id: '7', platform: 'Tiktok', url: data.tiktok || '', icon: 'tiktok' },
+                    //     { id: '8', platform: 'Telegram', url: data.telegram || '', icon: 'telegram' },
+                    //     { id: '9', platform: 'Discord', url: data.discord || '', icon: 'discord' },
+                    //     { id: '10', platform: 'Snapchat', url: data.snapchat || '', icon: 'snapchat' },
+                    //     { id: '11', platform: 'Globe', url: data.globe || '', icon: 'globe' }
+                    // ]);
                 }
             } catch (error) {
                 console.error('Error loading contact data:', error);
             } finally {
-                setIsLoadingData(false);
+                // setIsLoadingData(false);
             }
         };
 

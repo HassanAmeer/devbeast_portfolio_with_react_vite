@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Github, Linkedin, Twitter, Mail, Code2, Smartphone, Globe, Star, Award, Users, CheckCircle, Menu, X, ArrowRight, Download, ExternalLink, Instagram, Facebook, Youtube, Music2, Send, DessertIcon, Camera } from 'lucide-react';
+import { Github, Linkedin, Twitter, Code2, Smartphone, Globe, Star, Award, Users, CheckCircle, Menu, X, ArrowRight, Download, ExternalLink, Instagram, Facebook, Youtube, Music2, Send, DessertIcon, Camera } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import person1 from '../assets/person1.png';
 import ContactSection from './contact';
@@ -22,11 +22,11 @@ interface Project {
     updatedAt?: any;
 }
 
-interface ContactInfo {
-    email: string;
-    phone: string;
-    location: string;
-}
+// interface ContactInfo {
+//     email: string;
+//     phone: string;
+//     location: string;
+// }
 
 interface SocialLink {
     id: string;
@@ -35,14 +35,14 @@ interface SocialLink {
     icon: 'github' | 'linkedin' | 'twitter' | 'instagram' | 'facebook' | 'youtube' | 'tiktok' | 'telegram' | 'discord' | 'snapchat' | 'globe';
 }
 
-interface ContactMessage {
-    id: string;
-    phone: string;
-    email: string;
-    desc: string;
-    createdAt: string;
-    read: boolean;
-}
+// interface ContactMessage {
+//     id: string;
+//     phone: string;
+//     email: string;
+//     desc: string;
+//     createdAt: string;
+//     read: boolean;
+// }
 
 interface HeaderData {
     title: string;
@@ -70,7 +70,7 @@ const Portfolio = () => {
     const [scrolled] = useState(false);
     const [mousePosition] = useState({ x: 0, y: 0 });
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-    const [isLoadingData, setIsLoadingData] = useState(true);
+    // const [isLoadingData, setIsLoadingData] = useState(true);
 
     useEffect(() => {
         // const handleScroll = () => setScrolled(window.scrollY > 50);
@@ -93,7 +93,7 @@ const Portfolio = () => {
 
 
     ////////// now getting data from firebase and set it 
-    const [loader, setLoader] = useState(false);
+    // const [loader, setLoader] = useState(false);
 
     // Editable data states
     const [heroData, setHeroData] = useState({
@@ -123,11 +123,11 @@ const Portfolio = () => {
         logo: '',
     });
 
-    const [contactInfo, setContactInfo] = useState<ContactInfo>({
-        email: 'devbeast143@gmail.com',
-        phone: '+921234567',
-        location: 'Lahore Pakistan',
-    });
+    // const [contactInfo, setContactInfo] = useState<ContactInfo>({
+    //     email: 'devbeast143@gmail.com',
+    //     phone: '+921234567',
+    //     location: 'Lahore Pakistan',
+    // });
 
     const [socialLinks, setSocialLinks] = useState<SocialLink[]>([
         { id: '1', platform: 'Github', url: 'github.com', icon: 'github' },
@@ -143,26 +143,9 @@ const Portfolio = () => {
         { id: '12', platform: 'Globe', url: 'globe.com', icon: 'globe' }
     ]);
 
-    const [messages, setMessages] = useState<ContactMessage[]>([
-        {
-            id: '1',
-            phone: '0301234567',
-            email: 'john@example.com',
-            desc: 'Hi Akash, I loved your AI Healthcare app. Can we discuss a partnership?',
-            createdAt: 'Nov 10, 2025',
-            read: false
-        },
-        {
-            id: '2',
-            phone: '0301234567',
-            email: 'sarah@startup.io',
-            desc: 'We are hiring senior developers. Your portfolio is impressive!',
-            createdAt: 'Nov 9, 2025',
-            read: true
-        }
-    ]);
 
-    const [currentAdminData, setCurrentAdminData] = useState<{ email: string, pass: string } | null>(null);
+
+    // const [currentAdminData, setCurrentAdminData] = useState<{ email: string, pass: string } | null>(null);
 
     useEffect(() => {
 
@@ -181,11 +164,11 @@ const Portfolio = () => {
                         subtitle: data.subtitle || '',
                         logo: data.logo || ''
                     });
-                    setContactInfo({
-                        email: data.email || '',
-                        phone: data.phone || '',
-                        location: data.location || ''
-                    });
+                    // setContactInfo({
+                    //     email: data.email || '',
+                    //     phone: data.phone || '',
+                    //     location: data.location || ''
+                    // });
                     setSocialLinks([
                         { id: '1', platform: 'Github', url: data.github || '', icon: 'github' },
                         { id: '2', platform: 'Linkedin', url: data.linkedin || '', icon: 'linkedin' },
@@ -203,7 +186,7 @@ const Portfolio = () => {
             } catch (error) {
                 console.error('Error loading admin data:', error);
             } finally {
-                setIsLoadingData(false);
+                // setIsLoadingData(false);
             }
         };
         // Load loadHearoData
@@ -236,28 +219,10 @@ const Portfolio = () => {
             } catch (error) {
                 console.error('Error loading admin data:', error);
             } finally {
-                setIsLoadingData(false);
+                // setIsLoadingData(false);
             }
         };
-        // Load current admin data
-        const loadAdminData = async () => {
-            try {
-                const docRef = doc(db, 'dev1', 'admin');
-                const docSnap = await getDoc(docRef);
 
-                if (docSnap.exists()) {
-                    const data = docSnap.data();
-                    setCurrentAdminData({
-                        email: data.email || '',
-                        pass: data.pass || ''
-                    });
-                }
-            } catch (error) {
-                console.error('Error loading admin data:', error);
-            } finally {
-                setIsLoadingData(false);
-            }
-        };
 
         const loadProjectsData = async () => {
             try {
@@ -285,7 +250,7 @@ const Portfolio = () => {
             } catch (error) {
                 console.error('Error loading admin data:', error);
             } finally {
-                setIsLoadingData(false);
+                // setIsLoadingData(false);
             }
         };
         const loadReviewsData = async () => {
@@ -311,12 +276,11 @@ const Portfolio = () => {
             } catch (error) {
                 console.error('Error loading reviews:', error);
             } finally {
-                setIsLoadingData(false);
+                // setIsLoadingData(false);
             }
         };
 
         loadReviewsData();
-        loadAdminData();
         loadHeroData();
         loadSocialLinsData();
         loadProjectsData();
@@ -428,37 +392,12 @@ const Portfolio = () => {
         }
     ];
 
-    const stats = [
-        { icon: <Award className="w-8 h-8" />, number: '4+', label: 'Years Experience', color: 'from-purple-500 to-pink-500' },
-        { icon: <CheckCircle className="w-8 h-8" />, number: '150+', label: 'Projects Completed', color: 'from-blue-500 to-cyan-500' },
-        { icon: <Users className="w-8 h-8" />, number: '90%', label: 'Happy Clients', color: 'from-green-500 to-emerald-500' },
-        { icon: <Star className="w-8 h-8" />, number: '4.9', label: 'Average Rating', color: 'from-yellow-500 to-orange-500' }
-    ];
-
-
-    const testimonials = [
-        {
-            name: 'Sarah Johnson',
-            role: 'CEO, TechStart Inc',
-            text: 'Exceptional work! The app exceeded all expectations. Professional, fast, and delivered a product that our users absolutely love.',
-            rating: 5,
-            avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&q=80'
-        },
-        {
-            name: 'Michael Chen',
-            role: 'CTO, FinanceHub',
-            text: 'Best developer we have worked with. Clean code, great architecture, and outstanding communication throughout the project.',
-            rating: 5,
-            avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&q=80'
-        },
-        {
-            name: 'Emma Davis',
-            role: 'Product Lead, Innovate',
-            text: 'Transformed our vision into reality. The attention to detail and user experience is phenomenal. Highly recommend!',
-            rating: 5,
-            avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&q=80'
-        }
-    ];
+    // const stats = [
+    //     { icon: <Award className="w-8 h-8" />, number: '4+', label: 'Years Experience', color: 'from-purple-500 to-pink-500' },
+    //     { icon: <CheckCircle className="w-8 h-8" />, number: '150+', label: 'Projects Completed', color: 'from-blue-500 to-cyan-500' },
+    //     { icon: <Users className="w-8 h-8" />, number: '90%', label: 'Happy Clients', color: 'from-green-500 to-emerald-500' },
+    //     { icon: <Star className="w-8 h-8" />, number: '4.9', label: 'Average Rating', color: 'from-yellow-500 to-orange-500' }
+    // ];
 
     const filteredProjects = activeTab === 'all'
         ? projects

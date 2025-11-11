@@ -9,7 +9,7 @@ const ContactSection = () => {
     const [submitted, setSubmitted] = useState(false);
     const [contactInfo, setContactInfo] = useState<any[]>([]);
     const [socialLinks, setSocialLinks] = useState<any[]>([]);
-    const [isLoadingData, setIsLoadingData] = useState(true);
+    // const [isLoadingData, setIsLoadingData] = useState(true);
 
     const handleSubmit = async () => {
         if (formData.name && formData.phone && formData.email && formData.message) {
@@ -123,7 +123,7 @@ const ContactSection = () => {
             } catch (error) {
                 console.error('Error loading contact data:', error);
             } finally {
-                setIsLoadingData(false);
+                // setIsLoadingData(false);
             }
         };
 

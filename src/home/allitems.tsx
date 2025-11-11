@@ -38,7 +38,7 @@ const AllItems = () => {
     const [scrolled, setScrolled] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [projects, setProjects] = useState<Project[]>([]);
-    const [isLoadingData, setIsLoadingData] = useState(true);
+    // const [isLoadingData, setIsLoadingData] = useState(true);
 
     useEffect(() => {
         const handleScroll = () => setScrolled(window.scrollY > 50);
@@ -73,7 +73,7 @@ const AllItems = () => {
             } catch (error) {
                 console.error('Error loading projects:', error);
             } finally {
-                setIsLoadingData(false);
+                // setIsLoadingData(false);
             }
         };
 
