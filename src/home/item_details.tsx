@@ -7,12 +7,17 @@ import {
     Users,
     MessageCircle
 } from 'lucide-react';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '../config/fbconfig';
 
 const ItemDetails = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const item = location.state;
     const [scrollY, setScrollY] = useState(0);
+    const [contactInfo, setContactInfo] = useState<{ email: string; phone: string; location: string } | null>(null);
+    const [socialLinks, setSocialLinks] = useState<any[]>([]);
+    const [isLoadingData, setIsLoadingData] = useState(true);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -21,6 +26,45 @@ const ItemDetails = () => {
 
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
+
+    useEffect(() => {
+        const loadContactData = async () => {
+            try {
+                const docRef = doc(db, 'dev1', 'social_links');
+                const docSnap = await getDoc(docRef);
+
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    console.log('Contact Data:', data);
+
+                    setContactInfo({
+                        email: data.email || '',
+                        phone: data.phone || '',
+                        location: data.location || ''
+                    });
+                    setSocialLinks([
+                        { id: '1', platform: 'Github', url: data.github || '', icon: 'github' },
+                        { id: '2', platform: 'Linkedin', url: data.linkedin || '', icon: 'linkedin' },
+                        { id: '3', platform: 'Twitter', url: data.twitter || '', icon: 'twitter' },
+                        { id: '4', platform: 'Instagram', url: data.instagram || '', icon: 'instagram' },
+                        { id: '5', platform: 'Facebook', url: data.facebook || '', icon: 'facebook' },
+                        { id: '6', platform: 'Youtube', url: data.youtube || '', icon: 'youtube' },
+                        { id: '7', platform: 'Tiktok', url: data.tiktok || '', icon: 'tiktok' },
+                        { id: '8', platform: 'Telegram', url: data.telegram || '', icon: 'telegram' },
+                        { id: '9', platform: 'Discord', url: data.discord || '', icon: 'discord' },
+                        { id: '10', platform: 'Snapchat', url: data.snapchat || '', icon: 'snapchat' },
+                        { id: '11', platform: 'Globe', url: data.globe || '', icon: 'globe' }
+                    ]);
+                }
+            } catch (error) {
+                console.error('Error loading contact data:', error);
+            } finally {
+                setIsLoadingData(false);
+            }
+        };
+
+        loadContactData();
     }, []);
 
     if (!item) {
@@ -42,21 +86,23 @@ const ItemDetails = () => {
     }
 
     // Demo images gallery
-    const demoImages = [
-        item.image,
-        'https://images.unsplash.com/photo-1551650975-87deedd944c3?w=800&q=80',
-        'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=800&q=80',
-        'https://images.unsplash.com/photo-1557821552-17105176677c?w=800&q=80',
-        'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80',
-        'https://images.unsplash.com/photo-1509062522246-3755977927d7?w=800&q=80'
-    ];
+    const demoImages = item.projectImages && item.projectImages.length > 0
+        ? item.projectImages
+        : [
+            'https://images.unsplash.com/photo-1551650975-87deedd944c3?w=800&q=80',
+            'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=800&q=80',
+            'https://images.unsplash.com/photo-1557821552-17105176677c?w=800&q=80',
+            'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80',
+            'https://images.unsplash.com/photo-1509062522246-3755977927d7?w=800&q=80'
+        ];
 
-    const teamSize = '5 members';
-    const githubUrl = 'https://github.com/yourusername/project';
-    const liveUrl = 'https://yourproject.com';
-    const whatsappNumber = '+923012345678';
+    const teamSize = item.totalTeams ? `${item.totalTeams} members` : 'Individual project';
+    const githubUrl = item.githubLink || '#';
+    const liveUrl = item.projectLink || '#';
+    const whatsappNumber = contactInfo?.phone || '+923012345678';
 
     const handleWhatsAppClick = () => {
+        console.log('WhatsApp number:', whatsappNumber);
         window.open(`https://wa.me/${whatsappNumber.replace(/[^0-9]/g, '')}`, '_blank');
     };
 
@@ -74,7 +120,7 @@ const ItemDetails = () => {
                 }}
             >
                 <img
-                    src={item.image}
+                    src={item.projectImages && item.projectImages.length > 0 ? item.projectImages[0] : 'https://via.placeholder.com/800x600'}
                     alt={item.title}
                     className="w-full h-full object-cover"
                 />
@@ -119,7 +165,7 @@ const ItemDetails = () => {
                     <div className="container mx-auto px-6 py-12 max-w-5xl">
                         {/* Title Section */}
                         <div className="mb-12">
-                            {item.live && (
+                            {item.projectLink && (
                                 <div className="inline-flex items-center space-x-2 px-4 py-2 bg-green-500/20 border border-green-500/30 rounded-full mb-6">
                                     <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
                                     <span className="text-green-400 font-semibold text-sm">Live Project</span>
@@ -167,44 +213,48 @@ const ItemDetails = () => {
                             </div>
 
                             {/* GitHub Link */}
-                            <a
-                                href={githubUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="group relative"
-                            >
-                                <div className="absolute inset-0 bg-gradient-to-r from-gray-600/20 to-gray-800/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-all duration-500" />
-                                <div className="relative p-6 bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 hover:border-white/30 transition-all h-full flex flex-col justify-between">
-                                    <div className="flex items-center space-x-3 mb-2">
-                                        <Github className="w-6 h-6 text-gray-300" />
-                                        <span className="text-gray-400 text-sm">Source Code</span>
+                            {item.githubLink && (
+                                <a
+                                    href={githubUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="group relative"
+                                >
+                                    <div className="absolute inset-0 bg-gradient-to-r from-gray-600/20 to-gray-800/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-all duration-500" />
+                                    <div className="relative p-6 bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 hover:border-white/30 transition-all h-full flex flex-col justify-between">
+                                        <div className="flex items-center space-x-3 mb-2">
+                                            <Github className="w-6 h-6 text-gray-300" />
+                                            <span className="text-gray-400 text-sm">Source Code</span>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <p className="text-lg font-bold text-white">View on GitHub</p>
+                                            <ExternalLink className="w-4 h-4 text-gray-400 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+                                        </div>
                                     </div>
-                                    <div className="flex items-center space-x-2">
-                                        <p className="text-lg font-bold text-white">View on GitHub</p>
-                                        <ExternalLink className="w-4 h-4 text-gray-400 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
-                                    </div>
-                                </div>
-                            </a>
+                                </a>
+                            )}
 
                             {/* Live Demo Link */}
-                            <a
-                                href={liveUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="group relative"
-                            >
-                                <div className="absolute inset-0 bg-gradient-to-r from-purple-600/20 to-pink-600/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-all duration-500" />
-                                <div className="relative p-6 bg-gradient-to-r from-purple-600/30 to-pink-600/30 backdrop-blur-xl rounded-2xl border border-purple-500/50 hover:border-purple-400 transition-all h-full flex flex-col justify-between">
-                                    <div className="flex items-center space-x-3 mb-2">
-                                        <ExternalLink className="w-6 h-6 text-purple-300" />
-                                        <span className="text-purple-200 text-sm">Live Demo</span>
+                            {item.projectLink && (
+                                <a
+                                    href={liveUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="group relative"
+                                >
+                                    <div className="absolute inset-0 bg-gradient-to-r from-purple-600/20 to-pink-600/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-all duration-500" />
+                                    <div className="relative p-6 bg-gradient-to-r from-purple-600/30 to-pink-600/30 backdrop-blur-xl rounded-2xl border border-purple-500/50 hover:border-purple-400 transition-all h-full flex flex-col justify-between">
+                                        <div className="flex items-center space-x-3 mb-2">
+                                            <ExternalLink className="w-6 h-6 text-purple-300" />
+                                            <span className="text-purple-200 text-sm">Live Demo</span>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <p className="text-lg font-bold text-white">Visit Website</p>
+                                            <ExternalLink className="w-4 h-4 text-purple-300 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+                                        </div>
                                     </div>
-                                    <div className="flex items-center space-x-2">
-                                        <p className="text-lg font-bold text-white">Visit Website</p>
-                                        <ExternalLink className="w-4 h-4 text-purple-300 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
-                                    </div>
-                                </div>
-                            </a>
+                                </a>
+                            )}
                         </div>
 
                         {/* Demo Images Gallery */}

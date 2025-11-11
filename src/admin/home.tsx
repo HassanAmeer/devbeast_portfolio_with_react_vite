@@ -42,6 +42,7 @@ interface Project {
     githubLink: string;
     projectLink: string;
     totalTeams: string;
+    isWeb: boolean;
     createdAt?: any;
     updatedAt?: any;
 }
@@ -87,7 +88,8 @@ const AdminHomePage = () => {
         projectImages: [],
         githubLink: '',
         projectLink: '',
-        totalTeams: '0'
+        totalTeams: '0',
+        isWeb: false
     });
     const [loader, setLoader] = useState(false);
 
@@ -118,6 +120,7 @@ const AdminHomePage = () => {
             desc: 'Advanced banking platform with AI-powered fraud detection, biometric authentication, and real-time cryptocurrency trading.',
             tags: ['Flutter', 'Dart', 'Firebase', 'TensorFlow'],
             projectLink: '',
+            isWeb: true,
             totalTeams: '0',
             githubLink: '',
             projectImages: []
@@ -128,6 +131,7 @@ const AdminHomePage = () => {
             desc: 'Revolutionary telemedicine app with AI diagnosis, ML-powered health predictions, and secure patient data management.',
             tags: ['Flutter', 'Laravel', 'MySQL', 'AI'],
             projectLink: '',
+            isWeb: true,
             totalTeams: '0',
             githubLink: '',
             projectImages: []
@@ -202,8 +206,8 @@ const AdminHomePage = () => {
 
     useEffect(() => {
 
-        const deviceInfo = getDeviceName();
-        console.log('Device:', deviceInfo.full);
+        // const deviceInfo = getDeviceName();
+        // console.log('Device:', deviceInfo.full);
 
         const loadSocialLinsData = async () => {
             try {
@@ -312,6 +316,7 @@ const AdminHomePage = () => {
                         githubLink: data.githubLink || '',
                         projectLink: data.projectLink || '',
                         totalTeams: data.totalTeams || 0,
+                        isWeb: data.isWeb || false,
                     } as Project;
                 });
 
@@ -525,6 +530,7 @@ const AdminHomePage = () => {
                 githubLink: newProject.githubLink || '',
                 projectLink: newProject.projectLink || '',
                 totalTeams: newProject.totalTeams || '1',
+                isWeb: newProject.isWeb || false,
                 createdAt: serverTimestamp(),
                 updatedAt: serverTimestamp(),
             };
@@ -576,6 +582,7 @@ const AdminHomePage = () => {
                 githubLink: updatedProject.githubLink,
                 projectLink: updatedProject.projectLink,
                 totalTeams: updatedProject.totalTeams,
+                isWeb: updatedProject.isWeb,
                 updatedAt: serverTimestamp(),
             };
 
@@ -1086,7 +1093,8 @@ const AdminHomePage = () => {
                                                 projectImages: [],
                                                 githubLink: '',
                                                 projectLink: '',
-                                                totalTeams: '0'
+                                                totalTeams: '0',
+                                                isWeb: false
                                             });
                                             setShowAddProject(true);
                                         }}
@@ -1455,7 +1463,8 @@ const AdminHomePage = () => {
                                         projectImages: [],
                                         githubLink: '',
                                         projectLink: '',
-                                        totalTeams: '0'
+                                        totalTeams: '0',
+                                        isWeb: false
                                     });
                                 }}
                                 className="p-2 bg-red-600/20 hover:bg-red-600/40 rounded-lg transition-all"
@@ -1641,6 +1650,22 @@ const AdminHomePage = () => {
                                 }}
                                 className="w-full px-3 py-2 rounded-lg bg-white/5 backdrop-blur-xl border border-white/10 focus:border-purple-500 outline-none transition-all text-white text-sm"
                             />
+
+                            <div className="flex items-center space-x-3">
+                                <label className="text-sm text-gray-300">Is Web Project?</label>
+                                <input
+                                    type="checkbox"
+                                    checked={editingProject?.isWeb || newProjectData.isWeb || false}
+                                    onChange={(e) => {
+                                        if (editingProject) {
+                                            setEditingProject({ ...editingProject, isWeb: e.target.checked });
+                                        } else {
+                                            setNewProjectData({ ...newProjectData, isWeb: e.target.checked });
+                                        }
+                                    }}
+                                    className="w-4 h-4 text-purple-600 bg-gray-100 border-gray-300 rounded focus:ring-purple-500 focus:ring-2"
+                                />
+                            </div>
 
                             <div className="flex justify-end space-x-3 pt-4">
                                 <button

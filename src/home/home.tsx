@@ -4,6 +4,51 @@ import { useNavigate } from 'react-router-dom';
 import person1 from '../assets/person1.png';
 import ContactSection from './contact';
 import BringSection from './bring';
+import { doc, getDoc, collection, getDocs, query, orderBy } from 'firebase/firestore';
+import { db } from '../config/fbconfig';
+
+
+interface Project {
+    id: string;           // ← CHANGE FROM number TO string
+    title: string;
+    desc: string;
+    tags: string[];
+    projectImages: string[];  // or { url: string; name: string }[]
+    githubLink: string;
+    projectLink: string;
+    totalTeams: string;
+    isWeb: boolean;
+    createdAt?: any;
+    updatedAt?: any;
+}
+
+interface ContactInfo {
+    email: string;
+    phone: string;
+    location: string;
+}
+
+interface SocialLink {
+    id: string;
+    platform: string;
+    url: string;
+    icon: 'github' | 'linkedin' | 'twitter' | 'instagram' | 'facebook' | 'youtube' | 'tiktok' | 'telegram' | 'discord' | 'snapchat' | 'globe';
+}
+
+interface ContactMessage {
+    id: string;
+    phone: string;
+    email: string;
+    desc: string;
+    createdAt: string;
+    read: boolean;
+}
+
+interface HeaderData {
+    title: string;
+    subtitle: string;
+    logo: string;
+}
 
 const Portfolio = () => {
     const navigate = useNavigate();
@@ -13,6 +58,7 @@ const Portfolio = () => {
     const [scrolled] = useState(false);
     const [mousePosition] = useState({ x: 0, y: 0 });
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const [isLoadingData, setIsLoadingData] = useState(true);
 
     useEffect(() => {
         // const handleScroll = () => setScrolled(window.scrollY > 50);
@@ -30,6 +76,211 @@ const Portfolio = () => {
         //     window.removeEventListener('scroll', handleScroll);
         //     window.removeEventListener('mousemove', handleMouseMove);
         // };
+    }, []);
+
+
+
+    ////////// now getting data from firebase and set it 
+    const [loader, setLoader] = useState(false);
+
+    // Editable data states
+    const [heroData, setHeroData] = useState({
+        title: 'Akash Ameerasd',
+        subtitle: 'Senior Developerasd',
+        desc: 'Senior Full-Stack Developer specializing in Flutter, Laravel, and React — transforming ideas into stunning realityasdsf',
+        image: 'https://thelocalrent.com/link/v.php?t=1762852463&tk=37160f2e00721d906831565829ae1de7',
+        btn_name_1: 'View Portfolio',
+        btn_link_1: '#',
+        btn_name_2: 'View Portfolio',
+        btn_link_2: 'asd#',
+        card_title_1: '4+adsf',
+        card_subtitle_1: 'Yeaadsrs Experience',
+        card_title_2: '150+ds',
+        card_subtitle_2: 'Projecasdsts Completed',
+        card_title_3: '90%ads',
+        card_subtitle_3: 'Happadsy Clients',
+        card_title_4: '4.9dfv',
+        card_subtitle_4: 'Aveadsfrage Rating'
+    });
+
+    const [projects, setProjects] = useState<Project[]>([]);
+
+    const [headerData, setHeaderData] = useState<HeaderData>({
+        title: 'DeavBeast',
+        subtitle: 'Senio Flutter Developer',
+        logo: '',
+    });
+
+    const [contactInfo, setContactInfo] = useState<ContactInfo>({
+        email: 'devbeast143@gmail.com',
+        phone: '+921234567',
+        location: 'Lahore Pakistan',
+    });
+
+    const [socialLinks, setSocialLinks] = useState<SocialLink[]>([
+        { id: '1', platform: 'Github', url: 'github.com', icon: 'github' },
+        { id: '2', platform: 'Linkedin', url: 'linkedin.com', icon: 'linkedin' },
+        { id: '3', platform: 'Twitter', url: 'twitter.com', icon: 'twitter' },
+        { id: '4', platform: 'Instagram', url: 'instagram.com', icon: 'instagram' },
+        { id: '5', platform: 'Facebook', url: 'facebook.com', icon: 'facebook' },
+        { id: '6', platform: 'Youtube', url: 'youtube.com', icon: 'youtube' },
+        { id: '7', platform: 'Tiktok', url: 'tiktok.com', icon: 'tiktok' },
+        { id: '8', platform: 'Telegram', url: 'telegram.com', icon: 'telegram' },
+        { id: '9', platform: 'Discord', url: 'discord.com', icon: 'discord' },
+        { id: '10', platform: 'Snapchat', url: 'snapchat.com', icon: 'snapchat' },
+        { id: '12', platform: 'Globe', url: 'globe.com', icon: 'globe' }
+    ]);
+
+    const [messages, setMessages] = useState<ContactMessage[]>([
+        {
+            id: '1',
+            phone: '0301234567',
+            email: 'john@example.com',
+            desc: 'Hi Akash, I loved your AI Healthcare app. Can we discuss a partnership?',
+            createdAt: 'Nov 10, 2025',
+            read: false
+        },
+        {
+            id: '2',
+            phone: '0301234567',
+            email: 'sarah@startup.io',
+            desc: 'We are hiring senior developers. Your portfolio is impressive!',
+            createdAt: 'Nov 9, 2025',
+            read: true
+        }
+    ]);
+
+    const [currentAdminData, setCurrentAdminData] = useState<{ email: string, pass: string } | null>(null);
+
+    useEffect(() => {
+
+        // const deviceInfo = getDeviceName();
+        // console.log('Device:', deviceInfo.full);
+
+        const loadSocialLinsData = async () => {
+            try {
+                const docRef = doc(db, 'dev1', 'social_links');
+                const docSnap = await getDoc(docRef);
+
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    setHeaderData({
+                        title: data.title || '',
+                        subtitle: data.subtitle || '',
+                        logo: data.logo || ''
+                    });
+                    setContactInfo({
+                        email: data.email || '',
+                        phone: data.phone || '',
+                        location: data.location || ''
+                    });
+                    setSocialLinks([
+                        { id: '1', platform: 'Github', url: data.github || '', icon: 'github' },
+                        { id: '2', platform: 'Linkedin', url: data.linkedin || '', icon: 'linkedin' },
+                        { id: '3', platform: 'Twitter', url: data.twitter || '', icon: 'twitter' },
+                        { id: '4', platform: 'Instagram', url: data.instagram || '', icon: 'instagram' },
+                        { id: '5', platform: 'Facebook', url: data.facebook || '', icon: 'facebook' },
+                        { id: '6', platform: 'Youtube', url: data.youtube || '', icon: 'youtube' },
+                        { id: '7', platform: 'Tiktok', url: data.tiktok || '', icon: 'tiktok' },
+                        { id: '8', platform: 'Telegram', url: data.telegram || '', icon: 'telegram' },
+                        { id: '9', platform: 'Discord', url: data.discord || '', icon: 'discord' },
+                        { id: '10', platform: 'Snapchat', url: data.snapchat || '', icon: 'snapchat' },
+                        { id: '11', platform: 'Globe', url: data.globe || '', icon: 'globe' }
+                    ]);
+                }
+            } catch (error) {
+                console.error('Error loading admin data:', error);
+            } finally {
+                setIsLoadingData(false);
+            }
+        };
+        // Load loadHearoData
+        const loadHeroData = async () => {
+            try {
+                const docRef = doc(db, 'dev1', 'hero_section');
+                const docSnap = await getDoc(docRef);
+
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    setHeroData({
+                        title: data.title || 'Akash Ameer',
+                        subtitle: data.subtitle || 'Senior Developer',
+                        desc: data.desc || 'Senior Full-Stack Developer specializing in Flutter, Laravel, and React — transforming ideas into stunning reality',
+                        image: data.image || '',
+                        btn_name_1: data.btn_name_1 || 'View Portfolio',
+                        btn_link_1: data.btn_link_1 || '#',
+                        btn_name_2: data.btn_name_2 || 'View Portfolio',
+                        btn_link_2: data.btn_link_2 || '#',
+                        card_title_1: data.card_title_1 || '4+',
+                        card_subtitle_1: data.card_subtitle_1 || 'Years Experience',
+                        card_title_2: data.card_title_2 || '150+',
+                        card_subtitle_2: data.card_subtitle_2 || 'Projects Completed',
+                        card_title_3: data.card_title_3 || '90%',
+                        card_subtitle_3: data.card_subtitle_3 || 'Happy Clients',
+                        card_title_4: data.card_title_4 || '4.9',
+                        card_subtitle_4: data.card_subtitle_4 || 'Average Rating'
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading admin data:', error);
+            } finally {
+                setIsLoadingData(false);
+            }
+        };
+        // Load current admin data
+        const loadAdminData = async () => {
+            try {
+                const docRef = doc(db, 'dev1', 'admin');
+                const docSnap = await getDoc(docRef);
+
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    setCurrentAdminData({
+                        email: data.email || '',
+                        pass: data.pass || ''
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading admin data:', error);
+            } finally {
+                setIsLoadingData(false);
+            }
+        };
+
+        const loadProjectsData = async () => {
+            try {
+                const projectsCollectionRef = collection(db, 'dev1', 'all_projects_id', 'projects');
+                const q = query(projectsCollectionRef, orderBy('createdAt', 'desc'));
+                const querySnapshot = await getDocs(q);
+
+                const fetchedProjects: Project[] = querySnapshot.docs.map((doc) => {
+                    const data = doc.data();
+                    return {
+                        id: doc.id,                    // ← string, matches your interface
+                        title: data.title || 'Untitled',
+                        desc: data.desc || data.description || '',
+                        tags: data.tags || [],
+                        projectImages: data.projectImages || [],
+                        githubLink: data.githubLink || '',
+                        projectLink: data.projectLink || '',
+                        totalTeams: data.totalTeams || 0,
+                        isWeb: data.isWeb || false,
+                    } as Project;
+                });
+
+                setProjects(fetchedProjects);
+                console.log("Projects loaded:", fetchedProjects);
+            } catch (error) {
+                console.error('Error loading admin data:', error);
+            } finally {
+                setIsLoadingData(false);
+            }
+        };
+
+        loadAdminData();
+        loadHeroData();
+        loadSocialLinsData();
+        loadProjectsData();
     }, []);
 
     const platforms = [
@@ -114,89 +365,6 @@ const Portfolio = () => {
         { icon: <Star className="w-8 h-8" />, number: '4.9', label: 'Average Rating', color: 'from-yellow-500 to-orange-500' }
     ];
 
-    const projects = [
-        {
-            id: 1,
-            title: 'FinTech Mobile Banking',
-            description: 'Advanced banking platform with AI-powered fraud detection, biometric authentication, and real-time cryptocurrency trading.',
-            image: 'https://images.unsplash.com/photo-1563986768609-322da13575f3?w=800&q=80',
-            tags: ['Flutter', 'Dart', 'Firebase', 'TensorFlow'],
-            category: 'app',
-            gradient: 'from-purple-600 via-pink-500 to-red-500',
-            live: true
-        },
-        {
-            id: 2,
-            title: 'AI Healthcare Platform',
-            description: 'Revolutionary telemedicine app with AI diagnosis, ML-powered health predictions, and secure patient data management.',
-            image: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&q=80',
-            tags: ['Flutter', 'Laravel', 'MySQL', 'AI'],
-            category: 'app',
-            gradient: 'from-blue-600 via-cyan-500 to-teal-500',
-            live: true
-        },
-        {
-            id: 3,
-            title: 'Real Estate Metaverse',
-            description: 'Immersive 3D property marketplace with AR/VR tours, blockchain NFT deeds, and smart contract integration.',
-            image: 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800&q=80',
-            tags: ['React', 'Laravel', 'Three.js', 'Web3'],
-            category: 'web',
-            gradient: 'from-green-600 via-emerald-500 to-teal-500',
-            live: true
-        },
-        {
-            id: 4,
-            title: 'Smart Fitness AI',
-            description: 'AI-powered fitness companion with computer vision pose detection, personalized workout plans, and nutrition tracking.',
-            image: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&q=80',
-            tags: ['Flutter', 'TensorFlow', 'Firebase', 'ML'],
-            category: 'app',
-            gradient: 'from-orange-600 via-red-500 to-pink-500',
-            live: true
-        },
-        {
-            id: 5,
-            title: 'Cloud Restaurant OS',
-            description: 'Complete restaurant ecosystem with AI demand forecasting, IoT kitchen management, and contactless dining.',
-            image: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&q=80',
-            tags: ['React', 'Laravel', 'IoT', 'Firebase'],
-            category: 'web',
-            gradient: 'from-yellow-600 via-orange-500 to-red-500',
-            live: true
-        },
-        {
-            id: 6,
-            title: 'Social Connect 3D',
-            description: 'Next-gen social platform with 3D avatars, spatial audio, AR filters, and blockchain-based content monetization.',
-            image: 'https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=800&q=80',
-            tags: ['Flutter', 'WebRTC', 'Firebase', '3D'],
-            category: 'app',
-            gradient: 'from-pink-600 via-purple-500 to-indigo-500',
-            live: true
-        },
-        {
-            id: 7,
-            title: 'Enterprise CRM AI',
-            description: 'Intelligent CRM with predictive analytics, automated workflows, natural language processing, and voice commands.',
-            image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80',
-            tags: ['React', 'Laravel', 'AI', 'ML'],
-            category: 'web',
-            gradient: 'from-indigo-600 via-blue-500 to-cyan-500',
-            live: true
-        },
-        {
-            id: 8,
-            title: 'EduTech Universe',
-            description: 'Immersive learning platform with VR classrooms, AI tutoring, gamification, and blockchain certificates.',
-            image: 'https://images.unsplash.com/photo-1509062522246-3755977927d7?w=800&q=80',
-            tags: ['Flutter', 'WebXR', 'Firebase', 'Blockchain'],
-            category: 'app',
-            gradient: 'from-teal-600 via-green-500 to-emerald-500',
-            live: true
-        }
-    ];
-
 
     const testimonials = [
         {
@@ -224,7 +392,9 @@ const Portfolio = () => {
 
     const filteredProjects = activeTab === 'all'
         ? projects
-        : projects.filter(p => p.category === activeTab);
+        : activeTab === 'web'
+            ? projects.filter(p => p.isWeb)
+            : projects.filter(p => !p.isWeb);
 
     // const handleSubmit = () => {
     //     if (formData.name && formData.email && formData.message) {
@@ -345,40 +515,70 @@ const Portfolio = () => {
 
                             <h2 className="text-6xl md:text-6xl font-black mb-4 leading-tight">
                                 <span className="inline-block bg-gradient-to-r from-purple-400 via-pink-400 to-purple-400 bg-clip-text text-transparent animate-gradient bg-[length:200%_auto]">
-                                    Akash Ameer
+                                    {heroData.title}
                                 </span>
                                 <br />
                                 <span className="inline-block bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent animate-gradient bg-[length:200%_auto]">
-                                    Senior Developer
+                                    {heroData.subtitle}
                                 </span>
                             </h2>
 
                             <p className="text-xl md:text-2xl text-gray-300 mb-6 max-w-3xl mx-auto leading-relaxed font-light">
-                                Senior Full-Stack Developer specializing in{' '}
-                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400 font-semibold">Flutter</span>,{' '}
-                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-red-400 font-semibold">Laravel</span>, and{' '}
-                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400 font-semibold">React</span>
-                                {' '}— transforming ideas into stunning reality
+                                {heroData.desc}
                             </p>
 
 
 
                             {/* Stats */}
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
-                                {stats.map((stat, idx) => (
-                                    <div key={idx} className="group relative">
-                                        <div className={`absolute inset-0 bg-gradient-to-r ${stat.color} rounded-2xl blur-xl opacity-10 group-hover:opacity-60 transition-all duration-500`} />
-                                        <div className="relative p-4 rounded-2xl bg-black/40 backdrop-blur-xl hover:border-white/20 transition-all transform hover:scale-120 hover:-translate-y-1 duration-300">
-                                            <div className={`flex justify-center mb-3 bg-gradient-to-r ${stat.color} bg-clip-text text-transparent`}>
-                                                {stat.icon}
-                                            </div>
-                                            <div className={`text-4xl font-black bg-gradient-to-r ${stat.color} bg-clip-text text-transparent mb-1`}>
-                                                {stat.number}
-                                            </div>
-                                            <div className="text-sm text-gray-400 font-medium">{stat.label}</div>
+                                <div className="group relative">
+                                    <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl blur-xl opacity-10 group-hover:opacity-60 transition-all duration-500" />
+                                    <div className="relative p-4 rounded-2xl bg-black/40 backdrop-blur-xl hover:border-white/20 transition-all transform hover:scale-120 hover:-translate-y-1 duration-300">
+                                        <div className="flex justify-center mb-3 bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">
+                                            <Award className="w-8 h-8" />
                                         </div>
+                                        <div className="text-4xl font-black bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent mb-1">
+                                            {heroData.card_title_1}
+                                        </div>
+                                        <div className="text-sm text-gray-400 font-medium">{heroData.card_subtitle_1}</div>
                                     </div>
-                                ))}
+                                </div>
+                                <div className="group relative">
+                                    <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl blur-xl opacity-10 group-hover:opacity-60 transition-all duration-500" />
+                                    <div className="relative p-4 rounded-2xl bg-black/40 backdrop-blur-xl hover:border-white/20 transition-all transform hover:scale-120 hover:-translate-y-1 duration-300">
+                                        <div className="flex justify-center mb-3 bg-gradient-to-r from-blue-500 to-cyan-500 bg-clip-text text-transparent">
+                                            <CheckCircle className="w-8 h-8" />
+                                        </div>
+                                        <div className="text-4xl font-black bg-gradient-to-r from-blue-500 to-cyan-500 bg-clip-text text-transparent mb-1">
+                                            {heroData.card_title_2}
+                                        </div>
+                                        <div className="text-sm text-gray-400 font-medium">{heroData.card_subtitle_2}</div>
+                                    </div>
+                                </div>
+                                <div className="group relative">
+                                    <div className="absolute inset-0 bg-gradient-to-r from-green-500 to-emerald-500 rounded-2xl blur-xl opacity-10 group-hover:opacity-60 transition-all duration-500" />
+                                    <div className="relative p-4 rounded-2xl bg-black/40 backdrop-blur-xl hover:border-white/20 transition-all transform hover:scale-120 hover:-translate-y-1 duration-300">
+                                        <div className="flex justify-center mb-3 bg-gradient-to-r from-green-500 to-emerald-500 bg-clip-text text-transparent">
+                                            <Users className="w-8 h-8" />
+                                        </div>
+                                        <div className="text-4xl font-black bg-gradient-to-r from-green-500 to-emerald-500 bg-clip-text text-transparent mb-1">
+                                            {heroData.card_title_3}
+                                        </div>
+                                        <div className="text-sm text-gray-400 font-medium">{heroData.card_subtitle_3}</div>
+                                    </div>
+                                </div>
+                                <div className="group relative">
+                                    <div className="absolute inset-0 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-2xl blur-xl opacity-10 group-hover:opacity-60 transition-all duration-500" />
+                                    <div className="relative p-4 rounded-2xl bg-black/40 backdrop-blur-xl hover:border-white/20 transition-all transform hover:scale-120 hover:-translate-y-1 duration-300">
+                                        <div className="flex justify-center mb-3 bg-gradient-to-r from-yellow-500 to-orange-500 bg-clip-text text-transparent">
+                                            <Star className="w-8 h-8" />
+                                        </div>
+                                        <div className="text-4xl font-black bg-gradient-to-r from-yellow-500 to-orange-500 bg-clip-text text-transparent mb-1">
+                                            {heroData.card_title_4}
+                                        </div>
+                                        <div className="text-sm text-gray-400 font-medium">{heroData.card_subtitle_4}</div>
+                                    </div>
+                                </div>
                             </div>
                             <div className="flex flex-wrap justify-center gap-4 pt-8">
                                 <button className="group relative px-8 py-4 rounded-2xl font-bold overflow-hidden">
@@ -494,10 +694,10 @@ const Portfolio = () => {
                                     className="group relative rounded-3xl overflow-hidden transform hover:scale-105 transition-all duration-500"
                                     style={{ animationDelay: `${idx * 100}ms` }}
                                 >
-                                    <div className={`absolute inset-0 bg-gradient-to-r ${project.gradient} opacity-0 group-hover:opacity-20 transition-all duration-500 blur-xl`} />
+                                    <div className={`absolute inset-0 bg-gradient-to-r ${project.isWeb ? 'from-cyan-500 to-blue-500' : 'from-purple-500 to-pink-500'} opacity-0 group-hover:opacity-20 transition-all duration-500 blur-xl`} />
 
                                     <div className="relative bg-black/40 backdrop-blur-xl border border-white/10 hover:border-white/30 transition-all rounded-3xl overflow-hidden">
-                                        {project.live && (
+                                        {project.projectLink && (
                                             <div className="absolute top-4 right-4 z-20">
                                                 <div className="flex items-center space-x-2 px-2 py-1 bg-purple-500/90 opacity-70 backdrop-blur-xl rounded-full text-xs font-bold shadow-lg">
                                                     <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
@@ -506,10 +706,10 @@ const Portfolio = () => {
                                             </div>
                                         )}
 
-                                        <div className="relative h-50 overflow-hidden">
+                                        <div className="relative h-48 overflow-hidden">
                                             <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent z-10" />
                                             <img
-                                                src={project.image}
+                                                src={project.projectImages[0] || 'https://via.placeholder.com/400x300'}
                                                 alt={project.title}
                                                 className="w-full h-full object-cover group-hover:scale-110 transition-all duration-700"
                                             />
@@ -520,7 +720,7 @@ const Portfolio = () => {
                                                 {project.title}
                                             </h4>
                                             <p className="text-sm text-gray-400 mb-4 line-clamp-2 leading-relaxed">
-                                                {project.description}
+                                                {project.desc}
                                             </p>
 
                                             <div className="flex flex-wrap gap-1 mb-2">

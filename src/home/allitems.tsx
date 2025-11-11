@@ -15,13 +15,30 @@ import {
     Filter
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { collection, getDocs, query, orderBy } from 'firebase/firestore';
+import { db } from '../config/fbconfig';
+
+interface Project {
+    id: string;
+    title: string;
+    desc: string;
+    tags: string[];
+    projectImages: string[];
+    githubLink: string;
+    projectLink: string;
+    totalTeams: string;
+    isWeb: boolean;
+    createdAt?: any;
+    updatedAt?: any;
+}
 
 const AllItems = () => {
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState('all');
     const [scrolled, setScrolled] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-    // const [selectedProject] = useState<any>(null);
+    const [projects, setProjects] = useState<Project[]>([]);
+    const [isLoadingData, setIsLoadingData] = useState(true);
 
     useEffect(() => {
         const handleScroll = () => setScrolled(window.scrollY > 50);
@@ -29,92 +46,46 @@ const AllItems = () => {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
-    const projects = [
-        {
-            id: 1,
-            title: 'FinTech Mobile Banking',
-            description: 'Advanced banking platform with AI-powered fraud detection, biometric authentication, and real-time cryptocurrency trading.',
-            image: 'https://images.unsplash.com/photo-1563986768609-322da13575f3?w=800&q=80',
-            tags: ['Flutter', 'Dart', 'Firebase', 'TensorFlow'],
-            category: 'app',
-            gradient: 'from-purple-600 via-pink-500 to-red-500',
-            live: true
-        },
-        {
-            id: 2,
-            title: 'AI Healthcare Platform',
-            description: 'Revolutionary telemedicine app with AI diagnosis, ML-powered health predictions, and secure patient data management.',
-            image: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&q=80',
-            tags: ['Flutter', 'Laravel', 'MySQL', 'AI'],
-            category: 'app',
-            gradient: 'from-blue-600 via-cyan-500 to-teal-500',
-            live: true
-        },
-        {
-            id: 3,
-            title: 'Real Estate Metaverse',
-            description: 'Immersive 3D property marketplace with AR/VR tours, blockchain NFT deeds, and smart contract integration.',
-            image: 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800&q=80',
-            tags: ['React', 'Laravel', 'Three.js', 'Web3'],
-            category: 'web',
-            gradient: 'from-green-600 via-emerald-500 to-teal-500',
-            live: true
-        },
-        {
-            id: 4,
-            title: 'Smart Fitness AI',
-            description: 'AI-powered fitness companion with computer vision pose detection, personalized workout plans, and nutrition tracking.',
-            image: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&q=80',
-            tags: ['Flutter', 'TensorFlow', 'Firebase', 'ML'],
-            category: 'app',
-            gradient: 'from-orange-600 via-red-500 to-pink-500',
-            live: true
-        },
-        {
-            id: 5,
-            title: 'Cloud Restaurant OS',
-            description: 'Complete restaurant ecosystem with AI demand forecasting, IoT kitchen management, and contactless dining.',
-            image: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&q=80',
-            tags: ['React', 'Laravel', 'IoT', 'Firebase'],
-            category: 'web',
-            gradient: 'from-yellow-600 via-orange-500 to-red-500',
-            live: true
-        },
-        {
-            id: 6,
-            title: 'Social Connect 3D',
-            description: 'Next-gen social platform with 3D avatars, spatial audio, AR filters, and blockchain-based content monetization.',
-            image: 'https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=800&q=80',
-            tags: ['Flutter', 'WebRTC', 'Firebase', '3D'],
-            category: 'app',
-            gradient: 'from-pink-600 via-purple-500 to-indigo-500',
-            live: true
-        },
-        {
-            id: 7,
-            title: 'Enterprise CRM AI',
-            description: 'Intelligent CRM with predictive analytics, automated workflows, natural language processing, and voice commands.',
-            image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80',
-            tags: ['React', 'Laravel', 'AI', 'ML'],
-            category: 'web',
-            gradient: 'from-indigo-600 via-blue-500 to-cyan-500',
-            live: true
-        },
-        {
-            id: 8,
-            title: 'EduTech Universe',
-            description: 'Immersive learning platform with VR classrooms, AI tutoring, gamification, and blockchain certificates.',
-            image: 'https://images.unsplash.com/photo-1509062522246-3755977927d7?w=800&q=80',
-            tags: ['Flutter', 'WebXR', 'Firebase', 'Blockchain'],
-            category: 'app',
-            gradient: 'from-teal-600 via-green-500 to-emerald-500',
-            live: true
-        }
-    ];
+    useEffect(() => {
+        const loadProjectsData = async () => {
+            try {
+                const projectsCollectionRef = collection(db, 'dev1', 'all_projects_id', 'projects');
+                const q = query(projectsCollectionRef, orderBy('createdAt', 'desc'));
+                const querySnapshot = await getDocs(q);
+
+                const fetchedProjects: Project[] = querySnapshot.docs.map((doc) => {
+                    const data = doc.data();
+                    return {
+                        id: doc.id,
+                        title: data.title || 'Untitled',
+                        desc: data.desc || data.description || '',
+                        tags: data.tags || [],
+                        projectImages: data.projectImages || [],
+                        githubLink: data.githubLink || '',
+                        projectLink: data.projectLink || '',
+                        totalTeams: data.totalTeams || 0,
+                        isWeb: data.isWeb || false,
+                    } as Project;
+                });
+
+                setProjects(fetchedProjects);
+                console.log("Projects loaded:", fetchedProjects);
+            } catch (error) {
+                console.error('Error loading projects:', error);
+            } finally {
+                setIsLoadingData(false);
+            }
+        };
+
+        loadProjectsData();
+    }, []);
+
 
     const filteredProjects = activeTab === 'all'
         ? projects
-        : projects.filter(p => p.category === activeTab);
+        : activeTab === 'web'
+            ? projects.filter(p => p.isWeb)
+            : projects.filter(p => !p.isWeb);
 
     const handleProjectClick = (project: any) => {
         navigate('/item', { state: project });
@@ -248,8 +219,8 @@ const AllItems = () => {
                         </div>
                         {[
                             { id: 'all', label: 'All Projects', icon: <Globe className="w-4 h-4" />, count: projects.length },
-                            { id: 'app', label: 'Mobile Apps', icon: <Smartphone className="w-4 h-4" />, count: projects.filter(p => p.category === 'app').length },
-                            { id: 'web', label: 'Web Apps', icon: <Code2 className="w-4 h-4" />, count: projects.filter(p => p.category === 'web').length }
+                            { id: 'app', label: 'Mobile Apps', icon: <Smartphone className="w-4 h-4" />, count: projects.filter(p => !p.isWeb).length },
+                            { id: 'web', label: 'Web Apps', icon: <Code2 className="w-4 h-4" />, count: projects.filter(p => p.isWeb).length }
                         ].map((tab) => (
                             <button
                                 key={tab.id}
@@ -278,10 +249,10 @@ const AllItems = () => {
                                 className="group relative rounded-3xl overflow-hidden cursor-pointer transform hover:scale-105 transition-all duration-500"
                                 style={{ animationDelay: `${idx * 50}ms` }}
                             >
-                                <div className={`absolute inset-0 bg-gradient-to-r ${project.gradient} opacity-10 group-hover:opacity-20 transition-all duration-500 blur-xl`} />
+                                <div className={`absolute inset-0 bg-gradient-to-r ${project.isWeb ? 'from-cyan-500 to-blue-500' : 'from-purple-500 to-pink-500'} opacity-10 group-hover:opacity-20 transition-all duration-500 blur-xl`} />
 
                                 <div className="relative bg-black/40 backdrop-blur-xl border border-white/10 hover:border-white/30 transition-all rounded-3xl overflow-hidden h-full">
-                                    {project.live && (
+                                    {project.projectLink && (
                                         <div className="absolute top-4 right-4 z-20">
                                             <div className="flex items-center space-x-2 px-2 py-1.5  opacity-60 hover:opacity-100 hover:bg-cyan-800/90  bg-purple-600/90 backdrop-blur-xl rounded-full text-xs font-bold shadow-lg">
                                                 <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
@@ -290,10 +261,10 @@ const AllItems = () => {
                                         </div>
                                     )}
 
-                                    <div className="relative h-56 overflow-hidden">
+                                    <div className="relative h-48 overflow-hidden">
                                         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent z-10" />
                                         <img
-                                            src={project.image}
+                                            src={project.projectImages[0] || 'https://via.placeholder.com/400x300'}
                                             alt={project.title}
                                             className="w-full h-full object-cover group-hover:scale-110 transition-all duration-700"
                                         />
@@ -304,7 +275,7 @@ const AllItems = () => {
                                             {project.title}
                                         </h4>
                                         <p className="text-sm text-gray-400 mb-4 line-clamp-2 leading-relaxed">
-                                            {project.description}
+                                            {project.desc}
                                         </p>
 
                                         <div className="flex flex-wrap gap-2 mb-4">
