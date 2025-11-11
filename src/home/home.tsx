@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Github, Linkedin, Twitter, Code2, Smartphone, Globe, Star, Award, Users, CheckCircle, Menu, X, ArrowRight, Download, ExternalLink, Instagram, Facebook, Youtube, Music2, Send, DessertIcon, Camera } from 'lucide-react';
+import { Github, Linkedin, Twitter, Code2, Smartphone, Globe, Star, Award, Users, CheckCircle, Menu, X, ArrowRight, ExternalLink, Instagram, Facebook, Youtube, Music2, Send, DessertIcon, Camera, Link } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import person1 from '../assets/person1.png';
 import ContactSection from './contact';
@@ -101,10 +101,10 @@ const Portfolio = () => {
         subtitle: 'Senior Developer',
         desc: 'Senior Full-Stack Developer specializing in -- Flutter, Laravel, and React -- transforming ideas into stunning reality',
         image: person1,
-        btn_name_1: 'View Portfolio',
+        btn_name_1: 'Portfolio',
         btn_link_1: '#',
-        btn_name_2: 'View Portfolio',
-        btn_link_2: 'asd#',
+        btn_name_2: 'Github',
+        btn_link_2: '#',
         card_title_1: '4+adsf',
         card_subtitle_1: 'Yeaadsrs Experience',
         card_title_2: '150+ds',
@@ -202,9 +202,9 @@ const Portfolio = () => {
                         subtitle: data.subtitle || 'Senior Developer',
                         desc: data.desc || 'Senior Full-Stack Developer specializing in -- Flutter, Laravel, and React -- transforming ideas into stunning reality',
                         image: data.image || '',
-                        btn_name_1: data.btn_name_1 || 'View Portfolio',
+                        btn_name_1: data.btn_name_1 || 'Portfolio',
                         btn_link_1: data.btn_link_1 || '#',
-                        btn_name_2: data.btn_name_2 || 'View Portfolio',
+                        btn_name_2: data.btn_name_2 || 'Github',
                         btn_link_2: data.btn_link_2 || '#',
                         card_title_1: data.card_title_1 || '4+',
                         card_subtitle_1: data.card_subtitle_1 || 'Years Experience',
@@ -618,7 +618,7 @@ const Portfolio = () => {
                                         target="_blank"
                                         className="group relative px-8 py-4 rounded-2xl font-bold border-2 border-purple-500/30 hover:border-purple-500 backdrop-blur-xl bg-white/5 hover:bg-white/10 transition-all">
                                         <span className="flex items-center space-x-2">
-                                            <Download className="w-5 h-5 group-hover:translate-y-1 transition-transform" />
+                                            <Link className="w-5 h-5 group-hover:translate-y-1 transition-transform" />
                                             <span>{heroData.btn_name_2}</span>
                                         </span>
                                     </a> : ""}
