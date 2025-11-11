@@ -139,7 +139,7 @@ const ContactSection = () => {
             <div className="container mx-auto px-4 relative z-10 max-w-7xl">
                 {/* Header */}
                 <div className="text-center mb-12">
-                    <h3 className="text-4xl md:text-6xl font-black mb-4 bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">
+                    <h3 className="text-3xl md:text-6xl font-black mb-4 bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">
                         Let's Create Together
                     </h3>
                     <p className="text-gray-400 text-base md:text-lg max-w-2xl mx-auto">

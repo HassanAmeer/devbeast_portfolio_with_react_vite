@@ -472,7 +472,7 @@ const Portfolio = () => {
                                 {['Home', 'Skills', 'Projects', 'Contact'].map((item) => (
                                     <a
                                         key={item}
-                                        href={`#${item.toLowerCase()}`}
+                                        href={item === 'Projects' ? '/allitems' : `#${item.toLowerCase()}`}
                                         className="relative group px-5 py-2.5 text-sm font-semibold text-gray-300 hover:text-white transition-all"
                                     >
                                         <span className="relative z-10">{item}</span>
@@ -498,8 +498,7 @@ const Portfolio = () => {
                                 {['Home', 'Skills', 'Projects', 'Contact'].map((item) => (
                                     <a
                                         key={item}
-                                        href={`#${item.toLowerCase()}`}
-                                        onClick={() => setMobileMenuOpen(false)}
+                                        href={item === 'Projects' ? '/allitems' : `#${item.toLowerCase()}`}
                                         className="px-4 py-3 rounded-xl hover:bg-white/5 transition-all font-medium"
                                     >
                                         {item}
@@ -522,10 +521,10 @@ const Portfolio = () => {
                         />
                     </div>
 
-                    <div className="container mx-auto px-0 relative z-20 flex">
-                        <div className="text-center max-w-5xl mx-auto pt-20">
+                    <div className="container mx-auto px-0 relative z-20 flex flex-col md:flex-row items-center justify-center">
+                        <div className="text-center max-w-5xl mx-auto md:pt-0 pt-20">
 
-                            <h2 className="text-6xl md:text-6xl font-black mb-4 leading-tight">
+                            <h2 className="text-4xl md:text-6xl font-black mb-4 leading-tight">
                                 <span className="inline-block bg-gradient-to-r from-purple-400 via-pink-400 to-purple-400 bg-clip-text text-transparent animate-gradient bg-[length:200%_auto]">
                                     {heroData.title}
                                 </span>
@@ -628,18 +627,15 @@ const Portfolio = () => {
                         <img
                             src={person1}
                             alt="Workspace"
-                            className="w-1/3 bject-cover opacity-80"
+                            className="w-1/2 bject-cover opacity-80 md:w-1/3 pt-10 md:pt-0"
                         />
-
-
-
                     </div>
 
                 </section>
                 {/* Modern Platforms Marquee with Logos */}
                 <section className="py-8 relative inline-flex ">
                     {/* <div className="absolute inset-0 bg-gradient-to-r from-black via-purple-950/20 to-black" /> */}
-                    <div className="mb-2 inline-flex items-center space-x-2 px-6 py-3  rounded-half backdrop-blur-xl">
+                    <div className="hidden md:inline-flex mb-2 items-center space-x-2 px-6 py-3 rounded-half backdrop-blur-xl">
                         <ArrowRight className="w-5 h-5 text-purple-400 animate-pulse" />
                         <span className="text-sm font-bold bg-gradient-to-r from-purple-300 to-cyan-300 bg-clip-text text-transparent">
                             Services
@@ -651,7 +647,7 @@ const Portfolio = () => {
                                 <div key={idx} className="inline-flex mx-4">
                                     <div className="group relative">
                                         <div className={`absolute inset-0 bg-gradient-to-r ${platform.color} rounded-2xl blur-xl opacity-0 group-hover:opacity-50 transition-all duration-500`} />
-                                        <div className="relative flex items-center space-x-4 px-8 py-6 bg-black/40 backdrop-blur-xl rounded-2xl transition-all hover:scale-110 transform duration-300">
+                                        <div className="relative flex items-center space-x-4 px-2 md:px-6 py-2 bg-black/40 backdrop-blur-xl rounded-2xl transition-all hover:scale-110 transform duration-300">
                                             <img
                                                 src={platform.logo}
                                                 alt={platform.name}
@@ -678,7 +674,7 @@ const Portfolio = () => {
                             {/* <div className="inline-block px-4 py-2 bg-gradient-to-r from-purple-600/20 to-cyan-600/20 rounded-full text-sm font-bold text-purple-300 border border-purple-500/30 mb-6">
                                 PORTFOLIO
                             </div> */}
-                            <h3 className="text-5xl md:text-6xl font-black mb-6 bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">
+                            <h3 className="text-3xl md:text-6xl font-black mb-6 bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">
                                 Featured Projects
                             </h3>
                             {/* <p className="text-gray-400 text-lg max-w-2xl mx-auto mb-12">
@@ -713,7 +709,7 @@ const Portfolio = () => {
                         </div>
 
                         <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                            {filteredProjects.map((project, idx) => (
+                            {filteredProjects.map((project, idx) => idx < 20 ? (
                                 <div
                                     onClick={() => navigate('/item', { state: project })} // passing full data
                                     key={project.id}
@@ -769,7 +765,7 @@ const Portfolio = () => {
                                         </div>
                                     </div>
                                 </div>
-                            ))}
+                            ) : (<></>))}
                         </div>
                     </div>
                 </section>
@@ -782,16 +778,19 @@ const Portfolio = () => {
                         {/* <div className="inline-block px-4 py-2 bg-gradient-to-r from-purple-600/20 to-cyan-600/20 rounded-full text-sm font-bold text-purple-300 border border-purple-500/30 mb-6">
                             TESTIMONIALS
                         </div> */}
-                        <h3 className="text-5xl md:text-6xl font-black mb-6 bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">
+                        <h3 className="text-2xl md:text-6xl font-black mb-6 bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">
                             Client Success Stories
                         </h3>
                     </div>
 
-                    <div className="grid md:grid-cols-3 gap-8">
+                    <div className="gap-4 flex flex-row items-center overflow-x-auto">
                         {reviews.map((r, idx) => (
-                            <div key={idx} className="group relative">
+                            <div
+                                key={idx}
+                                className="group relative flex-shrink-0 w-[280px] md:w-1/3 lg:w-1/3"
+                            >
                                 <div className="absolute inset-0 bg-gradient-to-r from-purple-600/20 to-cyan-600/20 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-all duration-500" />
-                                <div className="relative p-8 rounded-3xl bg-black/40 backdrop-blur-xl border border-white/10 hover:border-white/30 transition-all transform hover:scale-105 hover:-translate-y-2 duration-500">
+                                <div className="relative p-8 rounded-3xl bg-black/40 backdrop-blur-xl border border-white/10 hover:border-white/30 transition-all transform scale-90 hover:scale-95 hover:-translate-y-2 duration-500">
                                     <div className="flex mb-4">
                                         {[...Array(r.rating)].map((_, i) => (
                                             <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />
@@ -824,7 +823,7 @@ const Portfolio = () => {
                 {/* Modern Footer */}
                 <footer className="border-t border-white/5 bg-black/60 backdrop-blur-xl py-12">
                     <div className="container mx-auto px-4">
-                        <div className="grid md:grid-cols-4 gap-8 mb-12">
+                        <div className="grid md:grid-cols-4 gap-8 mb-4">
                             <div className="md:col-span-2">
                                 <div className="flex items-center space-x-3 mb-6">
                                     <div className="relative">
@@ -841,7 +840,7 @@ const Portfolio = () => {
                                 <p className="text-gray-400 mb-6 max-w-md leading-relaxed">
                                     Senior Full-Stack Developer crafting exceptional digital experiences with cutting-edge technologies. Let's build something amazing together.
                                 </p>
-                                <div className="flex space-x-4">
+                                <div className="flex space-x-4 flex-wrap">
                                     {socialLinks.filter(link => link.url && link.url.trim() !== '').map((link) => {
                                         const Icon = {
                                             github: Github,
@@ -863,7 +862,7 @@ const Portfolio = () => {
                                                 href={link.url}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                className="w-10 h-10 bg-white/5 hover:bg-white/10 rounded-xl flex items-center justify-center transition-all transform hover:scale-110 border border-white/10 hover:border-white/20"
+                                                className="mb-2 md:mb-0 group relative w-10 h-10 bg-white/5 hover:bg-white/10 rounded-xl flex items-center justify-center transition-all transform hover:scale-110 border border-white/10 hover:border-white/20"
                                             >
                                                 <Icon className="w-5 h-5" />
                                             </a>
@@ -877,7 +876,7 @@ const Portfolio = () => {
                                 <ul className="space-y-2">
                                     {['Home', 'Skills', 'Projects', 'Contact'].map((item) => (
                                         <li key={item}>
-                                            <a href={`#${item.toLowerCase()}`} className="text-gray-400 hover:text-purple-400 transition-all">
+                                            <a href={item === 'Projects' ? '/allitems' : `#${item.toLowerCase()}`} className="text-gray-400 hover:text-purple-400 transition-all">
                                                 {item}
                                             </a>
                                         </li>
@@ -910,7 +909,7 @@ const Portfolio = () => {
                         </div>
                     </div>
                 </footer>
-            </div>
+            </div >
 
             <style>{`
         @keyframes marquee-slow {
@@ -938,7 +937,7 @@ const Portfolio = () => {
           animation: gradient 3s ease infinite;
         }
       `}</style>
-        </div>
+        </div >
     );
 };
 

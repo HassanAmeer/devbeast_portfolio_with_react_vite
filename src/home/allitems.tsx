@@ -12,10 +12,11 @@ import {
     Briefcase,
     User,
     MessageCircle,
-    Filter
+    Filter,
+    Instagram
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { collection, getDocs, query, orderBy } from 'firebase/firestore';
+import { collection, getDocs, query, orderBy, doc, getDoc } from 'firebase/firestore';
 import { db } from '../config/fbconfig';
 
 interface Project {
@@ -32,6 +33,34 @@ interface Project {
     updatedAt?: any;
 }
 
+interface SocialLink {
+    id: string;
+    platform: string;
+    url: string;
+    icon: 'github' | 'linkedin' | 'twitter' | 'instagram' | 'facebook' | 'youtube' | 'tiktok' | 'telegram' | 'discord' | 'snapchat' | 'globe';
+}
+
+// interface ContactMessage {
+//     id: string;
+//     phone: string;
+//     email: string;
+//     desc: string;
+//     createdAt: string;
+//     read: boolean;
+// }
+
+interface HeaderData {
+    title: string;
+    subtitle: string;
+    logo: string;
+}
+
+interface ContactInfo {
+    email: string;
+    phone: string;
+    location: string;
+}
+
 const AllItems = () => {
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState('all');
@@ -40,6 +69,34 @@ const AllItems = () => {
     const [projects, setProjects] = useState<Project[]>([]);
     // const [isLoadingData, setIsLoadingData] = useState(true);
 
+
+
+    // const [headerData, setHeaderData] = useState<HeaderData>({
+    //     title: 'DeavBeast',
+    //     subtitle: 'Senio Flutter Developer',
+    //     logo: '',
+    // });
+
+    const [contactInfo, setContactInfo] = useState<ContactInfo>({
+        email: 'devbeast143@gmail.com',
+        phone: '+921234567',
+        location: 'Lahore Pakistan',
+    });
+
+    const [socialLinks, setSocialLinks] = useState<SocialLink[]>([
+        { id: '1', platform: 'Github', url: 'github.com', icon: 'github' },
+        { id: '2', platform: 'Linkedin', url: 'linkedin.com', icon: 'linkedin' },
+        { id: '3', platform: 'Twitter', url: 'twitter.com', icon: 'twitter' },
+        { id: '4', platform: 'Instagram', url: 'instagram.com', icon: 'instagram' },
+        { id: '5', platform: 'Facebook', url: 'facebook.com', icon: 'facebook' },
+        { id: '6', platform: 'Youtube', url: 'youtube.com', icon: 'youtube' },
+        { id: '7', platform: 'Tiktok', url: 'tiktok.com', icon: 'tiktok' },
+        { id: '8', platform: 'Telegram', url: 'telegram.com', icon: 'telegram' },
+        { id: '9', platform: 'Discord', url: 'discord.com', icon: 'discord' },
+        { id: '10', platform: 'Snapchat', url: 'snapchat.com', icon: 'snapchat' },
+        { id: '12', platform: 'Globe', url: 'globe.com', icon: 'globe' }
+    ]);
+
     useEffect(() => {
         const handleScroll = () => setScrolled(window.scrollY > 50);
         window.addEventListener('scroll', handleScroll);
@@ -47,6 +104,44 @@ const AllItems = () => {
     }, []);
 
     useEffect(() => {
+
+        const loadSocialLinsData = async () => {
+            try {
+                const docRef = doc(db, 'dev1', 'social_links');
+                const docSnap = await getDoc(docRef);
+
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    // setHeaderData({
+                    //     title: data.title || '',
+                    //     subtitle: data.subtitle || '',
+                    //     logo: data.logo || ''
+                    // });
+                    // setContactInfo({
+                    //     email: data.email || '',
+                    //     phone: data.phone || '',
+                    //     location: data.location || ''
+                    // });
+                    setSocialLinks([
+                        { id: '1', platform: 'Github', url: data.github || '', icon: 'github' },
+                        { id: '2', platform: 'Linkedin', url: data.linkedin || '', icon: 'linkedin' },
+                        { id: '3', platform: 'Twitter', url: data.twitter || '', icon: 'twitter' },
+                        { id: '4', platform: 'Instagram', url: data.instagram || '', icon: 'instagram' },
+                        { id: '5', platform: 'Facebook', url: data.facebook || '', icon: 'facebook' },
+                        { id: '6', platform: 'Youtube', url: data.youtube || '', icon: 'youtube' },
+                        { id: '7', platform: 'Tiktok', url: data.tiktok || '', icon: 'tiktok' },
+                        { id: '8', platform: 'Telegram', url: data.telegram || '', icon: 'telegram' },
+                        { id: '9', platform: 'Discord', url: data.discord || '', icon: 'discord' },
+                        { id: '10', platform: 'Snapchat', url: data.snapchat || '', icon: 'snapchat' },
+                        { id: '11', platform: 'Globe', url: data.globe || '', icon: 'globe' }
+                    ]);
+                }
+            } catch (error) {
+                console.error('Error loading admin data:', error);
+            } finally {
+                // setIsLoadingData(false);
+            }
+        };
         const loadProjectsData = async () => {
             try {
                 const projectsCollectionRef = collection(db, 'dev1', 'all_projects_id', 'projects');
@@ -77,8 +172,13 @@ const AllItems = () => {
             }
         };
 
+        loadSocialLinsData();
         loadProjectsData();
     }, []);
+
+    const handleWhatsAppClick = (whatsappNumber: string) => {
+        window.open(`https://wa.me/${whatsappNumber.replace(/[^0-9]/g, '')}`, '_blank');
+    };
 
 
     const filteredProjects = activeTab === 'all'
@@ -124,7 +224,7 @@ const AllItems = () => {
                         <div className="flex items-center space-x-3">
                             {/* Desktop Menu */}
                             <nav className="hidden md:flex items-center space-x-2">
-                                <button
+                                {/* <button
                                     onClick={() => navigate('/')}
                                     className="group px-4 py-2 rounded-xl hover:bg-white/10 transition-all flex items-center space-x-2"
                                 >
@@ -134,28 +234,26 @@ const AllItems = () => {
                                 <button className="group px-4 py-2 rounded-xl hover:bg-white/10 transition-all flex items-center space-x-2">
                                     <Briefcase className="w-4 h-4" />
                                     <span className="text-sm font-semibold">Portfolio</span>
-                                </button>
-                                <button className="group px-4 py-2 rounded-xl hover:bg-white/10 transition-all flex items-center space-x-2">
-                                    <User className="w-4 h-4" />
-                                    <span className="text-sm font-semibold">About</span>
-                                </button>
-                                <button className="px-4 py-2 bg-gradient-to-r from-purple-600 to-cyan-600 rounded-xl font-bold hover:scale-105 transition-all flex items-center space-x-2">
+                                </button> */}
+                                {contactInfo.phone !== "" ? <button onClick={() => handleWhatsAppClick(contactInfo.phone)} className="px-4 py-2 bg-gradient-to-r from-purple-600 to-cyan-600 rounded-xl font-bold hover:scale-105 transition-all flex items-center space-x-2">
                                     <MessageCircle className="w-4 h-4" />
                                     <span className="text-sm">Contact</span>
-                                </button>
+                                </button> : <></>}
                             </nav>
 
                             {/* Social Icons */}
                             <div className="hidden lg:flex items-center space-x-2 pl-2 border-l border-white/10">
-                                <a href="#" className="p-2 hover:bg-white/10 rounded-lg transition-all">
+                                {socialLinks.find((e) => e.platform == "github")?.platform !== "" ? <a href={socialLinks.find((e) => e.platform == "github")?.url} className="p-2 hover:bg-white/10 rounded-lg transition-all">
                                     <Github className="w-4 h-4" />
-                                </a>
-                                <a href="#" className="p-2 hover:bg-white/10 rounded-lg transition-all">
+                                </a> : <></>}
+                                {socialLinks.find((e) => e.platform == "linkdin")?.platform !== "" ? <a href={socialLinks.find((e) => e.platform == "linkdin")?.url}
+                                    className="p-2 hover:bg-white/10 rounded-lg transition-all">
                                     <Linkedin className="w-4 h-4" />
-                                </a>
-                                <a href="#" className="p-2 hover:bg-white/10 rounded-lg transition-all">
-                                    <Twitter className="w-4 h-4" />
-                                </a>
+                                </a> : <></>}
+                                {socialLinks.find((e) => e.platform == "instagram")?.platform !== "" ? <a href={socialLinks.find((e) => e.platform == "instagram")?.url}
+                                    className="p-2 hover:bg-white/10 rounded-lg transition-all">
+                                    <Instagram className="w-4 h-4" />
+                                </a> : <></>}
                             </div>
 
                             {/* Mobile Menu Toggle */}
@@ -173,7 +271,7 @@ const AllItems = () => {
                 {mobileMenuOpen && (
                     <div className="md:hidden absolute top-full left-0 w-full bg-black/95 backdrop-blur-2xl border-b border-white/5">
                         <nav className="container mx-auto px-4 py-6 flex flex-col space-y-2">
-                            <button
+                            {/* <button
                                 onClick={() => { navigate('/'); setMobileMenuOpen(false); }}
                                 className="flex items-center space-x-3 px-4 py-3 rounded-xl hover:bg-white/5 transition-all"
                             >
@@ -187,21 +285,23 @@ const AllItems = () => {
                             <button className="flex items-center space-x-3 px-4 py-3 rounded-xl hover:bg-white/5 transition-all">
                                 <User className="w-5 h-5" />
                                 <span className="font-medium">About</span>
-                            </button>
-                            <button className="flex items-center space-x-3 px-4 py-3 bg-gradient-to-r from-purple-600 to-cyan-600 rounded-xl font-bold">
+                            </button> */}
+                            {contactInfo.phone !== "" ? <button onClick={() => handleWhatsAppClick(contactInfo.phone)} className="flex items-center space-x-3 px-4 py-3 bg-gradient-to-r from-purple-600 to-cyan-600 rounded-xl font-bold">
                                 <MessageCircle className="w-5 h-5" />
                                 <span>Contact</span>
-                            </button>
+                            </button> : <></>}
                             <div className="flex items-center space-x-3 px-4 pt-4 border-t border-white/10">
-                                <a href="#" className="p-2 hover:bg-white/10 rounded-lg transition-all">
-                                    <Github className="w-5 h-5" />
-                                </a>
-                                <a href="#" className="p-2 hover:bg-white/10 rounded-lg transition-all">
-                                    <Linkedin className="w-5 h-5" />
-                                </a>
-                                <a href="#" className="p-2 hover:bg-white/10 rounded-lg transition-all">
-                                    <Twitter className="w-5 h-5" />
-                                </a>
+                                {socialLinks.find((e) => e.platform == "github")?.platform !== "" ? <a href={socialLinks.find((e) => e.platform == "github")?.url} className="p-2 hover:bg-white/10 rounded-lg transition-all">
+                                    <Github className="w-4 h-4" />
+                                </a> : <></>}
+                                {socialLinks.find((e) => e.platform == "linkdin")?.platform !== "" ? <a href={socialLinks.find((e) => e.platform == "linkdin")?.url}
+                                    className="p-2 hover:bg-white/10 rounded-lg transition-all">
+                                    <Linkedin className="w-4 h-4" />
+                                </a> : <></>}
+                                {socialLinks.find((e) => e.platform == "instagram")?.platform !== "" ? <a href={socialLinks.find((e) => e.platform == "instagram")?.url}
+                                    className="p-2 hover:bg-white/10 rounded-lg transition-all">
+                                    <Instagram className="w-4 h-4" />
+                                </a> : <></>}
                             </div>
                         </nav>
                     </div>
