@@ -61,8 +61,8 @@ interface ContactMessage {
     id: string;
     phone: string;
     email: string;
-    message: string;
-    date: string;
+    desc: string;
+    createdAt: string;
     read: boolean;
 }
 
@@ -161,16 +161,16 @@ const AdminHomePage = () => {
             id: '1',
             phone: '0301234567',
             email: 'john@example.com',
-            message: 'Hi Akash, I loved your AI Healthcare app. Can we discuss a partnership?',
-            date: 'Nov 10, 2025',
+            desc: 'Hi Akash, I loved your AI Healthcare app. Can we discuss a partnership?',
+            createdAt: 'Nov 10, 2025',
             read: false
         },
         {
             id: '2',
             phone: '0301234567',
             email: 'sarah@startup.io',
-            message: 'We are hiring senior developers. Your portfolio is impressive!',
-            date: 'Nov 9, 2025',
+            desc: 'We are hiring senior developers. Your portfolio is impressive!',
+            createdAt: 'Nov 9, 2025',
             read: true
         }
     ]);
@@ -245,9 +245,36 @@ const AdminHomePage = () => {
                 setIsLoadingData(false);
             }
         };
+        const loadContactUsMessages = async () => {
+            try {
+                const contactUsCollectionRef = collection(db, 'dev1', 'contact_us_id', 'contact_us');
+                const q = query(contactUsCollectionRef, orderBy('createdAt', 'desc'));
+                const querySnapshot = await getDocs(q);
+
+                const fetchedContactUsMessages: ContactMessage[] = querySnapshot.docs.map((doc) => {
+                    const data = doc.data();
+                    return {
+                        id: doc.id,
+                        phone: data.phone,
+                        email: data.email,
+                        desc: data.desc,
+                        createdAt: data.createdAt,
+                        read: data.read,
+                    } as ContactMessage;
+                });
+
+                setMessages(fetchedContactUsMessages);
+                console.log("Projects loaded:", fetchedContactUsMessages);
+            } catch (error) {
+                console.error('Error loading admin data:', error);
+            } finally {
+                setIsLoadingData(false);
+            }
+        };
 
         loadAdminData();
         loadProjectsData();
+        loadContactUsMessages();
     }, []);
 
     const handleSave = async () => {
@@ -446,8 +473,36 @@ const AdminHomePage = () => {
     };
 
 
-    const deleteMessage = (id: string) => {
-        setMessages(messages.filter(m => m.id !== id));
+    const deleteMessage = async (id: string) => {
+        try {
+            setLoader(true);
+            const messageRef = doc(db, 'dev1', 'contact_us_id', 'contact_us', id);
+            await deleteDoc(messageRef);
+
+            setMessages(messages.filter(m => m.id !== id));
+            alert('Message deleted successfully!');
+        } catch (error) {
+            console.error('Error deleting message:', error);
+            alert('Failed to delete message. Please try again.');
+        } finally {
+            setLoader(false);
+        }
+    };
+
+    const markMessageAsRead = async (id: string) => {
+        try {
+            setLoader(true);
+            const messageRef = doc(db, 'dev1', 'contact_us_id', 'contact_us', id);
+            await updateDoc(messageRef, { read: true });
+
+            setMessages(messages.map(m => m.id === id ? { ...m, read: true } : m));
+            alert('Message marked as read!');
+        } catch (error) {
+            console.error('Error marking message as read:', error);
+            alert('Failed to mark message as read. Please try again.');
+        } finally {
+            setLoader(false);
+        }
     };
 
     return (
@@ -991,17 +1046,33 @@ const AdminHomePage = () => {
                                                         <div className="flex items-center space-x-3 mb-2">
                                                             {!msg.read && <div className="w-2 h-2 bg-purple-500 rounded-full animate-pulse" />}
                                                             <h4 className="font-bold text-lg">{msg.phone}</h4>
-                                                            <span className="text-sm text-gray-400">{msg.date}</span>
+                                                            <span className="text-sm text-gray-400">{msg.createdAt}</span>
                                                         </div>
                                                         <p className="text-gray-300 mb-2">{msg.email}</p>
-                                                        <p className="text-gray-400 mt-2 line-clamp-2">{msg.message}</p>
+                                                        <p className="text-gray-400 mt-2 line-clamp-2">{msg.desc}</p>
                                                     </div>
-                                                    <button
-                                                        onClick={() => deleteMessage(msg.id)}
-                                                        className="ml-4 p-3 bg-red-600/20 hover:bg-red-600/30 rounded-xl"
-                                                    >
-                                                        <Trash2 className="w-4 h-4 text-red-400" />
-                                                    </button>
+                                                    {loader === true ?
+                                                        <div className="w-8 h-8 border-4 border-purple-200 border-t-transparent rounded-full animate-spin" />
+                                                        : <div className="flex items-center space-x-2 ml-4">
+                                                            {!msg.read && (
+                                                                <button
+                                                                    onClick={() => markMessageAsRead(msg.id)}
+                                                                    disabled={loader}
+                                                                    className="p-2 bg-green-600/20 hover:bg-green-600/30 rounded-lg transition-all disabled:opacity-50"
+                                                                    title="Mark as read"
+                                                                >
+                                                                    <Eye className="w-4 h-4 text-green-400" />
+                                                                </button>
+                                                            )}
+                                                            <button
+                                                                onClick={() => deleteMessage(msg.id)}
+                                                                disabled={loader}
+                                                                className="p-2 bg-red-600/20 hover:bg-red-600/30 rounded-lg transition-all disabled:opacity-50"
+                                                                title="Delete message"
+                                                            >
+                                                                <Trash2 className="w-4 h-4 text-red-400" />
+                                                            </button>
+                                                        </div>}
                                                 </div>
                                             </div>
                                         ))
