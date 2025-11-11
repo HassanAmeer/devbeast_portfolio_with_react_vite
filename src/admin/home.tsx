@@ -91,20 +91,22 @@ const AdminHomePage = () => {
 
     // Editable data states
     const [heroData, setHeroData] = useState({
-        name: 'Akash Ameer',
-        title: 'Senior Developer',
-        description: 'Senior Full-Stack Developer specializing in Flutter, Laravel, and React — transforming ideas into stunning reality',
-        image: '',
-        btn1Name: 'View Portfolio',
-        btn1Link: '#',
-        btn2Name: 'View Portfolio',
-        btn2Link: '#',
-        stats: [
-            { number: '4+', label: 'Years Experience' },
-            { number: '150+', label: 'Projects Completed' },
-            { number: '90%', label: 'Happy Clients' },
-            { number: '4.9', label: 'Average Rating' }
-        ]
+        title: 'Akash Ameerasd',
+        subtitle: 'Senior Developerasd',
+        desc: 'Senior Full-Stack Developer specializing in Flutter, Laravel, and React — transforming ideas into stunning realityasdsf',
+        image: 'https://thelocalrent.com/link/v.php?t=1762852463&tk=37160f2e00721d906831565829ae1de7',
+        btn_name_1: 'View Portfolio',
+        btn_link_1: '#',
+        btn_name_2: 'View Portfolio',
+        btn_link_2: 'asd#',
+        card_title_1: '4+adsf',
+        card_subtitle_1: 'Yeaadsrs Experience',
+        card_title_2: '150+ds',
+        card_subtitle_2: 'Projecasdsts Completed',
+        card_title_3: '90%ads',
+        card_subtitle_3: 'Happadsy Clients',
+        card_title_4: '4.9dfv',
+        card_subtitle_4: 'Aveadsfrage Rating'
     });
 
     const [projects, setProjects] = useState<Project[]>([
@@ -234,6 +236,39 @@ const AdminHomePage = () => {
                 setIsLoadingData(false);
             }
         };
+        // Load loadHearoData
+        const loadHeroData = async () => {
+            try {
+                const docRef = doc(db, 'dev1', 'hero_section');
+                const docSnap = await getDoc(docRef);
+
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    setHeroData({
+                        title: data.title || 'Akash Ameer',
+                        subtitle: data.subtitle || 'Senior Developer',
+                        desc: data.desc || 'Senior Full-Stack Developer specializing in Flutter, Laravel, and React — transforming ideas into stunning reality',
+                        image: data.image || '',
+                        btn_name_1: data.btn_name_1 || 'View Portfolio',
+                        btn_link_1: data.btn_link_1 || '#',
+                        btn_name_2: data.btn_name_2 || 'View Portfolio',
+                        btn_link_2: data.btn_link_2 || '#',
+                        card_title_1: data.card_title_1 || '4+',
+                        card_subtitle_1: data.card_subtitle_1 || 'Years Experience',
+                        card_title_2: data.card_title_2 || '150+',
+                        card_subtitle_2: data.card_subtitle_2 || 'Projects Completed',
+                        card_title_3: data.card_title_3 || '90%',
+                        card_subtitle_3: data.card_subtitle_3 || 'Happy Clients',
+                        card_title_4: data.card_title_4 || '4.9',
+                        card_subtitle_4: data.card_subtitle_4 || 'Average Rating'
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading admin data:', error);
+            } finally {
+                setIsLoadingData(false);
+            }
+        };
         // Load current admin data
         const loadAdminData = async () => {
             try {
@@ -310,6 +345,7 @@ const AdminHomePage = () => {
         };
 
         loadAdminData();
+        loadHeroData();
         loadSocialLinsData();
         loadProjectsData();
         loadContactUsMessages();
@@ -319,7 +355,7 @@ const AdminHomePage = () => {
         try {
             if (activeSection === 'social') {
                 setLoader(true);
-                let logoToUpdate: string | undefined = undefined;
+                let logoToUpdate = headerData.logo;
                 if (headerData.logo && headerData.logo.startsWith('data:image/')) {
                     logoToUpdate = await uploadFileByBase64(headerData.logo);
                 }
@@ -343,7 +379,7 @@ const AdminHomePage = () => {
                     globe: socialLinks.find(link => link.icon === 'globe')?.url,
                 };
 
-                if (logoToUpdate !== undefined) {
+                if (logoToUpdate !== "") {
                     updateData.logo = logoToUpdate;
                 }
 
@@ -353,25 +389,36 @@ const AdminHomePage = () => {
                 setLoader(false);
             } else if (activeSection === 'hero') {
                 setLoader(true);
+                let imageToUpdate = heroData.image;
+                if (heroData.image && heroData.image.startsWith('data:image/')) {
+                    imageToUpdate = await uploadFileByBase64(heroData.image);
+                }
+
+                const updateData: any = {
+                    title: heroData.title,
+                    subtitle: heroData.subtitle,
+                    desc: heroData.desc,
+                    btn_name_1: heroData.btn_name_1,
+                    btn_link_1: heroData.btn_link_1,
+                    btn_name_2: heroData.btn_name_2,
+                    btn_link_2: heroData.btn_link_2,
+                    card_title_1: heroData.card_title_1,
+                    card_title_2: heroData.card_title_2,
+                    card_title_3: heroData.card_title_3,
+                    card_title_4: heroData.card_title_4,
+                    card_subtitle_1: heroData.card_subtitle_1,
+                    card_subtitle_2: heroData.card_subtitle_2,
+                    card_subtitle_3: heroData.card_subtitle_3,
+                    card_subtitle_4: heroData.card_subtitle_4,
+                };
+
+                if (imageToUpdate !== "") {
+                    updateData.image = imageToUpdate;
+                    heroData.image = imageToUpdate;
+                }
+
                 const hero_data = doc(db, 'dev1', 'hero_section');
-                await updateDoc(hero_data, {
-                    title: heroData.name,
-                    subtitle: heroData.title,
-                    desc: heroData.description,
-                    image: heroData.image,
-                    btn_name_1: heroData.btn1Name,
-                    btn_link_1: heroData.btn1Link,
-                    btn_name_2: heroData.btn2Name,
-                    btn_link_2: heroData.btn2Link,
-                    card_subtitle_1: heroData.stats.find(stat => stat.label === 'Years Experience')?.label,
-                    card_subtitle_2: heroData.stats.find(stat => stat.label === 'Projects Completed')?.label,
-                    card_subtitle_3: heroData.stats.find(stat => stat.label === 'Happy Clients')?.label,
-                    card_subtitle_4: heroData.stats.find(stat => stat.label === 'Average Rating')?.label,
-                    card_title_1: heroData.stats.find(stat => stat.label === 'Years Experience')?.number,
-                    card_title_2: heroData.stats.find(stat => stat.label === 'Projects Completed')?.number,
-                    card_title_3: heroData.stats.find(stat => stat.label === "Happy Clients")?.number,
-                    card_title_4: heroData.stats.find(stat => stat.label === "Average Rating")?.number
-                });
+                await updateDoc(hero_data, updateData);
                 alert('Hero section saved successfully!');
                 setLoader(false);
             }
@@ -448,12 +495,27 @@ const AdminHomePage = () => {
             setLoader(true);
             const projectsCollectionRef = collection(db, 'dev1', 'all_projects_id', 'projects');
 
+            let uploadedImages: string[] = [];
+            if (newProject.projectImages && newProject.projectImages.length > 0) {
+                for (const img of newProject.projectImages) {
+                    if (img.startsWith('data:image/')) {
+                        const uploadedUrl = await uploadFileByBase64(img);
+                        if (uploadedUrl) {
+                            uploadedImages.push(uploadedUrl);
+                        } else {
+                            console.log("Failed to upload image:", img);
+                        }
+                    } else {
+                        uploadedImages.push(img); // if already a URL
+                    }
+                }
+            }
+
             const projectData = {
                 title: newProject.title,
                 desc: newProject.desc,
                 tags: newProject.tags || [],
-                // projectImages: newProject.projectImages || [],
-                projectImages: ["11", "22"],
+                projectImages: uploadedImages.length > 0 ? uploadedImages : ["11", "22"], // fallback
                 githubLink: newProject.githubLink || '',
                 projectLink: newProject.projectLink || '',
                 totalTeams: newProject.totalTeams || '1',
@@ -466,6 +528,7 @@ const AdminHomePage = () => {
             const fullProject: Project = {
                 ...newProject,
                 id: docRef.id,
+                projectImages: uploadedImages.length > 0 ? uploadedImages : newProject.projectImages || [],
             };
 
             setProjects(prev => [...prev, fullProject]);
@@ -483,19 +546,45 @@ const AdminHomePage = () => {
         try {
             setLoader(true);
             const projectRef = doc(db, 'dev1', 'all_projects_id', 'projects', updatedProject.id);
-            await updateDoc(projectRef, {
+
+            let uploadedImages: string[] = [];
+            if (updatedProject.projectImages && updatedProject.projectImages.length > 0) {
+                for (const img of updatedProject.projectImages) {
+                    if (img.startsWith('data:image/')) {
+                        const uploadedUrl = await uploadFileByBase64(img);
+                        if (uploadedUrl) {
+                            uploadedImages.push(uploadedUrl);
+                        } else {
+                            console.log("Failed to upload image:", img);
+                        }
+                    } else {
+                        uploadedImages.push(img); // if already a URL
+                    }
+                }
+            }
+
+            const updateData: any = {
                 title: updatedProject.title,
                 desc: updatedProject.desc,
                 tags: updatedProject.tags,
-                // projectImages: updatedProject.projectImages,
-                projectImages: ['1', "2"],
                 githubLink: updatedProject.githubLink,
                 projectLink: updatedProject.projectLink,
                 totalTeams: updatedProject.totalTeams,
                 updatedAt: serverTimestamp(),
-            });
+            };
 
-            setProjects(projects.map(p => p.id === updatedProject.id ? updatedProject : p));
+            if (uploadedImages.length > 0) {
+                updateData.projectImages = uploadedImages;
+            }
+
+            await updateDoc(projectRef, updateData);
+
+            const updatedProjectWithImages = {
+                ...updatedProject,
+                projectImages: uploadedImages.length > 0 ? uploadedImages : updatedProject.projectImages,
+            };
+
+            setProjects(projects.map(p => p.id === updatedProject.id ? updatedProjectWithImages : p));
             alert('Project updated successfully!');
         } catch (error) {
             console.error('Error updating project:', error);
@@ -760,16 +849,6 @@ const AdminHomePage = () => {
                             <div className="space-y-6">
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div>
-                                        <label className="block text-sm font-semibold text-gray-300 mb-2">Name</label>
-                                        <input
-                                            type="text"
-                                            value={heroData.name}
-                                            onChange={(e) => setHeroData({ ...heroData, name: e.target.value })}
-                                            disabled={!isEditing}
-                                            className="w-full px-4 py-3 rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 focus:border-purple-500 outline-none transition-all text-white disabled:opacity-50"
-                                        />
-                                    </div>
-                                    <div>
                                         <label className="block text-sm font-semibold text-gray-300 mb-2">Title</label>
                                         <input
                                             type="text"
@@ -779,13 +858,23 @@ const AdminHomePage = () => {
                                             className="w-full px-4 py-3 rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 focus:border-purple-500 outline-none transition-all text-white disabled:opacity-50"
                                         />
                                     </div>
+                                    <div>
+                                        <label className="block text-sm font-semibold text-gray-300 mb-2">Subtitle</label>
+                                        <input
+                                            type="text"
+                                            value={heroData.subtitle}
+                                            onChange={(e) => setHeroData({ ...heroData, subtitle: e.target.value })}
+                                            disabled={!isEditing}
+                                            className="w-full px-4 py-3 rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 focus:border-purple-500 outline-none transition-all text-white disabled:opacity-50"
+                                        />
+                                    </div>
                                 </div>
 
                                 <div>
                                     <label className="block text-sm font-semibold text-gray-300 mb-2">Description</label>
                                     <textarea
-                                        value={heroData.description}
-                                        onChange={(e) => setHeroData({ ...heroData, description: e.target.value })}
+                                        value={heroData.desc}
+                                        onChange={(e) => setHeroData({ ...heroData, desc: e.target.value })}
                                         disabled={!isEditing}
                                         rows={3}
                                         className="w-full px-4 py-3 rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 focus:border-purple-500 outline-none transition-all text-white disabled:opacity-50 resize-none"
@@ -795,34 +884,78 @@ const AdminHomePage = () => {
                                 <div>
                                     <label className="block text-lg font-bold text-purple-400 mb-2">Statistics</label>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        {heroData.stats.map((stat, idx) => (
-                                            <div key={idx} className="flex space-x-2">
-                                                <input
-                                                    type="text"
-                                                    value={stat.number}
-                                                    onChange={(e) => {
-                                                        const newStats = [...heroData.stats];
-                                                        newStats[idx].number = e.target.value;
-                                                        setHeroData({ ...heroData, stats: newStats });
-                                                    }}
-                                                    disabled={!isEditing}
-                                                    placeholder="Number"
-                                                    className="flex-1 px-3 py-2 rounded-lg bg-white/5 backdrop-blur-xl border border-white/10 focus:border-purple-500 outline-none transition-all text-white disabled:opacity-50"
-                                                />
-                                                <input
-                                                    type="text"
-                                                    value={stat.label}
-                                                    onChange={(e) => {
-                                                        const newStats = [...heroData.stats];
-                                                        newStats[idx].label = e.target.value;
-                                                        setHeroData({ ...heroData, stats: newStats });
-                                                    }}
-                                                    disabled={!isEditing}
-                                                    placeholder="Label"
-                                                    className="flex-1 px-3 py-2 rounded-lg bg-white/5 backdrop-blur-xl border border-white/10 focus:border-purple-500 outline-none transition-all text-white disabled:opacity-50"
-                                                />
-                                            </div>
-                                        ))}
+                                        <div className="flex space-x-2">
+                                            <input
+                                                type="text"
+                                                value={heroData.card_title_1}
+                                                onChange={(e) => setHeroData({ ...heroData, card_title_1: e.target.value })}
+                                                disabled={!isEditing}
+                                                placeholder="Number"
+                                                className="flex-1 px-3 py-2 rounded-lg bg-white/5 backdrop-blur-xl border border-white/10 focus:border-purple-500 outline-none transition-all text-white disabled:opacity-50"
+                                            />
+                                            <input
+                                                type="text"
+                                                value={heroData.card_subtitle_1}
+                                                onChange={(e) => setHeroData({ ...heroData, card_subtitle_1: e.target.value })}
+                                                disabled={!isEditing}
+                                                placeholder="Label"
+                                                className="flex-1 px-3 py-2 rounded-lg bg-white/5 backdrop-blur-xl border border-white/10 focus:border-purple-500 outline-none transition-all text-white disabled:opacity-50"
+                                            />
+                                        </div>
+                                        <div className="flex space-x-2">
+                                            <input
+                                                type="text"
+                                                value={heroData.card_title_2}
+                                                onChange={(e) => setHeroData({ ...heroData, card_title_2: e.target.value })}
+                                                disabled={!isEditing}
+                                                placeholder="Number"
+                                                className="flex-1 px-3 py-2 rounded-lg bg-white/5 backdrop-blur-xl border border-white/10 focus:border-purple-500 outline-none transition-all text-white disabled:opacity-50"
+                                            />
+                                            <input
+                                                type="text"
+                                                value={heroData.card_subtitle_2}
+                                                onChange={(e) => setHeroData({ ...heroData, card_subtitle_2: e.target.value })}
+                                                disabled={!isEditing}
+                                                placeholder="Label"
+                                                className="flex-1 px-3 py-2 rounded-lg bg-white/5 backdrop-blur-xl border border-white/10 focus:border-purple-500 outline-none transition-all text-white disabled:opacity-50"
+                                            />
+                                        </div>
+                                        <div className="flex space-x-2">
+                                            <input
+                                                type="text"
+                                                value={heroData.card_title_3}
+                                                onChange={(e) => setHeroData({ ...heroData, card_title_3: e.target.value })}
+                                                disabled={!isEditing}
+                                                placeholder="Number"
+                                                className="flex-1 px-3 py-2 rounded-lg bg-white/5 backdrop-blur-xl border border-white/10 focus:border-purple-500 outline-none transition-all text-white disabled:opacity-50"
+                                            />
+                                            <input
+                                                type="text"
+                                                value={heroData.card_subtitle_3}
+                                                onChange={(e) => setHeroData({ ...heroData, card_subtitle_3: e.target.value })}
+                                                disabled={!isEditing}
+                                                placeholder="Label"
+                                                className="flex-1 px-3 py-2 rounded-lg bg-white/5 backdrop-blur-xl border border-white/10 focus:border-purple-500 outline-none transition-all text-white disabled:opacity-50"
+                                            />
+                                        </div>
+                                        <div className="flex space-x-2">
+                                            <input
+                                                type="text"
+                                                value={heroData.card_title_4}
+                                                onChange={(e) => setHeroData({ ...heroData, card_title_4: e.target.value })}
+                                                disabled={!isEditing}
+                                                placeholder="Number"
+                                                className="flex-1 px-3 py-2 rounded-lg bg-white/5 backdrop-blur-xl border border-white/10 focus:border-purple-500 outline-none transition-all text-white disabled:opacity-50"
+                                            />
+                                            <input
+                                                type="text"
+                                                value={heroData.card_subtitle_4}
+                                                onChange={(e) => setHeroData({ ...heroData, card_subtitle_4: e.target.value })}
+                                                disabled={!isEditing}
+                                                placeholder="Label"
+                                                className="flex-1 px-3 py-2 rounded-lg bg-white/5 backdrop-blur-xl border border-white/10 focus:border-purple-500 outline-none transition-all text-white disabled:opacity-50"
+                                            />
+                                        </div>
                                     </div>
                                 </div>
 
@@ -832,8 +965,8 @@ const AdminHomePage = () => {
                                         <label className="block text-sm font-semibold text-gray-300 mb-2">Button 1 Name</label>
                                         <input
                                             type="text"
-                                            value={heroData.btn1Name}
-                                            onChange={(e) => setHeroData({ ...heroData, btn1Name: e.target.value })}
+                                            value={heroData.btn_name_1}
+                                            onChange={(e) => setHeroData({ ...heroData, btn_name_1: e.target.value })}
                                             disabled={!isEditing}
                                             className="w-full px-4 py-3 rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 focus:border-purple-500 outline-none transition-all text-white disabled:opacity-50"
                                         />
@@ -842,8 +975,8 @@ const AdminHomePage = () => {
                                         <label className="block text-sm font-semibold text-gray-300 mb-2">Link</label>
                                         <input
                                             type="text"
-                                            value={heroData.btn1Link}
-                                            onChange={(e) => setHeroData({ ...heroData, btn1Link: e.target.value })}
+                                            value={heroData.btn_link_1}
+                                            onChange={(e) => setHeroData({ ...heroData, btn_link_1: e.target.value })}
                                             disabled={!isEditing}
                                             className="w-full px-4 py-3 rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 focus:border-purple-500 outline-none transition-all text-white disabled:opacity-50"
                                         />
@@ -854,8 +987,8 @@ const AdminHomePage = () => {
                                         <label className="block text-sm font-semibold text-gray-300 mb-2">Button 2 Name</label>
                                         <input
                                             type="text"
-                                            value={heroData.btn2Name}
-                                            onChange={(e) => setHeroData({ ...heroData, btn2Name: e.target.value })}
+                                            value={heroData.btn_name_2}
+                                            onChange={(e) => setHeroData({ ...heroData, btn_name_2: e.target.value })}
                                             disabled={!isEditing}
                                             className="w-full px-4 py-3 rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 focus:border-purple-500 outline-none transition-all text-white disabled:opacity-50"
                                         />
@@ -864,8 +997,8 @@ const AdminHomePage = () => {
                                         <label className="block text-sm font-semibold text-gray-300 mb-2">Link</label>
                                         <input
                                             type="text"
-                                            value={heroData.btn2Link}
-                                            onChange={(e) => setHeroData({ ...heroData, btn2Link: e.target.value })}
+                                            value={heroData.btn_link_2}
+                                            onChange={(e) => setHeroData({ ...heroData, btn_link_2: e.target.value })}
                                             disabled={!isEditing}
                                             className="w-full px-4 py-3 rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 focus:border-purple-500 outline-none transition-all text-white disabled:opacity-50"
                                         />
@@ -1313,7 +1446,7 @@ const AdminHomePage = () => {
                                         });
                                         Promise.all(imageUrls).then(urls => {
                                             if (editingProject) {
-                                                setEditingProject({ ...editingProject, projectImages: urls });
+                                                setEditingProject({ ...editingProject, projectImages: [...editingProject.projectImages, ...urls] });
                                             } else {
                                                 setNewProjectData({ ...newProjectData, projectImages: urls });
                                             }
