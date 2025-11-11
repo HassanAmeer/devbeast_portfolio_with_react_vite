@@ -165,10 +165,36 @@ const ItemDetails = () => {
                     <div className="container mx-auto px-6 py-12 max-w-5xl">
                         {/* Title Section */}
                         <div className="mb-12">
-                            {item.projectLink && (
+                            {/* {item.isWeb && (
                                 <div className="inline-flex items-center space-x-2 px-4 py-2 bg-green-500/20 border border-green-500/30 rounded-full mb-6">
-                                    <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-                                    <span className="text-green-400 font-semibold text-sm">Live Project</span>
+                                    <div className="w-2 h-2 bg-green-400 rounded-full animate-ping" />
+                                    <span className="text-green-400 font-semibold text-sm">{item.isWeb ? 'Web' : 'Mobile'}</span>
+                                </div>
+                            )} */}
+
+                            {item.isWeb !== undefined && (
+                                <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-500/30 rounded-full mb-6 backdrop-blur-sm overflow-hidden animate-fadeIn">
+                                    {/* Icon + Label */}
+                                    <div className="relative z-10 flex items-center gap-1.5 text-green-400 font-medium text-xs sm:text-sm">
+                                        {item.isWeb ? (
+                                            <>
+                                                <svg className="animate-pulse w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                                    <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
+                                                    <line x1="8" y1="21" x2="16" y2="21" />
+                                                    <line x1="12" y1="17" x2="12" y2="21" />
+                                                </svg>
+                                                <span>Web</span>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <svg className="animate-pulse w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                                    <rect x="5" y="2" width="14" height="20" rx="2" ry="2" />
+                                                    <line x1="12" y1="18" x2="12.01" y2="18" />
+                                                </svg>
+                                                <span>Mobile</span>
+                                            </>
+                                        )}
+                                    </div>
                                 </div>
                             )}
 
@@ -213,7 +239,7 @@ const ItemDetails = () => {
                             </div>
 
                             {/* GitHub Link */}
-                            {item.githubLink && (
+                            {item.githubLink !== "" ? (
                                 <a
                                     href={githubUrl}
                                     target="_blank"
@@ -232,10 +258,10 @@ const ItemDetails = () => {
                                         </div>
                                     </div>
                                 </a>
-                            )}
+                            ) : <></>}
 
                             {/* Live Demo Link */}
-                            {item.projectLink && (
+                            {item.projectLink !== "" ? (
                                 <a
                                     href={liveUrl}
                                     target="_blank"
@@ -254,7 +280,7 @@ const ItemDetails = () => {
                                         </div>
                                     </div>
                                 </a>
-                            )}
+                            ) : <></>}
                         </div>
 
                         {/* Demo Images Gallery */}

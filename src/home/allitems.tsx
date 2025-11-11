@@ -325,7 +325,7 @@ const AllItems = () => {
                             <button
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id)}
-                                className={`group relative px-6 py-3 rounded-xl font-bold transition-all transform hover:scale-105 flex items-center space-x-2 ${activeTab === tab.id
+                                className={`group relative md:px-6 px-2 md:py-3 py-2 rounded-xl font-bold transition-all transform hover:scale-105 flex items-center space-x-2 ${activeTab === tab.id
                                     ? 'bg-gradient-to-r from-purple-600 to-cyan-600 shadow-lg shadow-purple-500/30'
                                     : 'bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 backdrop-blur-xl'
                                     }`}
