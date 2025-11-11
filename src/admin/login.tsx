@@ -77,7 +77,7 @@ const AdminLogin = () => {
                 if (formData.email === storedEmail && formData.password === storedPassword) {
                     setSuccess(true);
                     setTimeout(() => {
-                        navigate('/home');
+                        navigate('/adm');
                     }, 1500);
                 } else {
                     setError('Invalid credentials. Please try again.');

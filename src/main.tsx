@@ -24,7 +24,7 @@ createRoot(document.getElementById('root')!).render(
         <Route path="/item" element={<ItemDetails />} />
         {/* admin routes */}
         <Route path="/login" element={<AdminLogin />} />
-        <Route path="/admin" element={<AdminHomePage />} />
+        <Route path="/adm" element={<AdminHomePage />} />
         {/* Optional: Redirect /home → /admin/home */}
         {/* <Route path="/home" element={<Navigate to="/admin/home" replace />} /> */}
       </Routes>

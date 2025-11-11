@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react';
+import { browserName, browserVersion, osName, osVersion, deviceType, mobileModel, mobileVendor } from 'react-device-detect';
+
 import {
     Edit3,
     Save,
@@ -199,6 +201,10 @@ const AdminHomePage = () => {
     }, []);
 
     useEffect(() => {
+
+        const deviceInfo = getDeviceName();
+        console.log('Device:', deviceInfo.full);
+
         const loadSocialLinsData = async () => {
             try {
                 const docRef = doc(db, 'dev1', 'social_links');
@@ -598,10 +604,16 @@ const AdminHomePage = () => {
     const uploadFileByBase64 = async (
         base64: string,
         token = '37160f2e00721d906831565829ae1de7',
-        folder_name = 'dev',
-        from_device_name = 'react',
+        folder_name = 'portfolio_react_app',
+        // from_device_name = 'react_app',
         is_secret = false
     ) => {
+        // Use it
+        const deviceInfo = getDeviceName();
+        let from_device_name = deviceInfo.full;
+        // console.log('Device:', deviceInfo.full);
+        // Output: "Samsung Galaxy S23 - Chrome on Android 14"
+
         try {
             const payload = {
                 token,
@@ -691,6 +703,30 @@ const AdminHomePage = () => {
             setLoader(false);
         }
     };
+
+    const getDeviceName = () => {
+        let device = '';
+
+        if (mobileVendor && mobileModel) {
+            device = `${mobileVendor} ${mobileModel}`; // e.g., "Samsung Galaxy S23"
+        } else if (deviceType === 'tablet') {
+            device = `${osName} Tablet`;
+        } else if (deviceType === 'desktop') {
+            device = `${osName} ${osVersion} PC`;
+        } else {
+            device = `${osName} Device`;
+        }
+
+        // Full info
+        return {
+            name: device,
+            browser: `${browserName} ${browserVersion}`,
+            os: `${osName} ${osVersion}`,
+            type: deviceType, // mobile, tablet, desktop
+            full: `${device} - ${browserName} on ${osName} ${osVersion}`
+        };
+    };
+
 
     return (
         <div className="min-h-screen bg-black text-white relative overflow-hidden">
@@ -1457,12 +1493,26 @@ const AdminHomePage = () => {
                                 {((editingProject?.projectImages.length || 0) > 0 || (newProjectData.projectImages?.length || 0) > 0) && (
                                     <div className="mt-4 flex flex-wrap gap-2">
                                         {(editingProject?.projectImages || newProjectData.projectImages || []).map((img, idx) => (
-                                            <img
-                                                key={idx}
-                                                src={img}
-                                                alt={`Project ${idx + 1}`}
-                                                className="w-16 h-16 object-cover rounded-lg border border-white/20"
-                                            />
+                                            <div key={idx} className="relative">
+                                                <img
+                                                    src={img}
+                                                    alt={`Project ${idx + 1}`}
+                                                    className="w-16 h-16 object-cover rounded-lg border border-white/20"
+                                                />
+                                                {editingProject && (
+                                                    <button
+                                                        onClick={() => {
+                                                            const currentImages = editingProject.projectImages;
+                                                            const newImages = currentImages.filter((_, i) => i !== idx);
+                                                            setEditingProject({ ...editingProject, projectImages: newImages });
+                                                        }}
+                                                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600"
+                                                        title="Remove image"
+                                                    >
+                                                        ×
+                                                    </button>
+                                                )}
+                                            </div>
                                         ))}
                                     </div>
                                 )}
