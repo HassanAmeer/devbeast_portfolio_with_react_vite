@@ -26,20 +26,22 @@ import {
     Subtitles
 } from 'lucide-react';
 import {
-    collection, doc, setDoc, updateDoc, deleteDoc, onSnapshot,
+    collection, getDocs, doc, setDoc, updateDoc, deleteDoc, onSnapshot,
     query, orderBy, serverTimestamp, addDoc, getDoc, writeBatch
 } from "firebase/firestore";
 import { db, storage } from '../config/fbconfig';
 
 interface Project {
-    id: number;
+    id: string;           // ← CHANGE FROM number TO string
     title: string;
-    description: string;
+    desc: string;
     tags: string[];
-    projectLink: string;
-    totalTeams: number;
+    projectImages: string[];  // or { url: string; name: string }[]
     githubLink: string;
-    projectImages: string[];
+    projectLink: string;
+    totalTeams: string;
+    createdAt?: any;
+    updatedAt?: any;
 }
 
 interface ContactInfo {
@@ -76,6 +78,15 @@ const AdminHomePage = () => {
     const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
     const [editingProject, setEditingProject] = useState<Project | null>(null);
     const [showAddProject, setShowAddProject] = useState(false);
+    const [newProjectData, setNewProjectData] = useState<Partial<Project>>({
+        title: '',
+        desc: '',
+        tags: [],
+        projectImages: [],
+        githubLink: '',
+        projectLink: '',
+        totalTeams: '0'
+    });
     const [loader, setLoader] = useState(false);
 
     // Editable data states
@@ -98,22 +109,22 @@ const AdminHomePage = () => {
 
     const [projects, setProjects] = useState<Project[]>([
         {
-            id: 1,
+            id: '1',
             title: 'FinTech Mobile Banking',
-            description: 'Advanced banking platform with AI-powered fraud detection, biometric authentication, and real-time cryptocurrency trading.',
+            desc: 'Advanced banking platform with AI-powered fraud detection, biometric authentication, and real-time cryptocurrency trading.',
             tags: ['Flutter', 'Dart', 'Firebase', 'TensorFlow'],
             projectLink: '',
-            totalTeams: 0,
+            totalTeams: '0',
             githubLink: '',
             projectImages: []
         },
         {
-            id: 2,
+            id: '2',
             title: 'AI Healthcare Platform',
-            description: 'Revolutionary telemedicine app with AI diagnosis, ML-powered health predictions, and secure patient data management.',
+            desc: 'Revolutionary telemedicine app with AI diagnosis, ML-powered health predictions, and secure patient data management.',
             tags: ['Flutter', 'Laravel', 'MySQL', 'AI'],
             projectLink: '',
-            totalTeams: 0,
+            totalTeams: '0',
             githubLink: '',
             projectImages: []
         }
@@ -208,36 +219,25 @@ const AdminHomePage = () => {
 
         const loadProjectsData = async () => {
             try {
-                // CORRECT: Reference the SUBCOLLECTION
-                const projectsCollectionRef = collection(
-                    db,
-                    'dev1',
-                    'all_projects_id',
-                    'projects'
-                );
+                const projectsCollectionRef = collection(db, 'dev1', 'all_projects_id', 'projects');
+                const q = query(projectsCollectionRef, orderBy('createdAt', 'desc'));
+                const querySnapshot = await getDocs(q);
 
-                // CORRECT: Fetch ALL documents in the collection
-                const querySnapshot = await getDoc(projectsCollectionRef);
-
-                // CORRECT: Map each document to plain object with ID
-                const fetchedProjects = querySnapshot.docs.map((doc) => {
+                const fetchedProjects: Project[] = querySnapshot.docs.map((doc) => {
                     const data = doc.data();
                     return {
-                        id: doc.id, // Firestore auto-generated ID (string)
-                        title: data.title || 'Untitled Project',
-                        description: data.desc || data.description || '',
+                        id: doc.id,                    // ← string, matches your interface
+                        title: data.title || 'Untitled',
+                        desc: data.desc || data.description || '',
                         tags: data.tags || [],
                         projectImages: data.projectImages || [],
                         githubLink: data.githubLink || '',
                         projectLink: data.projectLink || '',
                         totalTeams: data.totalTeams || 0,
-                        // Add any other fields
-                    };
+                    } as Project;
                 });
 
-                // CORRECT: Update your state (assuming setProjects is from useState)
                 setProjects(fetchedProjects);
-
                 console.log("Projects loaded:", fetchedProjects);
             } catch (error) {
                 console.error('Error loading admin data:', error);
@@ -273,6 +273,7 @@ const AdminHomePage = () => {
                     youtube: socialLinks.find(link => link.icon === 'youtube')?.url,
                     globe: socialLinks.find(link => link.icon === 'globe')?.url,
                 });
+                alert('Social settings saved successfully!');
                 setLoader(false);
             } else if (activeSection === 'hero') {
                 setLoader(true);
@@ -295,38 +296,7 @@ const AdminHomePage = () => {
                     card_title_3: heroData.stats.find(stat => stat.label === "Happy Clients")?.number,
                     card_title_4: heroData.stats.find(stat => stat.label === "Average Rating")?.number
                 });
-                setLoader(false);
-            } else if (activeSection === 'projects') {
-                setLoader(true);
-                if (!editingProject?.id) {
-                    console.error("No project ID provided for update");
-                    setLoader(false);
-                    return;
-                }
-
-                // Convert ID to string — THIS IS THE FIX
-                const projectId = String(editingProject.id);
-
-                // Correct Firestore document reference
-                const projectRef = doc(db, 'dev1', 'all_projects_id', 'projects', projectId);
-
-                const updatedProject = projects.find(project => project.id === editingProject.id);
-
-                if (!updatedProject) {
-                    console.error("Project not found in local state");
-                    setLoader(false);
-                    return;
-                }
-
-                await updateDoc(projectRef, {
-                    projectImages: updatedProject.projectImages,
-                    title: updatedProject.title,
-                    desc: updatedProject.description,
-                    totalTeams: updatedProject.totalTeams,
-                    githubLink: updatedProject.githubLink,
-                    tags: updatedProject.tags,
-                });
-                console.log("Project updated successfully!");
+                alert('Hero section saved successfully!');
                 setLoader(false);
             }
         } catch (error) {
@@ -397,16 +367,82 @@ const AdminHomePage = () => {
         }
     };
 
-    const addProject = (newProject: Project) => {
-        setProjects([...projects, newProject]);
+    const addProject = async (newProject: Omit<Project, 'id'>) => {
+        try {
+            setLoader(true);
+            const projectsCollectionRef = collection(db, 'dev1', 'all_projects_id', 'projects');
+
+            const projectData = {
+                title: newProject.title,
+                desc: newProject.desc,
+                tags: newProject.tags || [],
+                // projectImages: newProject.projectImages || [],
+                projectImages: ["11", "22"],
+                githubLink: newProject.githubLink || '',
+                projectLink: newProject.projectLink || '',
+                totalTeams: newProject.totalTeams || '1',
+                createdAt: serverTimestamp(),
+                updatedAt: serverTimestamp(),
+            };
+
+            const docRef = await addDoc(projectsCollectionRef, projectData);
+
+            const fullProject: Project = {
+                ...newProject,
+                id: docRef.id,
+            };
+
+            setProjects(prev => [...prev, fullProject]);
+            console.log("Project added successfully:", docRef.id);
+            alert('Project added successfully!');
+        } catch (error) {
+            console.error("Error adding project:", error);
+            alert('Failed to add project. Please try again.');
+        } finally {
+            setLoader(false);
+        }
     };
 
-    const updateProjectData = (updatedProject: Project) => {
-        setProjects(projects.map(p => p.id === updatedProject.id ? updatedProject : p));
+    const updateProjectData = async (updatedProject: Project) => {
+        try {
+            setLoader(true);
+            const projectRef = doc(db, 'dev1', 'all_projects_id', 'projects', updatedProject.id);
+            await updateDoc(projectRef, {
+                title: updatedProject.title,
+                desc: updatedProject.desc,
+                tags: updatedProject.tags,
+                // projectImages: updatedProject.projectImages,
+                projectImages: ['1', "2"],
+                githubLink: updatedProject.githubLink,
+                projectLink: updatedProject.projectLink,
+                totalTeams: updatedProject.totalTeams,
+                updatedAt: serverTimestamp(),
+            });
+
+            setProjects(projects.map(p => p.id === updatedProject.id ? updatedProject : p));
+            alert('Project updated successfully!');
+        } catch (error) {
+            console.error('Error updating project:', error);
+            alert('Failed to update project. Please try again.');
+        } finally {
+            setLoader(false);
+        }
     };
 
-    const deleteProject = (id: number) => {
-        setProjects(projects.filter(p => p.id !== id));
+    const deleteProject = async (id: string) => {
+        try {
+            setLoader(true);
+            const projectRef = doc(db, 'dev1', 'all_projects_id', 'projects', id);
+            await deleteDoc(projectRef);
+
+            setProjects(projects.filter(p => p.id !== id));
+            alert('Project deleted successfully!');
+        } catch (error) {
+            console.error('Error deleting project:', error);
+            alert('Failed to delete project. Please try again.');
+        } finally {
+            setLoader(false);
+        }
     };
 
 
@@ -720,10 +756,24 @@ const AdminHomePage = () => {
                                 <div className="flex justify-between items-center">
                                     <h3 className="text-xl font-bold">Projects ({projects.length})</h3>
                                     <button
-                                        onClick={() => setShowAddProject(true)}
-                                        className="flex items-center space-x-2 px-4 py-2 rounded-xl bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 transition-all"
+                                        onClick={() => {
+                                            setNewProjectData({
+                                                title: '',
+                                                desc: '',
+                                                tags: [],
+                                                projectImages: [],
+                                                githubLink: '',
+                                                projectLink: '',
+                                                totalTeams: '0'
+                                            });
+                                            setShowAddProject(true);
+                                        }}
+                                        disabled={loader}
+                                        className="flex items-center space-x-2 px-4 py-2 rounded-xl bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
-                                        <Plus className="w-4 h-4" />
+                                        {loader === true ?
+                                            <div className="w-8 h-8 border-4 border-purple-200 border-t-transparent rounded-full animate-spin" />
+                                            : <Plus className="w-4 h-4" />}
                                         <span>Add Project</span>
                                     </button>
                                 </div>
@@ -731,16 +781,16 @@ const AdminHomePage = () => {
                                     {projects.map((project) => (
                                         <div key={project.id} className="flex items-center justify-between p-4 rounded-2xl bg-black/40 backdrop-blur-xl border border-white/10 hover:border-white/30 transition-all">
                                             <div className="flex items-center space-x-4">
-                                                {project.image && (
+                                                {project.projectImages && (
                                                     <img
-                                                        src={project.image}
+                                                        src={project.projectImages[0] ?? ""}
                                                         alt={project.title}
                                                         className="w-16 h-16 object-cover rounded-lg border border-white/20"
                                                     />
                                                 )}
                                                 <div>
                                                     <h4 className="font-bold text-white">{project.title}</h4>
-                                                    <p className="text-sm text-gray-400 line-clamp-1">{project.description}</p>
+                                                    <p className="text-sm text-gray-400 line-clamp-1">{project.desc}</p>
                                                     <div className="flex items-center space-x-2 mt-1">
                                                         <span className="text-xs text-purple-400">{project.tags.length} tags</span>
                                                         <span className="text-xs text-cyan-400">{project.totalTeams} team members</span>
@@ -750,13 +800,15 @@ const AdminHomePage = () => {
                                             <div className="flex items-center space-x-2">
                                                 <button
                                                     onClick={() => setEditingProject(project)}
-                                                    className="p-2 bg-blue-600/20 hover:bg-blue-600/40 rounded-lg transition-all"
+                                                    disabled={loader}
+                                                    className="p-2 bg-blue-600/20 hover:bg-blue-600/40 rounded-lg transition-all disabled:opacity-50"
                                                 >
                                                     <Edit3 className="w-4 h-4 text-blue-400" />
                                                 </button>
                                                 <button
                                                     onClick={() => deleteProject(project.id)}
-                                                    className="p-2 bg-red-600/20 hover:bg-red-600/40 rounded-lg transition-all"
+                                                    disabled={loader}
+                                                    className="p-2 bg-red-600/20 hover:bg-red-600/40 rounded-lg transition-all disabled:opacity-50"
                                                 >
                                                     <Trash2 className="w-4 h-4 text-red-400" />
                                                 </button>
@@ -979,9 +1031,16 @@ const AdminHomePage = () => {
                                         </div>
                                     ) : (
                                         <div className="space-y-4">
-                                            <div className="p-4 rounded-xl bg-white/5 border border-white/10">
-                                                <h4 className="text-sm font-semibold text-gray-300 mb-2">Current Credentials</h4>
-                                                <p className="text-xs text-gray-400">Email: {currentAdminData?.email}</p>
+                                            <div>
+                                                <label className="block text-sm font-semibold text-gray-300 mb-2">New Email (Optional)</label>
+                                                <input
+                                                    type="email"
+                                                    placeholder="Enter new email address"
+                                                    value={adminCredentials.newEmail || currentAdminData?.email || ''}
+                                                    onChange={(e) => setAdminCredentials({ ...adminCredentials, newEmail: e.target.value })}
+                                                    disabled={loader}
+                                                    className="w-full px-4 py-3 rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 focus:border-purple-500 outline-none transition-all text-white disabled:opacity-50"
+                                                />
                                             </div>
                                             <div>
                                                 <label className="block text-sm font-semibold text-gray-300 mb-2">Current Password</label>
@@ -994,17 +1053,7 @@ const AdminHomePage = () => {
                                                     className="w-full px-4 py-3 rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 focus:border-purple-500 outline-none transition-all text-white disabled:opacity-50"
                                                 />
                                             </div>
-                                            <div>
-                                                <label className="block text-sm font-semibold text-gray-300 mb-2">New Email (Optional)</label>
-                                                <input
-                                                    type="email"
-                                                    placeholder="Enter new email address"
-                                                    value={adminCredentials.newEmail}
-                                                    onChange={(e) => setAdminCredentials({ ...adminCredentials, newEmail: e.target.value })}
-                                                    disabled={loader}
-                                                    className="w-full px-4 py-3 rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 focus:border-purple-500 outline-none transition-all text-white disabled:opacity-50"
-                                                />
-                                            </div>
+
                                             <div>
                                                 <label className="block text-sm font-semibold text-gray-300 mb-2">New Password (Optional)</label>
                                                 <input
@@ -1059,6 +1108,15 @@ const AdminHomePage = () => {
                                 onClick={() => {
                                     setShowAddProject(false);
                                     setEditingProject(null);
+                                    setNewProjectData({
+                                        title: '',
+                                        desc: '',
+                                        tags: [],
+                                        projectImages: [],
+                                        githubLink: '',
+                                        projectLink: '',
+                                        totalTeams: '0'
+                                    });
                                 }}
                                 className="p-2 bg-red-600/20 hover:bg-red-600/40 rounded-lg transition-all"
                             >
@@ -1085,14 +1143,16 @@ const AdminHomePage = () => {
                                         Promise.all(imageUrls).then(urls => {
                                             if (editingProject) {
                                                 setEditingProject({ ...editingProject, projectImages: urls });
+                                            } else {
+                                                setNewProjectData({ ...newProjectData, projectImages: urls });
                                             }
                                         });
                                     }}
                                     className="w-full px-4 py-3 rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 focus:border-purple-500 outline-none transition-all text-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-purple-600 file:text-white hover:file:bg-purple-700"
                                 />
-                                {(editingProject?.projectImages.length || 0) > 0 && (
+                                {((editingProject?.projectImages.length || 0) > 0 || (newProjectData.projectImages?.length || 0) > 0) && (
                                     <div className="mt-4 flex flex-wrap gap-2">
-                                        {(editingProject?.projectImages || []).map((img, idx) => (
+                                        {(editingProject?.projectImages || newProjectData.projectImages || []).map((img, idx) => (
                                             <img
                                                 key={idx}
                                                 src={img}
@@ -1107,50 +1167,60 @@ const AdminHomePage = () => {
                             <input
                                 type="text"
                                 placeholder="Enter project title"
-                                value={editingProject?.title || ''}
-                                onChange={(e) => editingProject && setEditingProject({ ...editingProject, title: e.target.value })}
+                                value={editingProject?.title || newProjectData.title || ''}
+                                onChange={(e) => {
+                                    if (editingProject) {
+                                        setEditingProject({ ...editingProject, title: e.target.value });
+                                    } else {
+                                        setNewProjectData({ ...newProjectData, title: e.target.value });
+                                    }
+                                }}
                                 className="w-full px-3 py-2 rounded-lg bg-white/5 backdrop-blur-xl border border-white/10 focus:border-purple-500 outline-none transition-all text-white font-bold"
                             />
 
                             <textarea
                                 placeholder="Enter project description"
-                                value={editingProject?.description || ''}
-                                onChange={(e) => editingProject && setEditingProject({ ...editingProject, description: e.target.value })}
+                                value={editingProject?.desc || newProjectData.desc || ''}
+                                onChange={(e) => {
+                                    if (editingProject) {
+                                        setEditingProject({ ...editingProject, desc: e.target.value });
+                                    } else {
+                                        setNewProjectData({ ...newProjectData, desc: e.target.value });
+                                    }
+                                }}
                                 rows={3}
                                 className="w-full px-3 py-2 rounded-lg bg-white/5 backdrop-blur-xl border border-white/10 focus:border-purple-500 outline-none transition-all text-white resize-none text-sm"
-                            />
-
-                            <input
-                                type="text"
-                                placeholder="Enter main image URL"
-                                value={editingProject?.image || ''}
-                                onChange={(e) => editingProject && setEditingProject({ ...editingProject, image: e.target.value })}
-                                className="w-full px-3 py-2 rounded-lg bg-white/5 backdrop-blur-xl border border-white/10 focus:border-purple-500 outline-none transition-all text-white text-sm"
                             />
 
                             <div>
                                 <label className="block text-sm text-gray-300 mb-2">Tags</label>
                                 <div className="space-y-2">
-                                    {(editingProject?.tags || []).map((tag, tagIdx) => (
+                                    {((editingProject?.tags || newProjectData.tags) || []).map((tag, tagIdx) => (
                                         <div key={tagIdx} className="flex items-center gap-2">
                                             <input
                                                 type="text"
                                                 placeholder="Enter tag name"
                                                 value={tag}
                                                 onChange={(e) => {
+                                                    const currentTags = editingProject?.tags || newProjectData.tags || [];
+                                                    const newTags = [...currentTags];
+                                                    newTags[tagIdx] = e.target.value;
                                                     if (editingProject) {
-                                                        const newTags = [...editingProject.tags];
-                                                        newTags[tagIdx] = e.target.value;
                                                         setEditingProject({ ...editingProject, tags: newTags });
+                                                    } else {
+                                                        setNewProjectData({ ...newProjectData, tags: newTags });
                                                     }
                                                 }}
                                                 className="flex-1 px-3 py-2 rounded-lg bg-white/5 backdrop-blur-xl border border-white/10 focus:border-purple-500 outline-none transition-all text-white text-sm"
                                             />
                                             <button
                                                 onClick={() => {
+                                                    const currentTags = editingProject?.tags || newProjectData.tags || [];
+                                                    const newTags = currentTags.filter((_, idx) => idx !== tagIdx);
                                                     if (editingProject) {
-                                                        const newTags = editingProject.tags.filter((_, idx) => idx !== tagIdx);
                                                         setEditingProject({ ...editingProject, tags: newTags });
+                                                    } else {
+                                                        setNewProjectData({ ...newProjectData, tags: newTags });
                                                     }
                                                 }}
                                                 className="px-2 py-1 bg-red-600/20 hover:bg-red-600/40 rounded text-red-400 text-sm"
@@ -1161,9 +1231,12 @@ const AdminHomePage = () => {
                                     ))}
                                     <button
                                         onClick={() => {
+                                            const currentTags = editingProject?.tags || newProjectData.tags || [];
+                                            const newTags = [...currentTags, ''];
                                             if (editingProject) {
-                                                const newTags = [...editingProject.tags, ''];
                                                 setEditingProject({ ...editingProject, tags: newTags });
+                                            } else {
+                                                setNewProjectData({ ...newProjectData, tags: newTags });
                                             }
                                         }}
                                         className="px-3 py-2 bg-green-600/20 hover:bg-green-600/40 rounded text-green-400 text-sm"
@@ -1176,24 +1249,42 @@ const AdminHomePage = () => {
                             <input
                                 type="url"
                                 placeholder="Enter project live/demo link"
-                                value={editingProject?.projectLink || ''}
-                                onChange={(e) => editingProject && setEditingProject({ ...editingProject, projectLink: e.target.value })}
+                                value={editingProject?.projectLink || newProjectData.projectLink || ''}
+                                onChange={(e) => {
+                                    if (editingProject) {
+                                        setEditingProject({ ...editingProject, projectLink: e.target.value });
+                                    } else {
+                                        setNewProjectData({ ...newProjectData, projectLink: e.target.value });
+                                    }
+                                }}
                                 className="w-full px-3 py-2 rounded-lg bg-white/5 backdrop-blur-xl border border-white/10 focus:border-purple-500 outline-none transition-all text-white text-sm"
                             />
 
                             <input
-                                type="number"
+                                type="text"
                                 placeholder="Enter total team members count"
-                                value={editingProject?.totalTeams || 0}
-                                onChange={(e) => editingProject && setEditingProject({ ...editingProject, totalTeams: parseInt(e.target.value) || 0 })}
+                                value={editingProject?.totalTeams || newProjectData.totalTeams || '0'}
+                                onChange={(e) => {
+                                    if (editingProject) {
+                                        setEditingProject({ ...editingProject, totalTeams: e.target.value || '0' });
+                                    } else {
+                                        setNewProjectData({ ...newProjectData, totalTeams: e.target.value || '0' });
+                                    }
+                                }}
                                 className="w-full px-3 py-2 rounded-lg bg-white/5 backdrop-blur-xl border border-white/10 focus:border-purple-500 outline-none transition-all text-white text-sm"
                             />
 
                             <input
                                 type="url"
                                 placeholder="Enter GitHub repository link"
-                                value={editingProject?.githubLink || ''}
-                                onChange={(e) => editingProject && setEditingProject({ ...editingProject, githubLink: e.target.value })}
+                                value={editingProject?.githubLink || newProjectData.githubLink || ''}
+                                onChange={(e) => {
+                                    if (editingProject) {
+                                        setEditingProject({ ...editingProject, githubLink: e.target.value });
+                                    } else {
+                                        setNewProjectData({ ...newProjectData, githubLink: e.target.value });
+                                    }
+                                }}
                                 className="w-full px-3 py-2 rounded-lg bg-white/5 backdrop-blur-xl border border-white/10 focus:border-purple-500 outline-none transition-all text-white text-sm"
                             />
 
@@ -1202,6 +1293,15 @@ const AdminHomePage = () => {
                                     onClick={() => {
                                         setShowAddProject(false);
                                         setEditingProject(null);
+                                        setNewProjectData({
+                                            title: '',
+                                            desc: '',
+                                            tags: [],
+                                            projectImages: [],
+                                            githubLink: '',
+                                            projectLink: '',
+                                            totalTeams: '0'
+                                        });
                                     }}
                                     className="px-6 py-3 rounded-xl bg-gray-600/20 hover:bg-gray-600/40 border border-gray-500/30 transition-all"
                                 >
@@ -1209,25 +1309,37 @@ const AdminHomePage = () => {
                                 </button>
                                 <button
                                     onClick={() => {
-                                        if (editingProject) {
+                                        const projectData = editingProject || newProjectData;
+                                        if (projectData.title && projectData.desc) {
                                             if (showAddProject) {
                                                 // Adding new project
-                                                const newProject = {
-                                                    ...editingProject,
-                                                    id: projects.length + 1
-                                                };
-                                                addProject(newProject);
+                                                addProject(projectData as Omit<Project, 'id'>);
                                             } else {
                                                 // Updating existing project
-                                                updateProjectData(editingProject);
+                                                updateProjectData(editingProject!);
                                             }
                                             setShowAddProject(false);
                                             setEditingProject(null);
+                                            setNewProjectData({
+                                                title: '',
+                                                desc: '',
+                                                tags: [],
+                                                projectImages: [],
+                                                githubLink: '',
+                                                projectLink: '',
+                                                totalTeams: '0'
+                                            });
+                                        } else {
+                                            alert('Please fill in title and description');
                                         }
                                     }}
-                                    className="px-6 py-3 rounded-xl bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 transition-all"
+                                    disabled={loader}
+                                    className="px-6 py-3 rounded-xl bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
                                 >
-                                    {showAddProject ? 'Add Project' : 'Update Project'}
+                                    {loader ? (
+                                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                    ) : null}
+                                    <span>{showAddProject ? 'Add Project' : 'Update Project'}</span>
                                 </button>
                             </div>
                         </div>
