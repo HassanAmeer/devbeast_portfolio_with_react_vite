@@ -66,6 +66,7 @@ const AllItems = () => {
     const [activeTab, setActiveTab] = useState('all');
     const [scrolled, setScrolled] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const [loading, setLoading] = useState(false);
     const [projects, setProjects] = useState<Project[]>([]);
     // const [isLoadingData, setIsLoadingData] = useState(true);
 
@@ -144,6 +145,7 @@ const AllItems = () => {
         };
         const loadProjectsData = async () => {
             try {
+                setLoading(true);
                 const projectsCollectionRef = collection(db, 'dev1', 'all_projects_id', 'projects');
                 const q = query(projectsCollectionRef, orderBy('createdAt', 'desc'));
                 const querySnapshot = await getDocs(q);
@@ -162,12 +164,13 @@ const AllItems = () => {
                         isWeb: data.isWeb || false,
                     } as Project;
                 });
-
+                setLoading(false);
                 setProjects(fetchedProjects);
                 console.log("Projects loaded:", fetchedProjects);
             } catch (error) {
                 console.error('Error loading projects:', error);
             } finally {
+                setLoading(false);
                 // setIsLoadingData(false);
             }
         };
@@ -339,6 +342,17 @@ const AllItems = () => {
                             </button>
                         ))}
                     </div>
+
+
+                    {loading ? (
+                        <center className='md:pt-40 pt-20'>
+                            <div className="w-6 h-6 lg:w-8 lg:h-8 border-4 border-purple-200
+                            border-t-transparent rounded-full animate-spin" />
+                        </center>
+                    ) : (
+                        <></>
+                    )}
+
 
                     {/* Projects Grid */}
                     <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">

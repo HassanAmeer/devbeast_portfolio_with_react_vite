@@ -8,8 +8,13 @@
 <img src="demo/4.png">
 <img src="demo/5.png">
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+admin login 
+- admin@gmail.com
+- 786
 
+<hr> 
+
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 Currently, two official plugins are available:
 
 - [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
@@ -159,7 +164,7 @@ export NODE_OPTIONS=--openssl-legacy-provider
 ```
 
 
-# --------------------------    firebase setup start -------------------------
+# ------------------  firebase setup start -------------------
 - add this packge to package.json file
 ```json
 "firebase": "^11.8.1",
@@ -355,4 +360,4 @@ const LoginComp = () => {
 export default LoginComp;
 ```
 
-# --------------------------    firebase setup end -------------------------
+# ------------------  firebase setup end -------------------

@@ -70,7 +70,7 @@ const Portfolio = () => {
     const [scrolled] = useState(false);
     const [mousePosition] = useState({ x: 0, y: 0 });
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-    // const [isLoadingData, setIsLoadingData] = useState(true);
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         // const handleScroll = () => setScrolled(window.scrollY > 50);
@@ -100,7 +100,7 @@ const Portfolio = () => {
         title: 'Akash Ameerasd',
         subtitle: 'Senior Developerasd',
         desc: 'Senior Full-Stack Developer specializing in Flutter, Laravel, and React — transforming ideas into stunning realityasdsf',
-        image: 'https://thelocalrent.com/link/v.php?t=1762852463&tk=37160f2e00721d906831565829ae1de7',
+        image: person1,
         btn_name_1: 'View Portfolio',
         btn_link_1: '#',
         btn_name_2: 'View Portfolio',
@@ -226,6 +226,7 @@ const Portfolio = () => {
 
         const loadProjectsData = async () => {
             try {
+                setLoading(true);
                 const projectsCollectionRef = collection(db, 'dev1', 'all_projects_id', 'projects');
                 const q = query(projectsCollectionRef, orderBy('createdAt', 'desc'));
                 const querySnapshot = await getDocs(q);
@@ -244,13 +245,13 @@ const Portfolio = () => {
                         isWeb: data.isWeb || false,
                     } as Project;
                 });
-
+                setLoading(false);
                 setProjects(fetchedProjects);
                 console.log("Projects loaded:", fetchedProjects);
             } catch (error) {
                 console.error('Error loading admin data:', error);
             } finally {
-                // setIsLoadingData(false);
+                setLoading(false);
             }
         };
         const loadReviewsData = async () => {
@@ -625,7 +626,7 @@ const Portfolio = () => {
                         </div>
 
                         <img
-                            src={person1}
+                            src={heroData.image}
                             alt="Workspace"
                             className="w-1/2 bject-cover opacity-80 md:w-1/3 pt-10 md:pt-0"
                         />
@@ -707,6 +708,14 @@ const Portfolio = () => {
                                 <ExternalLink className="w-4 h-4 group-hover/btn:translate-x-1 group-hover/btn:-translate-y-1 transition-transform" />
                             </button>
                         </div>
+
+                        {loading ? (
+                            <center className='md:pt-20 pt-20'>
+                                <div className="w-6 h-6 lg:w-8 lg:h-8 border-4 border-purple-200 border-t-transparent rounded-full animate-spin" />
+                            </center>
+                        ) : (
+                            <></>
+                        )}
 
                         <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                             {filteredProjects.map((project, idx) => idx < 20 ? (
