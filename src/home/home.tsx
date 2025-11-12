@@ -18,6 +18,7 @@ interface Project {
     projectLink: string;
     totalTeams: string;
     isWeb: boolean;
+    isPin: boolean;
     createdAt?: any;
     updatedAt?: any;
 }
@@ -245,8 +246,22 @@ const Portfolio = () => {
                         projectLink: data.projectLink || '',
                         totalTeams: data.totalTeams || 0,
                         isWeb: data.isWeb || false,
+                        isPin: data.isPin || false,
+                        createdAt: data.createdAt,
                     } as Project;
                 });
+
+                // Sort projects: pinned first, then by createdAt desc
+                fetchedProjects.sort((a, b) => {
+                    if (a.isPin !== b.isPin) {
+                        return a.isPin ? -1 : 1;
+                    }
+                    if (a.createdAt && b.createdAt) {
+                        return b.createdAt.toMillis() - a.createdAt.toMillis();
+                    }
+                    return 0;
+                });
+
                 setLoading(false);
                 setProjects(fetchedProjects);
                 console.log("Projects loaded:", fetchedProjects);
