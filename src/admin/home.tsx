@@ -27,6 +27,9 @@ import {
     Music2Icon,
     Star,
     Menu,
+    PinIcon,
+    PinOffIcon,
+    EyeOff,
 
 } from 'lucide-react';
 import {
@@ -45,6 +48,8 @@ interface Project {
     projectLink: string;
     totalTeams: string;
     isWeb: boolean;
+    isHide: boolean;
+    isPin: boolean;
     createdAt?: any;
     updatedAt?: any;
 }
@@ -93,6 +98,11 @@ const AdminHomePage = () => {
     const [isEditing, setIsEditing] = useState(false);
     // const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
     const [editingProject, setEditingProject] = useState<Project | null>(null);
+    // const [pinProject, setPinProject] = useState(false);
+    // const [hideProject, setHideProject] = useState({
+    //     id: '',
+    //     isHide: false
+    // });
     const [showAddProject, setShowAddProject] = useState(false);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [newProjectData, setNewProjectData] = useState<Partial<Project>>({
@@ -109,21 +119,21 @@ const AdminHomePage = () => {
 
     // Editable data states
     const [heroData, setHeroData] = useState({
-        title: 'Akash Ameerasd',
-        subtitle: 'Senior Developerasd',
-        desc: 'Senior Full-Stack Developer specializing in Flutter, Laravel, and React — transforming ideas into stunning realityasdsf',
+        title: 'Akash Ameer',
+        subtitle: 'Senior Developer',
+        desc: 'Senior Full-Stack Developer specializing in Flutter, Laravel, and React — transforming ideas into stunning reality',
         image: 'https://thelocalrent.com/link/v.php?t=1762852463&tk=37160f2e00721d906831565829ae1de7',
         btn_name_1: 'View Portfolio',
         btn_link_1: '#',
         btn_name_2: 'View Portfolio',
-        btn_link_2: 'asd#',
-        card_title_1: '4+adsf',
+        btn_link_2: '#',
+        card_title_1: '4+',
         card_subtitle_1: 'Yeaadsrs Experience',
-        card_title_2: '150+ds',
+        card_title_2: '150+',
         card_subtitle_2: 'Projecasdsts Completed',
-        card_title_3: '90%ads',
+        card_title_3: '90%',
         card_subtitle_3: 'Happadsy Clients',
-        card_title_4: '4.9dfv',
+        card_title_4: '4.9',
         card_subtitle_4: 'Aveadsfrage Rating'
     });
 
@@ -135,6 +145,8 @@ const AdminHomePage = () => {
             tags: ['Flutter', 'Dart', 'Firebase', 'TensorFlow'],
             projectLink: '',
             isWeb: true,
+            isHide: false,
+            isPin: false,
             totalTeams: '0',
             githubLink: '',
             projectImages: []
@@ -146,6 +158,8 @@ const AdminHomePage = () => {
             tags: ['Flutter', 'Laravel', 'MySQL', 'AI'],
             projectLink: '',
             isWeb: true,
+            isHide: false,
+            isPin: false,
             totalTeams: '0',
             githubLink: '',
             projectImages: []
@@ -369,6 +383,8 @@ const AdminHomePage = () => {
                         projectLink: data.projectLink || '',
                         totalTeams: data.totalTeams || 0,
                         isWeb: data.isWeb || false,
+                        isHide: data.isHide || false,
+                        isPin: data.isPin || false,
                     } as Project;
                 });
 
@@ -611,6 +627,8 @@ const AdminHomePage = () => {
                 projectLink: newProject.projectLink || '',
                 totalTeams: newProject.totalTeams || '1',
                 isWeb: newProject.isWeb || false,
+                isHide: newProject.isHide || false,
+                isPin: newProject.isPin || false,
                 createdAt: serverTimestamp(),
                 updatedAt: serverTimestamp(),
             };
@@ -663,6 +681,8 @@ const AdminHomePage = () => {
                 projectLink: updatedProject.projectLink,
                 totalTeams: updatedProject.totalTeams,
                 isWeb: updatedProject.isWeb,
+                isHide: updatedProject.isHide,
+                isPin: updatedProject.isPin,
                 updatedAt: serverTimestamp(),
             };
 
@@ -741,6 +761,50 @@ const AdminHomePage = () => {
 
     //////////
 
+
+    const togglePinProject = async (projectId: string) => {
+        try {
+            setLoader(true);
+            const project = projects.find(p => p.id === projectId);
+            if (!project) return;
+
+            const newPinState = !project.isPin;
+            const projectRef = doc(db, 'dev1', 'all_projects_id', 'projects', projectId);
+            await updateDoc(projectRef, {
+                isPin: newPinState,
+                updatedAt: serverTimestamp(),
+            });
+
+            setProjects(projects.map(p => p.id === projectId ? { ...p, isPin: newPinState } : p));
+        } catch (error) {
+            console.error('Error toggling pin:', error);
+            alert('Failed to toggle pin. Please try again.');
+        } finally {
+            setLoader(false);
+        }
+    };
+
+    const toggleHideProject = async (projectId: string) => {
+        try {
+            setLoader(true);
+            const project = projects.find(p => p.id === projectId);
+            if (!project) return;
+
+            const newHideState = !project.isHide;
+            const projectRef = doc(db, 'dev1', 'all_projects_id', 'projects', projectId);
+            await updateDoc(projectRef, {
+                isHide: newHideState,
+                updatedAt: serverTimestamp(),
+            });
+
+            setProjects(projects.map(p => p.id === projectId ? { ...p, isHide: newHideState } : p));
+        } catch (error) {
+            console.error('Error toggling hide:', error);
+            alert('Failed to toggle hide. Please try again.');
+        } finally {
+            setLoader(false);
+        }
+    };
 
     const deleteProject = async (id: string) => {
         try {
@@ -1242,6 +1306,8 @@ const AdminHomePage = () => {
                                                 </div>
                                             </div>
                                             <div className="flex items-center space-x-2 self-end sm:self-center">
+                                                {project.isPin ? <button onClick={() => togglePinProject(project.id)}> <PinIcon className="text-pink-400" />  </button> : <button onClick={() => togglePinProject(project.id)}> <PinOffIcon className="text-gray-400" />  </button>}
+                                                {project.isHide ? <button onClick={() => toggleHideProject(project.id)}> <EyeOff className="text-gray-400" />  </button> : <button onClick={() => toggleHideProject(project.id)}> <Eye className="text-green-400" />  </button>}
                                                 <button
                                                     onClick={() => setEditingProject(project)}
                                                     disabled={loader}

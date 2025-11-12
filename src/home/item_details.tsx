@@ -5,7 +5,10 @@ import {
     ExternalLink,
     Github,
     Users,
-    MessageCircle
+    MessageCircle,
+    ChevronLeft,
+    ChevronRight,
+    X
 } from 'lucide-react';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../config/fbconfig';
@@ -16,6 +19,8 @@ const ItemDetails = () => {
     const item = location.state;
     const [scrollY, setScrollY] = useState(0);
     const [contactInfo, setContactInfo] = useState<{ email: string; phone: string; location: string } | null>(null);
+    const [isCarouselOpen, setIsCarouselOpen] = useState(false);
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
     // const [socialLinks, setSocialLinks] = useState<any[]>([]);
     // const [isLoadingData, setIsLoadingData] = useState(true);
 
@@ -27,6 +32,30 @@ const ItemDetails = () => {
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
+
+    useEffect(() => {
+        const handleKeyDown = (event: KeyboardEvent) => {
+            if (!isCarouselOpen) return;
+
+            if (event.key === 'Escape') {
+                closeCarousel();
+            } else if (event.key === 'ArrowLeft') {
+                prevImage();
+            } else if (event.key === 'ArrowRight') {
+                nextImage();
+            }
+        };
+
+        if (isCarouselOpen) {
+            document.addEventListener('keydown', handleKeyDown);
+            document.body.style.overflow = 'hidden'; // Prevent background scroll
+        }
+
+        return () => {
+            document.removeEventListener('keydown', handleKeyDown);
+            document.body.style.overflow = 'unset';
+        };
+    }, [isCarouselOpen]);
 
     useEffect(() => {
         const loadContactData = async () => {
@@ -104,6 +133,23 @@ const ItemDetails = () => {
     const handleWhatsAppClick = () => {
         console.log('WhatsApp number:', whatsappNumber);
         window.open(`https://wa.me/${whatsappNumber.replace(/[^0-9]/g, '')}`, '_blank');
+    };
+
+    const openCarousel = (index: number) => {
+        setCurrentImageIndex(index);
+        setIsCarouselOpen(true);
+    };
+
+    const closeCarousel = () => {
+        setIsCarouselOpen(false);
+    };
+
+    const nextImage = () => {
+        setCurrentImageIndex((prev) => (prev + 1) % demoImages.length);
+    };
+
+    const prevImage = () => {
+        setCurrentImageIndex((prev) => (prev - 1 + demoImages.length) % demoImages.length);
     };
 
     // const opacity = Math.min(scrollY / 300, 1);
@@ -291,6 +337,7 @@ const ItemDetails = () => {
                                     <div
                                         key={idx}
                                         className="group relative rounded-2xl overflow-hidden aspect-video cursor-pointer"
+                                        onClick={() => openCarousel(idx)}
                                     >
                                         <div className="absolute inset-0 bg-gradient-to-r from-purple-600/20 to-cyan-600/20 opacity-0 group-hover:opacity-100 transition-all duration-500 z-10" />
                                         <img
@@ -329,6 +376,67 @@ const ItemDetails = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Image Carousel Modal */}
+            {isCarouselOpen && (
+                <div
+                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-md"
+                    onClick={closeCarousel}
+                >
+                    {/* Close Button */}
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            closeCarousel();
+                        }}
+                        className="absolute top-4 right-4 z-50 p-2 bg-black/60 hover:bg-black/80 rounded-full text-white transition-all hover:scale-110 md:top-6 md:right-6"
+                    >
+                        <X className="w-6 h-6 md:w-7 md:h-7" />
+                    </button>
+
+                    {/* Previous Button */}
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            prevImage();
+                        }}
+                        className="absolute left-4 top-1/2 -translate-y-1/2 z-50 p-2 md:p-3 bg-black/60 hover:bg-black/80 rounded-full text-white transition-all hover:scale-110"
+                    >
+                        <ChevronLeft className="w-7 h-7 md:w-9 md:h-9" />
+                    </button>
+
+                    {/* Next Button */}
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            nextImage();
+                        }}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 z-50 p-2 md:p-3 bg-black/60 hover:bg-black/80 rounded-full text-white transition-all hover:scale-110"
+                    >
+                        <ChevronRight className="w-7 h-7 md:w-9 md:h-9" />
+                    </button>
+
+                    {/* Main Image Container */}
+                    <div
+                        className="relative w-full h-full flex items-center justify-center p-4 md:p-8"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <div className="relative max-w-full max-h-full">
+                            <img
+                                src={demoImages[currentImageIndex]}
+                                alt={`Project image ${currentImageIndex + 1}`}
+                                className="max-w-full max-h-full w-auto h-auto object-contain rounded-lg shadow-2xl"
+                                style={{ maxHeight: '90vh', maxWidth: '90vw' }} // Critical for responsiveness
+                            />
+                        </div>
+                    </div>
+
+                    {/* Image Counter */}
+                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/60 backdrop-blur-sm rounded-full px-4 py-2 text-white text-sm md:text-base font-medium">
+                        {currentImageIndex + 1} / {demoImages.length}
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

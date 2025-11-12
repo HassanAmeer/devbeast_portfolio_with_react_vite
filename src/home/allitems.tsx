@@ -16,7 +16,7 @@ import {
     Instagram
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { collection, getDocs, query, orderBy, doc, getDoc } from 'firebase/firestore';
+import { collection, getDocs, query, orderBy, doc, getDoc, where } from 'firebase/firestore';
 import { db } from '../config/fbconfig';
 
 interface Project {
@@ -29,6 +29,8 @@ interface Project {
     projectLink: string;
     totalTeams: string;
     isWeb: boolean;
+    isHide: boolean;
+    isPin: boolean;
     createdAt?: any;
     updatedAt?: any;
 }
@@ -147,7 +149,9 @@ const AllItems = () => {
             try {
                 setLoading(true);
                 const projectsCollectionRef = collection(db, 'dev1', 'all_projects_id', 'projects');
-                const q = query(projectsCollectionRef, orderBy('createdAt', 'desc'));
+                const q = query(projectsCollectionRef,
+                    where('isHide', '==', false),
+                    orderBy('createdAt', 'desc'));
                 const querySnapshot = await getDocs(q);
 
                 const fetchedProjects: Project[] = querySnapshot.docs.map((doc) => {
@@ -162,6 +166,8 @@ const AllItems = () => {
                         projectLink: data.projectLink || '',
                         totalTeams: data.totalTeams || 0,
                         isWeb: data.isWeb || false,
+                        isHide: data.isHide || false,
+                        isPin: data.isPin || false,
                     } as Project;
                 });
                 setLoading(false);

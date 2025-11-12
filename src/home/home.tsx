@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
-import { Github, Linkedin, Twitter, Code2, Smartphone, Globe, Star, Award, Users, CheckCircle, Menu, X, ArrowRight, ExternalLink, Instagram, Facebook, Youtube, Music2, Send, DessertIcon, Camera, Link } from 'lucide-react';
+import { Github, Linkedin, Twitter, Code2, Smartphone, Globe, Star, Award, Users, CheckCircle, Menu, X, ArrowRight, ExternalLink, Instagram, Facebook, Youtube, Music2, Send, DessertIcon, Camera, Link, ArrowBigDownDashIcon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import person1 from '../assets/person1.png';
 import ContactSection from './contact';
 import BringSection from './bring';
-import { doc, getDoc, collection, getDocs, query, orderBy } from 'firebase/firestore';
+import { doc, getDoc, collection, getDocs, query, orderBy, where } from 'firebase/firestore';
 import { db } from '../config/fbconfig';
 
 
@@ -228,7 +228,9 @@ const Portfolio = () => {
             try {
                 setLoading(true);
                 const projectsCollectionRef = collection(db, 'dev1', 'all_projects_id', 'projects');
-                const q = query(projectsCollectionRef, orderBy('createdAt', 'desc'));
+                const q = query(projectsCollectionRef,
+                    where('isHide', '==', false),
+                    orderBy('createdAt', 'desc'));
                 const querySnapshot = await getDocs(q);
 
                 const fetchedProjects: Project[] = querySnapshot.docs.map((doc) => {
@@ -722,12 +724,12 @@ const Portfolio = () => {
                                 <div
                                     onClick={() => navigate('/item', { state: project })} // passing full data
                                     key={project.id}
-                                    className="group relative rounded-3xl overflow-hidden transform hover:scale-105 transition-all duration-500"
+                                    className="group relative md:pt-8 rounded-3xl overflow-hidden transform hover:scale-105 transition-all duration-500"
                                     style={{ animationDelay: `${idx * 100}ms` }}
                                 >
                                     <div className={`absolute inset-0 bg-gradient-to-r ${project.isWeb ? 'from-cyan-500 to-blue-500' : 'from-purple-500 to-pink-500'} opacity-0 group-hover:opacity-20 transition-all duration-500 blur-xl`} />
 
-                                    <div className="relative bg-black/40 backdrop-blur-xl border border-white/10 hover:border-white/30 transition-all rounded-3xl overflow-hidden">
+                                    <div className="relative bg-black/40 backdrop-blur-xl border border-white/20 hover:border-white/30 transition-all rounded-3xl overflow-hidden">
                                         {project.projectLink && (
                                             <div className="absolute top-4 right-4 z-20">
                                                 <div className="flex items-center space-x-2 px-2 py-1 bg-purple-500/90 opacity-70 backdrop-blur-xl rounded-full text-xs font-bold shadow-lg">
@@ -737,7 +739,7 @@ const Portfolio = () => {
                                             </div>
                                         )}
 
-                                        <div className="relative h-48 overflow-hidden">
+                                        <div className="relative h-60 overflow-hidden">
                                             <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent z-10" />
                                             <img
                                                 src={project.projectImages[0] || 'https://via.placeholder.com/400x300'}
@@ -778,6 +780,14 @@ const Portfolio = () => {
                         </div>
                     </div>
                 </section>
+                <center>
+                    <button
+                        onClick={() => navigate('/allitems')} // passing full data
+                        className="flex items-center md:mb-20 mb-10 space-x-2 text-purple-400 hover:text-cyan-400 transition-all group/btn">
+                        <ArrowBigDownDashIcon className="w-4 h-4 group-hover/btn:translate-x-1 group-hover/btn:-translate-y-1 transition-transform animate-bounce" />
+                        <span className="text-lg font-bold">View More</span>
+                    </button>
+                </center>
 
                 <hr style={{ border: 0, height: 1 }} className="bg-gray-700" />
 
