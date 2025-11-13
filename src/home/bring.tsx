@@ -1,7 +1,29 @@
-import { } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Smartphone, Code2, Database, Brain, Globe, Cloud } from 'lucide-react';
 
 const BringSection = () => {
+    const [isVisible, setIsVisible] = useState(false);
+    const sectionRef = useRef(null);
+
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                if (entry.isIntersecting) {
+                    setIsVisible(true);
+                }
+            },
+            { threshold: 0.1 }
+        );
+        if (sectionRef.current) {
+            observer.observe(sectionRef.current);
+        }
+        return () => {
+            if (sectionRef.current) {
+                observer.unobserve(sectionRef.current);
+            }
+        };
+    }, []);
+
     const features = [
         {
             icon: <Smartphone className="w-8 h-8" />,
@@ -49,40 +71,57 @@ const BringSection = () => {
 
     {/* Skills 3D Cards */ }
     return (
-        <section id="skills" className="py-24 container mx-auto px-4">
-            <div className="text-center mb-16">
-                {/* <div className="inline-block px-4 py-2 bg-gradient-to-r from-purple-600/20 to-cyan-600/20 rounded-full text-sm font-bold text-purple-300 border border-purple-500/30 mb-6">
-           EXPERTISE
-       </div> */}
-                <h3 className="text-3xl md:text-6xl font-black mb-6 bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">
-                    What I Bring
-                </h3>
-                <p className="text-gray-400 text-lg max-w-2xl mx-auto">
-                    Full-stack expertise with cutting-edge technologies
-                </p>
-            </div>
+        <>
+            <section ref={sectionRef} id="skills" className={`py-24 container mx-auto px-4 ${isVisible ? 'animate-bring' : ''}`}>
+                <div className="text-center mb-16">
+                    {/* <div className="inline-block px-4 py-2 bg-gradient-to-r from-purple-600/20 to-cyan-600/20 rounded-full text-sm font-bold text-purple-300 border border-purple-500/30 mb-6">
+               EXPERTISE
+            </div> */}
+                    <h3 className="text-3xl md:text-6xl font-black mb-6 bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">
+                        What I Bring
+                    </h3>
+                    <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+                        Full-stack expertise with cutting-edge technologies
+                    </p>
+                </div>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {features.map((feature, idx) => (
-                    <div
-                        key={idx}
-                        className="group relative"
-                        style={{ animationDelay: `${feature.delay}ms` }}
-                    >
-                        <div className={`absolute inset-0 bg-gradient-to-r ${feature.color} rounded-3xl blur-xl opacity-0 group-hover:opacity-30 transition-all duration-500`} />
-                        <div className="relative p-8 rounded-3xl bg-black/40 backdrop-blur-xl border border-white/10 hover:border-white/30 transition-all transform hover:scale-105 hover:-translate-y-2 duration-500">
-                            <div className={`w-16 h-16 bg-gradient-to-r ${feature.color} rounded-2xl flex items-center justify-center mb-6 shadow-2xl group-hover:scale-110 group-hover:rotate-6 transition-all duration-500`}>
-                                {feature.icon}
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {features.map((feature, idx) => (
+                        <div
+                            key={idx}
+                            className="group relative"
+                            style={{ animationDelay: `${feature.delay}ms` }}
+                        >
+                            <div className={`absolute inset-0 bg-gradient-to-r ${feature.color} rounded-3xl blur-xl opacity-0 group-hover:opacity-30 transition-all duration-500`} />
+                            <div className="relative p-8 rounded-3xl bg-black/40 backdrop-blur-xl border border-white/10 hover:border-white/30 transition-all transform hover:scale-105 hover:-translate-y-2 duration-500">
+                                <div className={`w-16 h-16 bg-gradient-to-r ${feature.color} rounded-2xl flex items-center justify-center mb-6 shadow-2xl group-hover:scale-110 group-hover:rotate-6 transition-all duration-500`}>
+                                    {feature.icon}
+                                </div>
+                                <h4 className="text-2xl font-bold mb-4 text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-cyan-400 transition-all">
+                                    {feature.title}
+                                </h4>
+                                <p className="text-gray-400 leading-relaxed">{feature.desc}</p>
                             </div>
-                            <h4 className="text-2xl font-bold mb-4 text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-cyan-400 transition-all">
-                                {feature.title}
-                            </h4>
-                            <p className="text-gray-400 leading-relaxed">{feature.desc}</p>
                         </div>
-                    </div>
-                ))}
-            </div>
-        </section>
+                    ))}
+                </div>
+            </section>
+            <style>{`
+                @keyframes fade-in-bring {
+                    from {
+                        opacity: 0;
+                        transform: translateY(20px);
+                    }
+                    to {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+                }
+                .animate-bring {
+                    animation: fade-in-bring 1s ease-out;
+                }
+            `}</style>
+        </>
     );
 };
 

@@ -1,7 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Github, Linkedin, Twitter, Code2, Smartphone, Globe, Star, Award, Users, CheckCircle, Menu, X, ArrowRight, ExternalLink, Instagram, Facebook, Youtube, Music2, Send, DessertIcon, Camera, Link, ArrowBigDownDashIcon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import person1 from '../assets/person1.png';
+import services1 from '../assets/services1.png';
+import services2 from '../assets/services2.png';
 import ContactSection from './contact';
 import BringSection from './bring';
 import { doc, getDoc, collection, getDocs, query, orderBy, where } from 'firebase/firestore';
@@ -73,6 +75,9 @@ const Portfolio = () => {
     const [mousePosition] = useState({ x: 0, y: 0 });
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [isServicesVisible, setIsServicesVisible] = useState(false);
+    const servicesRef = useRef(null);
+    const [logoSrc, setLogoSrc] = useState(services1);
 
     useEffect(() => {
         // const handleScroll = () => setScrolled(window.scrollY > 50);
@@ -308,6 +313,37 @@ const Portfolio = () => {
         }
     }, []);
 
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                if (entry.isIntersecting) {
+                    setIsServicesVisible(true);
+                }
+            },
+            { threshold: 0.1 }
+        );
+        if (servicesRef.current) {
+            observer.observe(servicesRef.current);
+        }
+        return () => {
+            if (servicesRef.current) {
+                observer.unobserve(servicesRef.current);
+            }
+        };
+    }, []);
+
+    useEffect(() => {
+        if (headerData.logo) {
+            const images = [services1, headerData.logo, services1];
+            let index = 0;
+            const interval = setInterval(() => {
+                setLogoSrc(images[index]);
+                index = (index + 1) % images.length;
+            }, 1200);
+            return () => clearInterval(interval);
+        }
+    }, [headerData.logo]);
+
 
     // Reviews state
     const [reviews, setReviews] = useState<Review[]>([
@@ -473,13 +509,17 @@ const Portfolio = () => {
                     <div className="container mx-auto px-4 py-4">
                         <div className="flex justify-between items-center">
                             <div className="flex items-center space-x-3 group cursor-pointer">
-                                <div className="relative animate-pulse">
-                                    <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-cyan-600 rounded-2xl blur-xl opacity-50 group-hover:opacity-100 transition-all" />
-                                    <div className="relative w-14 h-14 bg-gradient-to-br from-purple-600 via-pink-600 to-cyan-600 rounded-2xl flex items-center justify-center text-2xl font-black shadow-2xl transform group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
-                                        {/* <Code2 className="w-7 h-7 text-white" /> */}
-                                        <img src={headerData.logo} alt="" />
-                                    </div>
+
+                                {/* <img src={services1} alt="" className="w-20" /> */}
+                                <div className="relative animate-pulse w-14 h-8">
+                                    {/* <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-cyan-600 rounded-2xl blur-xl opacity-50 group-hover:opacity-100 transition-all" /> */}
+                                    {/* <div className="relative w-14 h-14 bg-gradient-to-br from-purple-600 via-pink-600 to-cyan-600 rounded-2xl flex items-center justify-center text-2xl font-black shadow-2xl transform group-hover:scale-110 group-hover:rotate-3 transition-all duration-300"> */}
+                                    {/* <Code2 className="w-7 h-7 text-white" /> */}
+                                    <img src={logoSrc} alt="" className="absolute inset-0 transition-opacity duration-500" />
+                                    {/* </div> */}
                                 </div>
+
+
                                 <div>
                                     <h1 className="text-xl font-black bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">
                                         {headerData.title}
@@ -685,8 +725,25 @@ const Portfolio = () => {
 
                 </section>
                 <hr style={{ border: 0, height: 1 }} className="bg-gray-700" />
+
+                {/* Services Showcase Section */}
+                <section ref={servicesRef} className={`py-8 relative ${isServicesVisible ? 'animate-services' : ''}`}>
+                    <div className="container mx-auto px-4">
+                        <div className="text-center mb-16">
+                            <h3 className="text-3xl md:text-6xl font-black mb-6 bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">
+                                Our Services
+                            </h3>
+                            <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+                                Perfect solutions for mobile and web development that bring your ideas to life with stunning animations and seamless experiences.
+                            </p>
+                        </div>
+                        <img src={services2} alt="" className="w-full object-cover" />
+
+                    </div>
+                </section>
+
                 <BringSection />
-                <hr style={{ border: 0, height: 1 }} className="bg-gray-700 mt-20" />
+                <hr style={{ border: 0, height: 1 }} className="bg-gray-700 mt-0" />
 
                 {/* Projects with Real Images */}
                 <section id="projects" className="py-24 relative">
@@ -972,8 +1029,21 @@ const Portfolio = () => {
           50% { background-position: 100% 50%; }
         }
         .animate-gradient {
-          animation: gradient 3s ease infinite;
-        }
+           animation: gradient 3s ease infinite;
+         }
+        @keyframes fade-in {
+           from {
+             opacity: 0;
+             transform: translateY(20px);
+           }
+           to {
+             opacity: 1;
+             transform: translateY(0);
+           }
+         }
+         .animate-services {
+           animation: fade-in 1s ease-out;
+         }
       `}</style>
         </div >
     );
