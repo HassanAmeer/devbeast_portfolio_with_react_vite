@@ -393,6 +393,9 @@ const AdminHomePage = () => {
                     if (a.isPin !== b.isPin) {
                         return a.isPin ? -1 : 1;
                     }
+                    if (a.isHide !== b.isHide) {
+                        return a.isHide ? -1 : 1;
+                    }
                     if (a.createdAt && b.createdAt) {
                         return b.createdAt.toMillis() - a.createdAt.toMillis();
                     }
