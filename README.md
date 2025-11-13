@@ -364,3 +364,32 @@ export default LoginComp;
 
 
 
+# ---------------firebase Deploy ----------
+```bash
+    npm run build 
+```
+```bash
+    firebase init 
+```
+```bash
+    firebase deploy --only hosting 
+```
+
+# ---------------firebase Deploy on second side ----------
+like site 1 name : devbeast-786
+like site 2 name : devbest
+
+1. paste in firebase json
+```json
+{
+  "hosting": {
+    "site": "devbest",
+    "public": "public",
+  }
+}
+```
+
+2. run the command
+```bash
+    firebase deploy --only hosting:devbest
+```
