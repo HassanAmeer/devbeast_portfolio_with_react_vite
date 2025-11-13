@@ -119,7 +119,7 @@ const AdminHomePage = () => {
 
     // Editable data states
     const [heroData, setHeroData] = useState({
-        title: 'Akash Ameer',
+        title: 'Dev Beast',
         subtitle: 'Senior Developer',
         desc: 'Senior Full-Stack Developer specializing in Flutter, Laravel, and React — transforming ideas into stunning reality',
         image: 'https://thelocalrent.com/link/v.php?t=1762852463&tk=37160f2e00721d906831565829ae1de7',
@@ -128,13 +128,13 @@ const AdminHomePage = () => {
         btn_name_2: 'View Portfolio',
         btn_link_2: '#',
         card_title_1: '4+',
-        card_subtitle_1: 'Yeaadsrs Experience',
+        card_subtitle_1: 'Years Experience',
         card_title_2: '150+',
-        card_subtitle_2: 'Projecasdsts Completed',
+        card_subtitle_2: 'Projects Completed',
         card_title_3: '90%',
-        card_subtitle_3: 'Happadsy Clients',
+        card_subtitle_3: 'Happay Clients',
         card_title_4: '4.9',
-        card_subtitle_4: 'Aveadsfrage Rating'
+        card_subtitle_4: 'Average Rating'
     });
 
     const [projects, setProjects] = useState<Project[]>([
@@ -197,7 +197,7 @@ const AdminHomePage = () => {
             id: '1',
             phone: '0301234567',
             email: 'john@example.com',
-            desc: 'Hi Akash, I loved your AI Healthcare app. Can we discuss a partnership?',
+            desc: 'Hi Dev, I loved your AI Healthcare app. Can we discuss a partnership?',
             createdAt: 'Nov 10, 2025',
             read: false
         },
@@ -321,7 +321,7 @@ const AdminHomePage = () => {
                 if (docSnap.exists()) {
                     const data = docSnap.data();
                     setHeroData({
-                        title: data.title || 'Akash Ameer',
+                        title: data.title || 'Dev Beast',
                         subtitle: data.subtitle || 'Senior Developer',
                         desc: data.desc || 'Senior Full-Stack Developer specializing in Flutter, Laravel, and React — transforming ideas into stunning reality',
                         image: data.image || '',

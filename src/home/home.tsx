@@ -112,14 +112,14 @@ const Portfolio = () => {
         btn_link_1: '#',
         btn_name_2: 'Github',
         btn_link_2: '#',
-        card_title_1: '4+adsf',
-        card_subtitle_1: 'Yeaadsrs Experience',
-        card_title_2: '150+ds',
-        card_subtitle_2: 'Projecasdsts Completed',
-        card_title_3: '90%ads',
-        card_subtitle_3: 'Happadsy Clients',
-        card_title_4: '4.9dfv',
-        card_subtitle_4: 'Aveadsfrage Rating'
+        card_title_1: '4+',
+        card_subtitle_1: 'Years Experience',
+        card_title_2: '150+',
+        card_subtitle_2: 'Projects Completed',
+        card_title_3: '90%',
+        card_subtitle_3: 'Happy Clients',
+        card_title_4: '4.9',
+        card_subtitle_4: 'Avearage Rating'
     });
 
     const [projects, setProjects] = useState<Project[]>([]);
