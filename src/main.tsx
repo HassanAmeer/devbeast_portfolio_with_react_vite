@@ -8,6 +8,7 @@ import ItemDetails from './home/item_details.tsx'
 import AllItems from './home/allitems.tsx'
 import AdminLogin from './admin/login.tsx'
 import AdminHomePage from './admin/home'
+import ImportData from './import_data.tsx'
 
 
 createRoot(document.getElementById('root')!).render(
@@ -27,6 +28,8 @@ createRoot(document.getElementById('root')!).render(
         <Route path="/adm" element={<AdminHomePage />} />
         {/* Optional: Redirect /home → /admin/home */}
         {/* <Route path="/home" element={<Navigate to="/admin/home" replace />} /> */}
+        {/* ImportData */}
+        <Route path="/importdata" element={<ImportData />} />
       </Routes>
     </Router>
 

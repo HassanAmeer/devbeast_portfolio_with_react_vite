@@ -159,7 +159,7 @@ const Portfolio = () => {
         // const deviceInfo = getDeviceName();
         // console.log('Device:', deviceInfo.full);
 
-        const loadSocialLinsData = async () => {
+        const loadSocialLinksData = async () => {
             try {
                 const docRef = doc(db, 'dev1', 'social_links');
                 const docSnap = await getDoc(docRef);
@@ -190,6 +190,7 @@ const Portfolio = () => {
                         { id: '11', platform: 'Globe', url: data.globe || '', icon: 'globe' }
                     ]);
                 }
+                // console.log("loadSocialLinksData loaded:", docSnap.data);s
             } catch (error) {
                 console.error('Error loading admin data:', error);
             } finally {
@@ -223,6 +224,7 @@ const Portfolio = () => {
                         card_subtitle_4: data.card_subtitle_4 || 'Average Rating'
                     });
                 }
+                // console.log("loadHeroData loaded:", docSnap.data);
             } catch (error) {
                 console.error('Error loading admin data:', error);
             } finally {
@@ -307,7 +309,7 @@ const Portfolio = () => {
 
         loadReviewsData();
         loadHeroData();
-        loadSocialLinsData();
+        loadSocialLinksData();
         if (projects.length === 0) {
             loadProjectsData();
         }
