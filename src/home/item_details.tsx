@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../config/fbconfig';
+import { preloadImages } from '../utils/imageCache';
 
 const ItemDetails = () => {
     const location = useLocation();
@@ -95,6 +96,13 @@ const ItemDetails = () => {
 
         loadContactData();
     }, []);
+
+    // Preload project images when item is available
+    useEffect(() => {
+        if (item && item.projectImages && item.projectImages.length > 0) {
+            preloadImages(item.projectImages);
+        }
+    }, [item]);
 
     if (!item) {
         return (

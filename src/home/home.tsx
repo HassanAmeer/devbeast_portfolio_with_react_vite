@@ -6,6 +6,7 @@ import ContactSection from './contact';
 import BringSection from './bring';
 import { doc, getDoc, collection, getDocs, query, orderBy, where } from 'firebase/firestore';
 import { db } from '../config/fbconfig';
+import { preloadProjectImages } from '../utils/imageCache';
 
 
 interface Project {
@@ -264,6 +265,7 @@ const Portfolio = () => {
 
                 setLoading(false);
                 setProjects(fetchedProjects);
+                preloadProjectImages(fetchedProjects);
                 console.log("Projects loaded:", fetchedProjects);
             } catch (error) {
                 console.error('Error loading admin data:', error);
@@ -301,36 +303,38 @@ const Portfolio = () => {
         loadReviewsData();
         loadHeroData();
         loadSocialLinsData();
-        loadProjectsData();
+        if (projects.length === 0) {
+            loadProjectsData();
+        }
     }, []);
 
 
     // Reviews state
     const [reviews, setReviews] = useState<Review[]>([
-        {
-            id: '1',
-            name: 'Sarah Johnson',
-            role: 'CEO, TechStart Inc',
-            text: 'Exceptional work! The app exceeded all expectations. Professional, fast, and delivered a product that our users absolutely love.',
-            rating: 5,
-            avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&q=80'
-        },
-        {
-            id: '2',
-            name: 'Michael Chen',
-            role: 'CTO, FinanceHub',
-            text: 'Best developer we have worked with. Clean code, great architecture, and outstanding communication throughout the project.',
-            rating: 5,
-            avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&q=80'
-        },
-        {
-            id: '3',
-            name: 'Emma Davis',
-            role: 'Product Lead, Innovate',
-            text: 'Transformed our vision into reality. The attention to detail and user experience is phenomenal. Highly recommend!',
-            rating: 5,
-            avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&q=80'
-        }
+        // {
+        //     id: '1',
+        //     name: 'Sarah Johnson',
+        //     role: 'CEO, TechStart Inc',
+        //     text: 'Exceptional work! The app exceeded all expectations. Professional, fast, and delivered a product that our users absolutely love.',
+        //     rating: 5,
+        //     avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&q=80'
+        // },
+        // {
+        //     id: '2',
+        //     name: 'Michael Chen',
+        //     role: 'CTO, FinanceHub',
+        //     text: 'Best developer we have worked with. Clean code, great architecture, and outstanding communication throughout the project.',
+        //     rating: 5,
+        //     avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&q=80'
+        // },
+        // {
+        //     id: '3',
+        //     name: 'Emma Davis',
+        //     role: 'Product Lead, Innovate',
+        //     text: 'Transformed our vision into reality. The attention to detail and user experience is phenomenal. Highly recommend!',
+        //     rating: 5,
+        //     avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&q=80'
+        // }
     ]);
 
 

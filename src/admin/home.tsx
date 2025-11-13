@@ -388,6 +388,17 @@ const AdminHomePage = () => {
                     } as Project;
                 });
 
+                // Sort projects: pinned first, then by createdAt desc
+                fetchedProjects.sort((a, b) => {
+                    if (a.isPin !== b.isPin) {
+                        return a.isPin ? -1 : 1;
+                    }
+                    if (a.createdAt && b.createdAt) {
+                        return b.createdAt.toMillis() - a.createdAt.toMillis();
+                    }
+                    return 0;
+                });
+
                 setProjects(fetchedProjects);
                 console.log("Projects loaded:", fetchedProjects);
             } catch (error) {

@@ -18,6 +18,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { collection, getDocs, query, orderBy, doc, getDoc, where } from 'firebase/firestore';
 import { db } from '../config/fbconfig';
+import { preloadProjectImages } from '../utils/imageCache';
 
 interface Project {
     id: string;
@@ -185,6 +186,7 @@ const AllItems = () => {
 
                 setLoading(false);
                 setProjects(fetchedProjects);
+                preloadProjectImages(fetchedProjects);
                 console.log("Projects loaded:", fetchedProjects);
             } catch (error) {
                 console.error('Error loading projects:', error);
@@ -195,7 +197,9 @@ const AllItems = () => {
         };
 
         loadSocialLinsData();
-        loadProjectsData();
+        if (projects.length === 0) {
+            loadProjectsData();
+        }
     }, []);
 
     const handleWhatsAppClick = (whatsappNumber: string) => {
