@@ -7,7 +7,7 @@ import services2 from '../assets/services2.png';
 import ContactSection from './contact';
 import BringSection from './bring';
 import { doc, getDoc, collection, getDocs, query, orderBy, where } from 'firebase/firestore';
-import { db } from '../config/fbconfig';
+import { db, heroSectionCollectionId, mainCollection, projectsCollection, projectsCollectionId, reviewsCollection, reviewsCollectionId, socialLinksCollectionId } from '../config/fbconfig';
 import { preloadProjectImages } from '../utils/imageCache';
 
 
@@ -161,7 +161,7 @@ const Portfolio = () => {
 
         const loadSocialLinksData = async () => {
             try {
-                const docRef = doc(db, 'dev1', 'social_links');
+                const docRef = doc(db, mainCollection, socialLinksCollectionId);
                 const docSnap = await getDoc(docRef);
 
                 if (docSnap.exists()) {
@@ -200,7 +200,7 @@ const Portfolio = () => {
         // Load loadHearoData
         const loadHeroData = async () => {
             try {
-                const docRef = doc(db, 'dev1', 'hero_section');
+                const docRef = doc(db, mainCollection, heroSectionCollectionId);
                 const docSnap = await getDoc(docRef);
 
                 if (docSnap.exists()) {
@@ -236,7 +236,7 @@ const Portfolio = () => {
         const loadProjectsData = async () => {
             try {
                 setLoading(true);
-                const projectsCollectionRef = collection(db, 'dev1', 'all_projects_id', 'projects');
+                const projectsCollectionRef = collection(db, mainCollection, projectsCollectionId, projectsCollection);
                 const q = query(projectsCollectionRef,
                     where('isHide', '==', false),
                     orderBy('createdAt', 'desc'));
@@ -282,7 +282,7 @@ const Portfolio = () => {
         };
         const loadReviewsData = async () => {
             try {
-                const reviewsCollectionRef = collection(db, 'dev1', 'all_reviews_id', 'reviews');
+                const reviewsCollectionRef = collection(db, mainCollection, reviewsCollectionId, reviewsCollection);
                 const q = query(reviewsCollectionRef, orderBy('createdAt', 'desc'));
                 const querySnapshot = await getDocs(q);
 

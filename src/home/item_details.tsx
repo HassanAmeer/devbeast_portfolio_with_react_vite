@@ -11,7 +11,7 @@ import {
     X
 } from 'lucide-react';
 import { doc, getDoc } from 'firebase/firestore';
-import { db } from '../config/fbconfig';
+import { db, mainCollection, socialLinksCollectionId } from '../config/fbconfig';
 import { preloadImages } from '../utils/imageCache';
 
 const ItemDetails = () => {
@@ -61,7 +61,7 @@ const ItemDetails = () => {
     useEffect(() => {
         const loadContactData = async () => {
             try {
-                const docRef = doc(db, 'dev1', 'social_links');
+                const docRef = doc(db, mainCollection, socialLinksCollectionId);
                 const docSnap = await getDoc(docRef);
 
                 if (docSnap.exists()) {

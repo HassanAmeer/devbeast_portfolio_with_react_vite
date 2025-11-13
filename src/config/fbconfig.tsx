@@ -18,5 +18,28 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const storage = getStorage(app);
 
-export { db, storage };
+
+
+
+
+
+
+/////////////////////////////////////////////
+// Change your Collection Name
+const mainCollection = 'dev1';
+// inside
+const adminCollectionId = 'admin';
+const heroSectionCollectionId = 'hero_section';
+const socialLinksCollectionId = 'social_links';
+//
+const projectsCollectionId = 'all_projects_id';
+const projectsCollection = 'projects';
+//
+const contactUsCollectionId = 'contact_us_id';
+const contactUsCollection = 'contact_us';
+//
+const reviewsCollectionId = 'all_reviews_id';
+const reviewsCollection = 'reviews';
+
+export { db, storage, mainCollection, adminCollectionId, heroSectionCollectionId, socialLinksCollectionId, projectsCollectionId, projectsCollection, contactUsCollectionId, contactUsCollection, reviewsCollectionId, reviewsCollection };
 

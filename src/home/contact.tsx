@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Mail, Phone, MapPin, Send, Github, Linkedin, Twitter, MessageCircle, CheckCircle, Globe, Instagram, Facebook, Youtube, Music2Icon, Camera, DessertIcon } from 'lucide-react';
 import { doc, getDoc, collection, addDoc, serverTimestamp } from 'firebase/firestore';
-import { db } from '../config/fbconfig';
+import { contactUsCollection, contactUsCollectionId, db, mainCollection, socialLinksCollectionId } from '../config/fbconfig';
 
 const ContactSection = () => {
     const [formData, setFormData] = useState({ name: '', phone: '', email: '', message: '' });
@@ -16,7 +16,7 @@ const ContactSection = () => {
             setIsSubmitting(true);
             try {
                 // Send data to Firebase
-                const contactUsCollectionRef = collection(db, 'dev1', 'contact_us_id', 'contact_us');
+                const contactUsCollectionRef = collection(db, mainCollection, contactUsCollectionId, contactUsCollection);
                 await addDoc(contactUsCollectionRef, {
                     phone: formData.phone,
                     email: formData.email,
@@ -44,7 +44,7 @@ const ContactSection = () => {
     useEffect(() => {
         const loadContactData = async () => {
             try {
-                const docRef = doc(db, 'dev1', 'social_links');
+                const docRef = doc(db, mainCollection, socialLinksCollectionId);
                 const docSnap = await getDoc(docRef);
 
                 if (docSnap.exists()) {

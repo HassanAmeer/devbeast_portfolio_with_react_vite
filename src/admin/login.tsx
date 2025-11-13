@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { db } from '../config/fbconfig';
+import { adminCollectionId, db, mainCollection } from '../config/fbconfig';
 import { doc, getDoc } from "firebase/firestore";
 import { useNavigate } from 'react-router-dom';
 
@@ -57,7 +57,7 @@ const AdminLogin = () => {
 
         try {
             // Get admin credentials from Firestore
-            const docRef = doc(db, 'dev1', 'admin');
+            const docRef = doc(db, mainCollection, adminCollectionId);
             const docSnap = await getDoc(docRef);
 
             if (docSnap.exists()) {

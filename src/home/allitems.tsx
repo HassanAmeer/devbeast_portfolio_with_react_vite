@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { collection, getDocs, query, orderBy, doc, getDoc, where } from 'firebase/firestore';
-import { db } from '../config/fbconfig';
+import { db, mainCollection, projectsCollection, projectsCollectionId, socialLinksCollectionId } from '../config/fbconfig';
 import { preloadProjectImages } from '../utils/imageCache';
 
 interface Project {
@@ -111,7 +111,7 @@ const AllItems = () => {
 
         const loadSocialLinsData = async () => {
             try {
-                const docRef = doc(db, 'dev1', 'social_links');
+                const docRef = doc(db, mainCollection, socialLinksCollectionId);
                 const docSnap = await getDoc(docRef);
 
                 if (docSnap.exists()) {
@@ -149,7 +149,7 @@ const AllItems = () => {
         const loadProjectsData = async () => {
             try {
                 setLoading(true);
-                const projectsCollectionRef = collection(db, 'dev1', 'all_projects_id', 'projects');
+                const projectsCollectionRef = collection(db, mainCollection, projectsCollectionId, projectsCollection);
                 const q = query(projectsCollectionRef,
                     where('isHide', '==', false),
                     orderBy('createdAt', 'desc'));
@@ -269,14 +269,14 @@ const AllItems = () => {
 
                             {/* Social Icons */}
                             <div className="hidden lg:flex items-center space-x-2 pl-2 border-l border-white/10">
-                                {socialLinks.find((e) => e.platform == "github")?.platform !== "" ? <a href={socialLinks.find((e) => e.platform == "github")?.url} className="p-2 hover:bg-white/10 rounded-lg transition-all">
+                                {socialLinks.find((e) => e.platform == "Github")?.platform !== "" ? <a href={socialLinks.find((e) => e.platform === "Github")?.url} className="p-2 hover:bg-white/10 rounded-lg transition-all">
                                     <Github className="w-4 h-4" />
                                 </a> : <></>}
-                                {socialLinks.find((e) => e.platform == "linkdin")?.platform !== "" ? <a href={socialLinks.find((e) => e.platform == "linkdin")?.url}
+                                {socialLinks.find((e) => e.platform == "Linkedin")?.platform !== "" ? <a href={socialLinks.find((e) => e.platform === "Linkedin")?.url}
                                     className="p-2 hover:bg-white/10 rounded-lg transition-all">
                                     <Linkedin className="w-4 h-4" />
                                 </a> : <></>}
-                                {socialLinks.find((e) => e.platform == "instagram")?.platform !== "" ? <a href={socialLinks.find((e) => e.platform == "instagram")?.url}
+                                {socialLinks.find((e) => e.platform == "Instagram")?.platform !== "" ? <a href={socialLinks.find((e) => e.platform === "Instagram")?.url}
                                     className="p-2 hover:bg-white/10 rounded-lg transition-all">
                                     <Instagram className="w-4 h-4" />
                                 </a> : <></>}

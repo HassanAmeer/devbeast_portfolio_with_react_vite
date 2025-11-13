@@ -36,7 +36,7 @@ import {
     collection, getDocs, doc, updateDoc, deleteDoc,
     query, orderBy, serverTimestamp, addDoc, getDoc
 } from "firebase/firestore";
-import { db } from '../config/fbconfig';
+import { adminCollectionId, contactUsCollection, contactUsCollectionId, db, heroSectionCollectionId, mainCollection, projectsCollection, projectsCollectionId, reviewsCollection, reviewsCollectionId, socialLinksCollectionId } from '../config/fbconfig';
 
 interface Project {
     id: string;           // ← CHANGE FROM number TO string
@@ -277,7 +277,7 @@ const AdminHomePage = () => {
 
         const loadSocialLinsData = async () => {
             try {
-                const docRef = doc(db, 'dev1', 'social_links');
+                const docRef = doc(db, mainCollection, socialLinksCollectionId);
                 const docSnap = await getDoc(docRef);
 
                 if (docSnap.exists()) {
@@ -315,7 +315,7 @@ const AdminHomePage = () => {
         // Load loadHearoData
         const loadHeroData = async () => {
             try {
-                const docRef = doc(db, 'dev1', 'hero_section');
+                const docRef = doc(db, mainCollection, heroSectionCollectionId);
                 const docSnap = await getDoc(docRef);
 
                 if (docSnap.exists()) {
@@ -348,7 +348,7 @@ const AdminHomePage = () => {
         // Load current admin data
         const loadAdminData = async () => {
             try {
-                const docRef = doc(db, 'dev1', 'admin');
+                const docRef = doc(db, mainCollection, adminCollectionId);
                 const docSnap = await getDoc(docRef);
 
                 if (docSnap.exists()) {
@@ -367,7 +367,7 @@ const AdminHomePage = () => {
 
         const loadProjectsData = async () => {
             try {
-                const projectsCollectionRef = collection(db, 'dev1', 'all_projects_id', 'projects');
+                const projectsCollectionRef = collection(db, mainCollection, projectsCollectionId, projectsCollection);
                 const q = query(projectsCollectionRef, orderBy('createdAt', 'desc'));
                 const querySnapshot = await getDocs(q);
 
@@ -413,7 +413,7 @@ const AdminHomePage = () => {
 
         const loadReviewsData = async () => {
             try {
-                const reviewsCollectionRef = collection(db, 'dev1', 'all_reviews_id', 'reviews');
+                const reviewsCollectionRef = collection(db, mainCollection, reviewsCollectionId, reviewsCollection);
                 const q = query(reviewsCollectionRef, orderBy('createdAt', 'desc'));
                 const querySnapshot = await getDocs(q);
 
@@ -439,7 +439,7 @@ const AdminHomePage = () => {
         };
         const loadContactUsMessages = async () => {
             try {
-                const contactUsCollectionRef = collection(db, 'dev1', 'contact_us_id', 'contact_us');
+                const contactUsCollectionRef = collection(db, mainCollection, contactUsCollectionId, contactUsCollection);
                 const q = query(contactUsCollectionRef, orderBy('createdAt', 'desc'));
                 const querySnapshot = await getDocs(q);
 
@@ -504,8 +504,8 @@ const AdminHomePage = () => {
                     updateData.logo = logoToUpdate;
                 }
 
-                const social_links = doc(db, 'dev1', 'social_links');
-                await updateDoc(social_links, updateData);
+                const socialLinks2 = doc(db, mainCollection, socialLinksCollectionId);
+                await updateDoc(socialLinks2, updateData);
                 alert('Social settings saved successfully!');
                 setLoader(false);
             } else if (activeSection === 'hero') {
@@ -538,7 +538,7 @@ const AdminHomePage = () => {
                     heroData.image = imageToUpdate;
                 }
 
-                const hero_data = doc(db, 'dev1', 'hero_section');
+                const hero_data = doc(db, mainCollection, heroSectionCollectionId);
                 await updateDoc(hero_data, updateData);
                 alert('Hero section saved successfully!');
                 setLoader(false);
@@ -570,7 +570,7 @@ const AdminHomePage = () => {
 
         try {
             // First verify current password
-            const docRef = doc(db, 'dev1', 'admin');
+            const docRef = doc(db, mainCollection, adminCollectionId);
             setLoader(true);
             const docSnap = await getDoc(docRef);
 
@@ -614,7 +614,7 @@ const AdminHomePage = () => {
     const addProject = async (newProject: Omit<Project, 'id'>) => {
         try {
             setLoader(true);
-            const projectsCollectionRef = collection(db, 'dev1', 'all_projects_id', 'projects');
+            const projectsCollectionRef = collection(db, mainCollection, projectsCollectionId, projectsCollection);
 
             let uploadedImages: string[] = [];
             if (newProject.projectImages && newProject.projectImages.length > 0) {
@@ -669,7 +669,7 @@ const AdminHomePage = () => {
     const updateProjectData = async (updatedProject: Project) => {
         try {
             setLoader(true);
-            const projectRef = doc(db, 'dev1', 'all_projects_id', 'projects', updatedProject.id);
+            const projectRef = doc(db, mainCollection, projectsCollectionId, projectsCollection, updatedProject.id);
 
             let uploadedImages: string[] = [];
             if (updatedProject.projectImages && updatedProject.projectImages.length > 0) {
@@ -783,7 +783,7 @@ const AdminHomePage = () => {
             if (!project) return;
 
             const newPinState = !project.isPin;
-            const projectRef = doc(db, 'dev1', 'all_projects_id', 'projects', projectId);
+            const projectRef = doc(db, mainCollection, projectsCollectionId, projectsCollection, projectId);
             await updateDoc(projectRef, {
                 isPin: newPinState,
                 updatedAt: serverTimestamp(),
@@ -805,7 +805,7 @@ const AdminHomePage = () => {
             if (!project) return;
 
             const newHideState = !project.isHide;
-            const projectRef = doc(db, 'dev1', 'all_projects_id', 'projects', projectId);
+            const projectRef = doc(db, mainCollection, projectsCollectionId, projectsCollection, projectId);
             await updateDoc(projectRef, {
                 isHide: newHideState,
                 updatedAt: serverTimestamp(),
@@ -823,7 +823,7 @@ const AdminHomePage = () => {
     const deleteProject = async (id: string) => {
         try {
             setLoader(true);
-            const projectRef = doc(db, 'dev1', 'all_projects_id', 'projects', id);
+            const projectRef = doc(db, mainCollection, projectsCollectionId, projectsCollection, id);
             await deleteDoc(projectRef);
 
             setProjects(projects.filter(p => p.id !== id));
@@ -839,7 +839,7 @@ const AdminHomePage = () => {
     const addReview = async (newReview: Omit<Review, 'id'>) => {
         try {
             setLoader(true);
-            const reviewsCollectionRef = collection(db, 'dev1', 'all_reviews_id', 'reviews');
+            const reviewsCollectionRef = collection(db, mainCollection, reviewsCollectionId, reviewsCollection);
 
             const reviewData = {
                 name: newReview.name,
@@ -878,7 +878,7 @@ const AdminHomePage = () => {
                 avatarToUpdate = await uploadFileByBase64(updatedReview.avatar);
             }
 
-            const reviewRef = doc(db, 'dev1', 'all_reviews_id', 'reviews', updatedReview.id);
+            const reviewRef = doc(db, mainCollection, reviewsCollectionId, reviewsCollection, updatedReview.id);
 
             const updateData: any = {
                 name: updatedReview.name,
@@ -906,7 +906,7 @@ const AdminHomePage = () => {
     const deleteReview = async (id: string) => {
         try {
             setLoader(true);
-            const reviewRef = doc(db, 'dev1', 'all_reviews_id', 'reviews', id);
+            const reviewRef = doc(db, mainCollection, reviewsCollectionId, reviewsCollection, id);
             await deleteDoc(reviewRef);
 
             setReviews(reviews.filter(r => r.id !== id));
@@ -923,7 +923,7 @@ const AdminHomePage = () => {
     const deleteMessage = async (id: string) => {
         try {
             setLoader(true);
-            const messageRef = doc(db, 'dev1', 'contact_us_id', 'contact_us', id);
+            const messageRef = doc(db, mainCollection, contactUsCollectionId, contactUsCollection, id);
             await deleteDoc(messageRef);
 
             setMessages(messages.filter(m => m.id !== id));
@@ -939,7 +939,7 @@ const AdminHomePage = () => {
     const markMessageAsRead = async (id: string) => {
         try {
             setLoader(true);
-            const messageRef = doc(db, 'dev1', 'contact_us_id', 'contact_us', id);
+            const messageRef = doc(db, mainCollection, contactUsCollectionId, contactUsCollection, id);
             await updateDoc(messageRef, { read: true });
 
             setMessages(messages.map(m => m.id === id ? { ...m, read: true } : m));

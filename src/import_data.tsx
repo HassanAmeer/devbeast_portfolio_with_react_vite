@@ -1,6 +1,6 @@
 import { addDoc, collection, doc, setDoc, updateDoc } from 'firebase/firestore';
 import React, { useState } from 'react';
-import { db } from './config/fbconfig';
+import { adminCollectionId, contactUsCollection, contactUsCollectionId, db, heroSectionCollectionId, mainCollection, projectsCollection, projectsCollectionId, socialLinksCollectionId } from './config/fbconfig';
 
 const ImportData: React.FC = () => {
 
@@ -1659,39 +1659,38 @@ const ImportData: React.FC = () => {
 
 
 
-    const collectionName = "dev2";
     const importData = async () => {
-        if (!confirm("Are You Sure Want to Import Data In Collection: " + collectionName)) {
+        if (!confirm("Are You Sure Want to Import Data In Collection: " + mainCollection)) {
             return;
         }
 
         try {
             setLoader(true);
-            // 1. social_links
-            const social_links = doc(db, collectionName, 'social_links');
-            await setDoc(social_links, socialLinksData);
+            // 1. socialLinks
+            const socialLinks = doc(db, mainCollection, socialLinksCollectionId);
+            await setDoc(socialLinks, socialLinksData);
             console.log("socialLinksData imported");
-            // 2. hero_section
-            const hero_data = doc(db, collectionName, 'hero_section');
+            // 2. heroSection
+            const hero_data = doc(db, mainCollection, heroSectionCollectionId);
             await setDoc(hero_data, heroData);
             console.log("heroData imported");
 
             // 3. add projects
-            const projectsCollectionRef = collection(db, collectionName, 'all_projects_id', 'projects');
+            const projectsCollectionRef = collection(db, mainCollection, projectsCollectionId, projectsCollection);
             for (let index = 0; index < projectsData.length; index++) {
                 await addDoc(projectsCollectionRef, projectsData[index]);
             }
             console.log("projectsData imported");
 
             // 4. contact us data 
-            const contactUsCollectionRef = collection(db, collectionName, 'contact_us_id', 'contact_us');
+            const contactUsCollectionRef = collection(db, mainCollection, contactUsCollectionId, contactUsCollection);
             for (let index = 0; index < contacts_Data.length; index++) {
                 await addDoc(contactUsCollectionRef, contacts_Data[index]);
             }
             console.log("contacts_Data imported");
 
             // 5. admin data 
-            const adminId = doc(db, collectionName, 'admin');
+            const adminId = doc(db, mainCollection, adminCollectionId);
             await updateDoc(adminId, adminData);
             console.log("adminData imported");
 
