@@ -228,7 +228,8 @@ const AdminHomePage = () => {
             role: 'CEO, TechStart Inc',
             text: 'Exceptional work! The app exceeded all expectations. Professional, fast, and delivered a product that our users absolutely love.',
             rating: 5,
-            avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&q=80'
+            avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&q=80',
+            createdAt: serverTimestamp()
         },
         {
             id: '2',
@@ -236,7 +237,8 @@ const AdminHomePage = () => {
             role: 'CTO, FinanceHub',
             text: 'Best developer we have worked with. Clean code, great architecture, and outstanding communication throughout the project.',
             rating: 5,
-            avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&q=80'
+            avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&q=80',
+            createdAt: serverTimestamp()
         },
         {
             id: '3',
@@ -244,7 +246,8 @@ const AdminHomePage = () => {
             role: 'Product Lead, Innovate',
             text: 'Transformed our vision into reality. The attention to detail and user experience is phenomenal. Highly recommend!',
             rating: 5,
-            avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&q=80'
+            avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&q=80',
+            createdAt: serverTimestamp()
         }
     ]);
 
@@ -426,6 +429,7 @@ const AdminHomePage = () => {
                         text: data.text || '',
                         rating: data.rating || 5,
                         avatar: data.avatar || '',
+                        createdAt: data.createdAt,
                     } as Review;
                 });
 

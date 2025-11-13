@@ -119,7 +119,7 @@ const Portfolio = () => {
         card_title_3: '90%',
         card_subtitle_3: 'Happy Clients',
         card_title_4: '4.9',
-        card_subtitle_4: 'Avearage Rating'
+        card_subtitle_4: 'Average Rating'
     });
 
     const [projects, setProjects] = useState<Project[]>([]);
