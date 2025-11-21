@@ -1,6 +1,7 @@
-import { useState, useEffect, useRef } from 'react';
-import { isMobile } from 'react-device-detect';
+import { useState, useEffect } from 'react';
+
 import { Github, Linkedin, Twitter, Code2, Smartphone, Globe, Star, Award, Users, CheckCircle, Menu, X, ArrowRight, ExternalLink, Instagram, Facebook, Youtube, Music2, Send, DessertIcon, Camera, Link, ArrowBigDownDashIcon } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import person1 from '../assets/person1.png';
 import services1 from '../assets/services1.png';
@@ -78,10 +79,10 @@ const Portfolio = () => {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [loading, setLoading] = useState(false);
     const [loader, setLoader] = useState(false);
-    const [isServicesVisible, setIsServicesVisible] = useState(false);
-    const servicesRef = useRef(null);
+
+
     const [logoSrc, setLogoSrc] = useState(services1);
-    const [visibleProjects, setVisibleProjects] = useState<Set<number>>(new Set());
+
 
     useEffect(() => {
         // const handleScroll = () => setScrolled(window.scrollY > 50);
@@ -318,24 +319,7 @@ const Portfolio = () => {
         }
     }, []);
 
-    useEffect(() => {
-        const observer = new IntersectionObserver(
-            ([entry]) => {
-                if (entry.isIntersecting) {
-                    setIsServicesVisible(true);
-                }
-            },
-            { threshold: 0.1 }
-        );
-        if (servicesRef.current) {
-            observer.observe(servicesRef.current);
-        }
-        return () => {
-            if (servicesRef.current) {
-                observer.unobserve(servicesRef.current);
-            }
-        };
-    }, []);
+
 
     useEffect(() => {
         if (headerData.logo) {
@@ -528,71 +512,11 @@ const Portfolio = () => {
 
 
 
-    const getDeviceName = () => {
-        let device = '';
-
-        // Full info
-        return {
-            name: device,
-            browser: `Browser`,
-            os: `OS`,
-            type: 'desktop', // mobile, tablet, desktop
-            full: `Device - Browser on OS`
-        };
-    };
 
 
 
-    const uploadFileByBase64 = async (
-        base64: string,
-        token = '37160f2e00721d906831565829ae1de7',
-        folder_name = 'portfolio_react_app_reviews',
-        // from_device_name = 'react_app',
-        is_secret = false
-    ) => {
-        // Use it
-        const deviceInfo = getDeviceName();
-        let from_device_name = deviceInfo.full;
-        // console.log('Device:', deviceInfo.full);
-        // Output: "Samsung Galaxy S23 - Chrome on Android 14"
 
-        try {
-            const payload = {
-                token,
-                folder_name,
-                is_secret: is_secret ? "1" : "0",
-                from_device_name,
-                file_base64: base64.replace(/^data:image\/[a-z]+;base64,/, '') // Clean prefix
-            };
 
-            setLoader(true);
-            const response = await fetch('https://thelocalrent.com/link/api/upload_base64.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-
-            const result = await response.json(); // ← NOW IT WORKS
-            console.log('Upload Result:', result);
-            console.log('Upload result.data:', result.link);
-
-            if (result.success) {
-                if (result.link) {
-                    return result.link; // ← contains your public link
-                }
-                console.log("uploadFileByBase64 failed:");
-                return "";
-            } else {
-                throw new Error(result.message);
-            }
-
-        } catch (error: any) {
-            console.error('Upload failed:', error.message);
-            alert('Upload failed: ' + error.message);
-        } finally {
-            setLoader(false);
-        }
-    };
 
 
     return (
@@ -709,7 +633,11 @@ const Portfolio = () => {
                     <div className="container mx-auto px-0 relative z-20 flex flex-col md:flex-row items-center justify-center">
                         <div className="text-center max-w-5xl mx-auto md:pt-0 pt-20">
 
-                            <h2 className="text-4xl md:text-6xl font-black mb-4 leading-tight">
+                            <motion.h2
+                                initial={{ y: -50, opacity: 0 }}
+                                animate={{ y: 0, opacity: 1 }}
+                                transition={{ duration: 0.8, delay: 0.2 }}
+                                className="text-4xl md:text-6xl font-black mb-4 leading-tight">
                                 <span className="inline-block bg-gradient-to-r from-purple-400 via-pink-400 to-purple-400 bg-clip-text text-transparent animate-gradient bg-[length:200%_auto]">
                                     {heroData.title}
                                 </span>
@@ -717,9 +645,13 @@ const Portfolio = () => {
                                 <span className="inline-block bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent animate-gradient bg-[length:200%_auto]">
                                     {heroData.subtitle}
                                 </span>
-                            </h2>
+                            </motion.h2>
 
-                            <p className="text-xl md:text-2xl text-gray-300 mb-6 max-w-3xl mx-auto leading-relaxed font-light">
+                            <motion.p
+                                initial={{ y: 50, opacity: 0 }}
+                                animate={{ y: 0, opacity: 1 }}
+                                transition={{ duration: 0.8, delay: 0.4 }}
+                                className="text-xl md:text-2xl text-gray-300 mb-6 max-w-3xl mx-auto leading-relaxed font-light">
                                 {heroData.desc.split('--').map((part, index) =>
                                     index % 2 === 1 ? (
                                         <span key={index} className="bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent font-bold">
@@ -729,12 +661,16 @@ const Portfolio = () => {
                                         part
                                     )
                                 )}
-                            </p>
+                            </motion.p>
 
 
 
                             {/* Stats */}
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
+                            <motion.div
+                                initial={{ opacity: 0, scale: 0.8 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                transition={{ duration: 0.8, delay: 0.6 }}
+                                className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
                                 <div className="group relative">
                                     <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl blur-xl opacity-10 group-hover:opacity-60 transition-all duration-500" />
                                     <div className="relative p-4 rounded-2xl bg-black/40 backdrop-blur-xl hover:border-white/20 transition-all transform hover:scale-120 hover:-translate-y-1 duration-300">
@@ -783,8 +719,12 @@ const Portfolio = () => {
                                         <div className="text-sm text-gray-400 font-medium">{heroData.card_subtitle_4}</div>
                                     </div>
                                 </div>
-                            </div>
-                            <div className="flex flex-wrap justify-center gap-4 pt-8">
+                            </motion.div>
+                            <motion.div
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                transition={{ duration: 0.8, delay: 0.8 }}
+                                className="flex flex-wrap justify-center gap-4 pt-8">
                                 {heroData.btn_link_1 ? <a
                                     href={heroData.btn_link_1}
                                     className="group relative px-8 py-4 rounded-2xl font-bold overflow-hidden">
@@ -806,10 +746,13 @@ const Portfolio = () => {
                                             <span>{heroData.btn_name_2}</span>
                                         </span>
                                     </a> : ""}
-                            </div>
+                            </motion.div>
                         </div>
 
-                        <img
+                        <motion.img
+                            initial={{ x: 100, opacity: 0 }}
+                            animate={{ x: 0, opacity: 0.8 }}
+                            transition={{ duration: 1, delay: 0.5 }}
                             src={heroData.image}
                             alt="Workspace"
                             className="w-1/2 bject-cover opacity-80 md:w-1/3 pt-10 md:pt-0"
@@ -818,7 +761,12 @@ const Portfolio = () => {
 
                 </section>
                 {/* Modern Platforms Marquee with Logos */}
-                <section className="py-8 relative inline-flex ">
+                <motion.section
+                    initial={{ opacity: 0, y: 50 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.8 }}
+                    viewport={{ once: true }}
+                    className="py-8 relative inline-flex " >
                     {/* <div className="absolute inset-0 bg-gradient-to-r from-black via-purple-950/20 to-black" /> */}
                     <div className="hidden md:inline-flex mb-2 items-center space-x-2 px-6 py-3 rounded-half backdrop-blur-xl">
                         <ArrowRight className="w-5 h-5 text-purple-400 animate-pulse" />
@@ -846,11 +794,16 @@ const Portfolio = () => {
                         </div>
                     </div>
 
-                </section>
+                </motion.section>
                 <hr style={{ border: 0, height: 1 }} className="bg-gray-700" />
 
                 {/* Services Showcase Section */}
-                <section ref={servicesRef} className={`py-8 relative ${isServicesVisible ? 'animate-services' : ''}`}>
+                <motion.section
+                    initial={{ opacity: 0, y: 50 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.8 }}
+                    viewport={{ once: true }}
+                    className="py-8 relative">
                     <div className="container mx-auto px-4">
                         <div className="text-center mb-16">
                             <h3 className="text-3xl md:text-6xl font-black mb-6 bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">
@@ -863,28 +816,44 @@ const Portfolio = () => {
                         <img src={services2} alt="" className="w-full object-cover" />
 
                     </div>
-                </section>
+                </motion.section>
 
                 <BringSection />
                 <hr style={{ border: 0, height: 1 }} className="bg-gray-700 mt-0" />
 
                 {/* Projects with Real Images */}
-                <section id="projects" className="py-24 relative">
+                <motion.section
+                    id="projects"
+                    initial={{ opacity: 0 }}
+                    whileInView={{ opacity: 1 }}
+                    transition={{ duration: 0.8 }}
+                    viewport={{ once: true }}
+                    className="py-24 relative">
                     <div className="absolute inset-0 bg-gradient-to-b from-black via-purple-950/10 to-black" />
                     <div className="container mx-auto px-2 relative z-10">
                         <div className="text-center mb-12">
                             {/* <div className="inline-block px-4 py-2 bg-gradient-to-r from-purple-600/20 to-cyan-600/20 rounded-full text-sm font-bold text-purple-300 border border-purple-500/30 mb-6">
                                 PORTFOLIO
                             </div> */}
-                            <h3 className="text-3xl md:text-6xl font-black mb-6 bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">
+                            <motion.h3
+                                initial={{ y: -30, opacity: 0 }}
+                                whileInView={{ y: 0, opacity: 1 }}
+                                transition={{ duration: 0.6 }}
+                                viewport={{ once: true }}
+                                className="text-3xl md:text-6xl font-black mb-6 bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">
                                 Featured Projects
-                            </h3>
+                            </motion.h3>
                             {/* <p className="text-gray-400 text-lg max-w-2xl mx-auto mb-12">
                                 Innovative solutions that push boundaries
                             </p> */}
                         </div>
 
-                        <div className="flex flex-wrap justify-center gap-4 mb-16">
+                        <motion.div
+                            initial={{ y: 30, opacity: 0 }}
+                            whileInView={{ y: 0, opacity: 1 }}
+                            transition={{ duration: 0.6, delay: 0.2 }}
+                            viewport={{ once: true }}
+                            className="flex flex-wrap justify-center gap-4 mb-16">
                             {[
                                 { id: 'all', label: 'All Projects', icon: <Globe className="w-5 h-5" /> },
                                 { id: 'app', label: 'Mobile Apps', icon: <Smartphone className="w-5 h-5" /> },
@@ -908,7 +877,7 @@ const Portfolio = () => {
                                 <span className="text-sm font-bold">View All</span>
                                 <ExternalLink className="w-4 h-4 group-hover/btn:translate-x-1 group-hover/btn:-translate-y-1 transition-transform" />
                             </button>
-                        </div>
+                        </motion.div>
 
                         {loading ? (
                             <center className='md:pt-20 pt-20'>
@@ -920,11 +889,14 @@ const Portfolio = () => {
 
                         <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                             {filteredProjects.map((project, idx) => idx < 20 ? (
-                                <div
+                                <motion.div
                                     onClick={() => navigate('/item', { state: project })} // passing full data
                                     key={project.id}
+                                    initial={{ opacity: 0, scale: 0.9 }}
+                                    whileInView={{ opacity: 1, scale: 1 }}
+                                    transition={{ duration: 0.5, delay: idx * 0.1 }}
+                                    viewport={{ once: true }}
                                     className="group relative md:pt-8 rounded-3xl overflow-hidden transform hover:scale-105 transition-all duration-500"
-                                    style={{ animationDelay: `${idx * 100}ms` }}
                                 >
                                     <div className={`absolute inset-0 bg-gradient-to-r ${project.isWeb ? 'from-cyan-500 to-blue-500' : 'from-purple-500 to-pink-500'} opacity-0 group-hover:opacity-20 transition-all duration-500 blur-xl`} />
 
@@ -974,11 +946,11 @@ const Portfolio = () => {
                                             </button> */}
                                         </div>
                                     </div>
-                                </div>
+                                </motion.div>
                             ) : (<></>))}
                         </div>
                     </div>
-                </section>
+                </motion.section>
                 <center>
                     <button
                         onClick={() => navigate('/allitems')} // passing full data
@@ -991,18 +963,28 @@ const Portfolio = () => {
                 <hr style={{ border: 0, height: 1 }} className="bg-gray-700" />
 
                 {/* Testimonials */}
-                <section className="py-24 container mx-auto px-4">
+                <motion.section
+                    initial={{ opacity: 0, y: 50 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.8 }}
+                    viewport={{ once: true }}
+                    className="py-24 container mx-auto px-4">
                     <div className="text-center mb-16">
                         {/* <div className="inline-block px-4 py-2 bg-gradient-to-r from-purple-600/20 to-cyan-600/20 rounded-full text-sm font-bold text-purple-300 border border-purple-500/30 mb-6">
                             TESTIMONIALS
                         </div> */}
                         <div className="flex flex-col md:flex-row items-center justify-center gap-4 mb-6">
-                            <h3 className="text-2xl md:text-6xl font-black bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">
+                            <motion.h3
+                                initial={{ x: -50, opacity: 0 }}
+                                whileInView={{ x: 0, opacity: 1 }}
+                                transition={{ duration: 0.6 }}
+                                viewport={{ once: true }}
+                                className="text-2xl md:text-6xl font-black bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">
                                 Client Success Stories
-                            </h3>
+                            </motion.h3>
                             <button
                                 onClick={() => setShowReviewModal(true)}
-                                className="group relative px-6 py-3 rounded-2xl font-bold bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-cyan-600 hover:to-purple-600 transition-all transform hover:scale-105 shadow-lg shadow-purple-500/30"
+                                className="group relative px-6 py-3 rounded-2xl font-bold border border-white/40 hover:border-white/70 transition-all transform hover:scale-105 shadow-lg shadow-white/10"
                             >
                                 <span className="flex items-center space-x-2 text-white">
                                     <span>Add Review</span>
@@ -1012,7 +994,12 @@ const Portfolio = () => {
                         </div>
                     </div>
 
-                    <div className="gap-4 flex flex-row items-center overflow-x-auto">
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        whileInView={{ opacity: 1 }}
+                        transition={{ duration: 0.8, delay: 0.2 }}
+                        viewport={{ once: true }}
+                        className="gap-4 flex flex-row items-center overflow-x-auto">
                         {reviews.map((r, idx) => (
                             <div
                                 key={idx}
@@ -1042,162 +1029,169 @@ const Portfolio = () => {
                                 </div>
                             </div>
                         ))}
-                    </div>
-                </section>
+                    </motion.div>
+                </motion.section>
 
                 {/* Add Review Modal */}
-                {showReviewModal && (
-                    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                        <div className="bg-black/90 backdrop-blur-xl rounded-3xl border border-white/20 max-w-md w-full max-h-[90vh] overflow-y-auto">
-                            <div className="p-6">
-                                <div className="flex justify-between items-center mb-6">
-                                    <h3 className="text-2xl font-black bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent">
-                                        Add Your Review
-                                    </h3>
-                                    <button
-                                        onClick={() => setShowReviewModal(false)}
-                                        className="text-gray-400 hover:text-white transition-all"
-                                    >
-                                        <X className="w-6 h-6" />
-                                    </button>
-                                </div>
-
-                                <form onSubmit={async (e) => {
-                                    e.preventDefault();
-                                    if (!reviewForm.name || !reviewForm.text) return;
-
-                                    const newReview: Omit<Review, 'id'> = {
-                                        name: reviewForm.name,
-                                        role: reviewForm.role || 'Client',
-                                        text: reviewForm.text,
-                                        rating: reviewForm.rating,
-                                        avatar: reviewForm.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(reviewForm.name)}&background=random&color=fff&size=100`
-                                    };
-
-                                    try {
-                                        await addReview(newReview);
-                                        setReviewForm({ name: '', role: '', text: '', rating: 5, avatar: '' });
-                                        setShowReviewModal(false);
-                                    } catch (error) {
-                                        console.error('Error submitting review:', error);
-                                    }
-                                }} className="space-y-4">
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-300 mb-2">Name *</label>
-                                        <input
-                                            type="text"
-                                            value={reviewForm.name}
-                                            onChange={(e) => setReviewForm({ ...reviewForm, name: e.target.value })}
-                                            className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400 focus:border-purple-500 focus:outline-none transition-all"
-                                            placeholder="Your name"
-                                            required
-                                        />
-                                    </div>
-
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-300 mb-2">Role/Position</label>
-                                        <input
-                                            type="text"
-                                            value={reviewForm.role}
-                                            onChange={(e) => setReviewForm({ ...reviewForm, role: e.target.value })}
-                                            className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400 focus:border-purple-500 focus:outline-none transition-all"
-                                            placeholder="e.g. CEO, Developer, Designer"
-                                        />
-                                    </div>
-
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-300 mb-2">Avatar Image</label>
-                                        <input
-                                            type="file"
-                                            accept="image/*"
-                                            onChange={(e) => {
-                                                const file = e.target.files?.[0];
-                                                if (file) {
-                                                    const reader = new FileReader();
-                                                    reader.onload = (event) => {
-                                                        const base64 = event.target?.result as string;
-                                                        if (base64) {
-                                                            setReviewForm({ ...reviewForm, avatar: base64 });
-                                                        }
-                                                    };
-                                                    reader.readAsDataURL(file);
-                                                }
-                                            }}
-                                            className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400 focus:border-purple-500 focus:outline-none transition-all file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-purple-600 file:text-white hover:file:bg-purple-700"
-                                        />
-                                        {reviewForm.avatar && reviewForm.avatar.startsWith('data:image/') && (
-                                            <div className="mt-4">
-                                                <img
-                                                    src={reviewForm.avatar}
-                                                    alt="Avatar Preview"
-                                                    className="w-16 h-16 object-cover rounded-full border-2 border-purple-500/50"
-                                                />
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-300 mb-2">Rating</label>
-                                        <div className="flex space-x-1">
-                                            {[1, 2, 3, 4, 5].map((star) => (
-                                                <button
-                                                    key={star}
-                                                    type="button"
-                                                    onClick={() => setReviewForm({ ...reviewForm, rating: star })}
-                                                    className="focus:outline-none"
-                                                >
-                                                    <Star
-                                                        className={`w-6 h-6 ${star <= reviewForm.rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-400'} hover:text-yellow-400 transition-all`}
-                                                    />
-                                                </button>
-                                            ))}
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-300 mb-2">Review *</label>
-                                        <textarea
-                                            value={reviewForm.text}
-                                            onChange={(e) => setReviewForm({ ...reviewForm, text: e.target.value })}
-                                            className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400 focus:border-purple-500 focus:outline-none transition-all resize-none"
-                                            rows={4}
-                                            placeholder="Share your experience..."
-                                            required
-                                        />
-                                    </div>
-
-                                    <div className="flex space-x-3 pt-4">
+                {
+                    showReviewModal && (
+                        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                            <div className="bg-black/90 backdrop-blur-xl rounded-3xl border border-white/20 max-w-md w-full max-h-[90vh] overflow-y-auto">
+                                <div className="p-6">
+                                    <div className="flex justify-between items-center mb-6">
+                                        <h3 className="text-2xl font-black bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent">
+                                            Add Your Review
+                                        </h3>
                                         <button
-                                            type="button"
                                             onClick={() => setShowReviewModal(false)}
-                                            className="flex-1 px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-gray-300 hover:bg-white/10 transition-all"
+                                            className="text-gray-400 hover:text-white transition-all"
                                         >
-                                            Cancel
-                                        </button>
-                                        <button
-                                            type="submit"
-                                            disabled={loader || !reviewForm.name || !reviewForm.text}
-                                            className="flex-1 px-4 py-3 bg-gradient-to-r from-purple-600 to-cyan-600 rounded-xl text-white font-bold hover:from-cyan-600 hover:to-purple-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                                        >
-                                            {loader ? (
-                                                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mx-auto" />
-                                            ) : (
-                                                'Submit Review'
-                                            )}
+                                            <X className="w-6 h-6" />
                                         </button>
                                     </div>
-                                </form>
+
+                                    <form onSubmit={async (e) => {
+                                        e.preventDefault();
+                                        if (!reviewForm.name || !reviewForm.text) return;
+
+                                        const newReview: Omit<Review, 'id'> = {
+                                            name: reviewForm.name,
+                                            role: reviewForm.role || 'Client',
+                                            text: reviewForm.text,
+                                            rating: reviewForm.rating,
+                                            avatar: reviewForm.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(reviewForm.name)}&background=random&color=fff&size=100`
+                                        };
+
+                                        try {
+                                            await addReview(newReview);
+                                            setReviewForm({ name: '', role: '', text: '', rating: 5, avatar: '' });
+                                            setShowReviewModal(false);
+                                        } catch (error) {
+                                            console.error('Error submitting review:', error);
+                                        }
+                                    }} className="space-y-4">
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-300 mb-2">Name *</label>
+                                            <input
+                                                type="text"
+                                                value={reviewForm.name}
+                                                onChange={(e) => setReviewForm({ ...reviewForm, name: e.target.value })}
+                                                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400 focus:border-purple-500 focus:outline-none transition-all"
+                                                placeholder="Your name"
+                                                required
+                                            />
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-300 mb-2">Project Name</label>
+                                            <input
+                                                type="text"
+                                                value={reviewForm.role}
+                                                onChange={(e) => setReviewForm({ ...reviewForm, role: e.target.value })}
+                                                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400 focus:border-purple-500 focus:outline-none transition-all"
+                                                placeholder="e.g. Ecommerce, chating App"
+                                            />
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-300 mb-2">Avatar Image</label>
+                                            <input
+                                                type="file"
+                                                accept="image/*"
+                                                onChange={(e) => {
+                                                    const file = e.target.files?.[0];
+                                                    if (file) {
+                                                        const reader = new FileReader();
+                                                        reader.onload = (event) => {
+                                                            const base64 = event.target?.result as string;
+                                                            if (base64) {
+                                                                setReviewForm({ ...reviewForm, avatar: base64 });
+                                                            }
+                                                        };
+                                                        reader.readAsDataURL(file);
+                                                    }
+                                                }}
+                                                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400 focus:border-purple-500 focus:outline-none transition-all file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-purple-600 file:text-white hover:file:bg-purple-700"
+                                            />
+                                            {reviewForm.avatar && reviewForm.avatar.startsWith('data:image/') && (
+                                                <div className="mt-4">
+                                                    <img
+                                                        src={reviewForm.avatar}
+                                                        alt="Avatar Preview"
+                                                        className="w-16 h-16 object-cover rounded-full border-2 border-purple-500/50"
+                                                    />
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-300 mb-2">Rating</label>
+                                            <div className="flex space-x-1">
+                                                {[1, 2, 3, 4, 5].map((star) => (
+                                                    <button
+                                                        key={star}
+                                                        type="button"
+                                                        onClick={() => setReviewForm({ ...reviewForm, rating: star })}
+                                                        className="focus:outline-none"
+                                                    >
+                                                        <Star
+                                                            className={`w-6 h-6 ${star <= reviewForm.rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-400'} hover:text-yellow-400 transition-all`}
+                                                        />
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-300 mb-2">Review *</label>
+                                            <textarea
+                                                value={reviewForm.text}
+                                                onChange={(e) => setReviewForm({ ...reviewForm, text: e.target.value })}
+                                                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400 focus:border-purple-500 focus:outline-none transition-all resize-none"
+                                                rows={4}
+                                                placeholder="Share your experience..."
+                                                required
+                                            />
+                                        </div>
+
+                                        <div className="flex space-x-3 pt-4">
+                                            <button
+                                                type="button"
+                                                onClick={() => setShowReviewModal(false)}
+                                                className="flex-1 px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-gray-300 hover:bg-white/10 transition-all"
+                                            >
+                                                Cancel
+                                            </button>
+                                            <button
+                                                type="submit"
+                                                disabled={loader || !reviewForm.name || !reviewForm.text}
+                                                className="flex-1 px-4 py-3 bg-gradient-to-r from-purple-600 to-cyan-600 rounded-xl text-white font-bold hover:from-cyan-600 hover:to-purple-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                            >
+                                                {loader ? (
+                                                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mx-auto" />
+                                                ) : (
+                                                    'Submit Review'
+                                                )}
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                )}
+                    )
+                }
 
                 {/* Contact Section */}
                 <ContactSection></ContactSection>
 
 
                 {/* Modern Footer */}
-                <footer className="border-t border-white/5 bg-black/60 backdrop-blur-xl py-12">
+                <motion.footer
+                    initial={{ opacity: 0 }}
+                    whileInView={{ opacity: 1 }}
+                    transition={{ duration: 0.8 }}
+                    viewport={{ once: true }}
+                    className="border-t border-white/5 bg-black/60 backdrop-blur-xl py-12">
                     <div className="container mx-auto px-4">
                         <div className="grid md:grid-cols-4 gap-8 mb-4">
                             <div className="md:col-span-2">
@@ -1284,8 +1278,8 @@ const Portfolio = () => {
                             </div>
                         </div>
                     </div>
-                </footer>
-            </div >
+                </motion.footer>
+            </div>
 
             <style>{`
         @keyframes marquee-slow {
@@ -1326,7 +1320,7 @@ const Portfolio = () => {
            animation: fade-in 1s ease-out;
          }
       `}</style>
-        </div >
+        </div>
     );
 };
 
