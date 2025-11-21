@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { isMobile } from 'react-device-detect';
 import { Github, Linkedin, Twitter, Code2, Smartphone, Globe, Star, Award, Users, CheckCircle, Menu, X, ArrowRight, ExternalLink, Instagram, Facebook, Youtube, Music2, Send, DessertIcon, Camera, Link, ArrowBigDownDashIcon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import person1 from '../assets/person1.png';
@@ -6,9 +7,10 @@ import services1 from '../assets/services1.png';
 import services2 from '../assets/services2.png';
 import ContactSection from './contact';
 import BringSection from './bring';
-import { doc, getDoc, collection, getDocs, query, orderBy, where } from 'firebase/firestore';
+import { doc, getDoc, collection, getDocs, query, orderBy, where, serverTimestamp, addDoc } from 'firebase/firestore';
 import { db, heroSectionCollectionId, mainCollection, projectsCollection, projectsCollectionId, reviewsCollection, reviewsCollectionId, socialLinksCollectionId } from '../config/fbconfig';
 import { preloadProjectImages } from '../utils/imageCache';
+
 
 
 interface Project {
@@ -75,9 +77,11 @@ const Portfolio = () => {
     const [mousePosition] = useState({ x: 0, y: 0 });
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [loader, setLoader] = useState(false);
     const [isServicesVisible, setIsServicesVisible] = useState(false);
     const servicesRef = useRef(null);
     const [logoSrc, setLogoSrc] = useState(services1);
+    const [visibleProjects, setVisibleProjects] = useState<Set<number>>(new Set());
 
     useEffect(() => {
         // const handleScroll = () => setScrolled(window.scrollY > 50);
@@ -99,8 +103,7 @@ const Portfolio = () => {
 
 
 
-    ////////// now getting data from firebase and set it 
-    // const [loader, setLoader] = useState(false);
+    ////////// now getting data from firebase and set it
 
     // Editable data states
     const [heroData, setHeroData] = useState({
@@ -347,6 +350,44 @@ const Portfolio = () => {
     }, [headerData.logo]);
 
 
+    const addReview = async (newReview: Omit<Review, 'id'>) => {
+        try {
+            setLoader(true);
+            const reviewsCollectionRef = collection(db, mainCollection, reviewsCollectionId, reviewsCollection);
+
+            const reviewData = {
+                name: newReview.name,
+                role: newReview.role,
+                text: newReview.text,
+                rating: newReview.rating,
+                avatar: newReview.avatar,
+                createdAt: serverTimestamp(),
+                updatedAt: serverTimestamp(),
+            };
+
+            const docRef = await addDoc(reviewsCollectionRef, reviewData);
+
+            const fullReview: Review = {
+                ...newReview,
+                id: docRef.id,
+            };
+
+            setReviews(prev => [...prev, fullReview]);
+            console.log("Review added successfully:", docRef.id);
+            alert('Review added successfully!');
+        } catch (error) {
+            console.error("Error adding review:", error);
+            alert('Failed to add review. Please try again.');
+        } finally {
+            setLoader(false);
+        }
+    };
+
+
+
+    //////////
+
+
     // Reviews state
     const [reviews, setReviews] = useState<Review[]>([
         // {
@@ -374,6 +415,16 @@ const Portfolio = () => {
         //     avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&q=80'
         // }
     ]);
+
+    // Review form state
+    const [reviewForm, setReviewForm] = useState({
+        name: '',
+        role: '',
+        text: '',
+        rating: 5,
+        avatar: ''
+    });
+    const [showReviewModal, setShowReviewModal] = useState(false);
 
 
 
@@ -473,6 +524,76 @@ const Portfolio = () => {
     //         alert('⚠️ Please fill in all fields.');
     //     }
     // };
+
+
+
+
+    const getDeviceName = () => {
+        let device = '';
+
+        // Full info
+        return {
+            name: device,
+            browser: `Browser`,
+            os: `OS`,
+            type: 'desktop', // mobile, tablet, desktop
+            full: `Device - Browser on OS`
+        };
+    };
+
+
+
+    const uploadFileByBase64 = async (
+        base64: string,
+        token = '37160f2e00721d906831565829ae1de7',
+        folder_name = 'portfolio_react_app_reviews',
+        // from_device_name = 'react_app',
+        is_secret = false
+    ) => {
+        // Use it
+        const deviceInfo = getDeviceName();
+        let from_device_name = deviceInfo.full;
+        // console.log('Device:', deviceInfo.full);
+        // Output: "Samsung Galaxy S23 - Chrome on Android 14"
+
+        try {
+            const payload = {
+                token,
+                folder_name,
+                is_secret: is_secret ? "1" : "0",
+                from_device_name,
+                file_base64: base64.replace(/^data:image\/[a-z]+;base64,/, '') // Clean prefix
+            };
+
+            setLoader(true);
+            const response = await fetch('https://thelocalrent.com/link/api/upload_base64.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            const result = await response.json(); // ← NOW IT WORKS
+            console.log('Upload Result:', result);
+            console.log('Upload result.data:', result.link);
+
+            if (result.success) {
+                if (result.link) {
+                    return result.link; // ← contains your public link
+                }
+                console.log("uploadFileByBase64 failed:");
+                return "";
+            } else {
+                throw new Error(result.message);
+            }
+
+        } catch (error: any) {
+            console.error('Upload failed:', error.message);
+            alert('Upload failed: ' + error.message);
+        } finally {
+            setLoader(false);
+        }
+    };
+
 
     return (
         <div className="min-h-screen bg-black text-white overflow-hidden relative">
@@ -875,9 +996,20 @@ const Portfolio = () => {
                         {/* <div className="inline-block px-4 py-2 bg-gradient-to-r from-purple-600/20 to-cyan-600/20 rounded-full text-sm font-bold text-purple-300 border border-purple-500/30 mb-6">
                             TESTIMONIALS
                         </div> */}
-                        <h3 className="text-2xl md:text-6xl font-black mb-6 bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">
-                            Client Success Stories
-                        </h3>
+                        <div className="flex flex-col md:flex-row items-center justify-center gap-4 mb-6">
+                            <h3 className="text-2xl md:text-6xl font-black bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">
+                                Client Success Stories
+                            </h3>
+                            <button
+                                onClick={() => setShowReviewModal(true)}
+                                className="group relative px-6 py-3 rounded-2xl font-bold bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-cyan-600 hover:to-purple-600 transition-all transform hover:scale-105 shadow-lg shadow-purple-500/30"
+                            >
+                                <span className="flex items-center space-x-2 text-white">
+                                    <span>Add Review</span>
+                                    <Star className="w-5 h-5 group-hover:fill-yellow-400 group-hover:text-yellow-400 transition-all" />
+                                </span>
+                            </button>
+                        </div>
                     </div>
 
                     <div className="gap-4 flex flex-row items-center overflow-x-auto">
@@ -912,6 +1044,153 @@ const Portfolio = () => {
                         ))}
                     </div>
                 </section>
+
+                {/* Add Review Modal */}
+                {showReviewModal && (
+                    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                        <div className="bg-black/90 backdrop-blur-xl rounded-3xl border border-white/20 max-w-md w-full max-h-[90vh] overflow-y-auto">
+                            <div className="p-6">
+                                <div className="flex justify-between items-center mb-6">
+                                    <h3 className="text-2xl font-black bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent">
+                                        Add Your Review
+                                    </h3>
+                                    <button
+                                        onClick={() => setShowReviewModal(false)}
+                                        className="text-gray-400 hover:text-white transition-all"
+                                    >
+                                        <X className="w-6 h-6" />
+                                    </button>
+                                </div>
+
+                                <form onSubmit={async (e) => {
+                                    e.preventDefault();
+                                    if (!reviewForm.name || !reviewForm.text) return;
+
+                                    const newReview: Omit<Review, 'id'> = {
+                                        name: reviewForm.name,
+                                        role: reviewForm.role || 'Client',
+                                        text: reviewForm.text,
+                                        rating: reviewForm.rating,
+                                        avatar: reviewForm.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(reviewForm.name)}&background=random&color=fff&size=100`
+                                    };
+
+                                    try {
+                                        await addReview(newReview);
+                                        setReviewForm({ name: '', role: '', text: '', rating: 5, avatar: '' });
+                                        setShowReviewModal(false);
+                                    } catch (error) {
+                                        console.error('Error submitting review:', error);
+                                    }
+                                }} className="space-y-4">
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-300 mb-2">Name *</label>
+                                        <input
+                                            type="text"
+                                            value={reviewForm.name}
+                                            onChange={(e) => setReviewForm({ ...reviewForm, name: e.target.value })}
+                                            className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400 focus:border-purple-500 focus:outline-none transition-all"
+                                            placeholder="Your name"
+                                            required
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-300 mb-2">Role/Position</label>
+                                        <input
+                                            type="text"
+                                            value={reviewForm.role}
+                                            onChange={(e) => setReviewForm({ ...reviewForm, role: e.target.value })}
+                                            className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400 focus:border-purple-500 focus:outline-none transition-all"
+                                            placeholder="e.g. CEO, Developer, Designer"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-300 mb-2">Avatar Image</label>
+                                        <input
+                                            type="file"
+                                            accept="image/*"
+                                            onChange={(e) => {
+                                                const file = e.target.files?.[0];
+                                                if (file) {
+                                                    const reader = new FileReader();
+                                                    reader.onload = (event) => {
+                                                        const base64 = event.target?.result as string;
+                                                        if (base64) {
+                                                            setReviewForm({ ...reviewForm, avatar: base64 });
+                                                        }
+                                                    };
+                                                    reader.readAsDataURL(file);
+                                                }
+                                            }}
+                                            className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400 focus:border-purple-500 focus:outline-none transition-all file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-purple-600 file:text-white hover:file:bg-purple-700"
+                                        />
+                                        {reviewForm.avatar && reviewForm.avatar.startsWith('data:image/') && (
+                                            <div className="mt-4">
+                                                <img
+                                                    src={reviewForm.avatar}
+                                                    alt="Avatar Preview"
+                                                    className="w-16 h-16 object-cover rounded-full border-2 border-purple-500/50"
+                                                />
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-300 mb-2">Rating</label>
+                                        <div className="flex space-x-1">
+                                            {[1, 2, 3, 4, 5].map((star) => (
+                                                <button
+                                                    key={star}
+                                                    type="button"
+                                                    onClick={() => setReviewForm({ ...reviewForm, rating: star })}
+                                                    className="focus:outline-none"
+                                                >
+                                                    <Star
+                                                        className={`w-6 h-6 ${star <= reviewForm.rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-400'} hover:text-yellow-400 transition-all`}
+                                                    />
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-300 mb-2">Review *</label>
+                                        <textarea
+                                            value={reviewForm.text}
+                                            onChange={(e) => setReviewForm({ ...reviewForm, text: e.target.value })}
+                                            className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400 focus:border-purple-500 focus:outline-none transition-all resize-none"
+                                            rows={4}
+                                            placeholder="Share your experience..."
+                                            required
+                                        />
+                                    </div>
+
+                                    <div className="flex space-x-3 pt-4">
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowReviewModal(false)}
+                                            className="flex-1 px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-gray-300 hover:bg-white/10 transition-all"
+                                        >
+                                            Cancel
+                                        </button>
+                                        <button
+                                            type="submit"
+                                            disabled={loader || !reviewForm.name || !reviewForm.text}
+                                            className="flex-1 px-4 py-3 bg-gradient-to-r from-purple-600 to-cyan-600 rounded-xl text-white font-bold hover:from-cyan-600 hover:to-purple-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                        >
+                                            {loader ? (
+                                                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mx-auto" />
+                                            ) : (
+                                                'Submit Review'
+                                            )}
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                )}
 
                 {/* Contact Section */}
                 <ContactSection></ContactSection>
