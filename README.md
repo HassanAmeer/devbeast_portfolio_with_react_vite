@@ -1,123 +1,91 @@
-# React + TypeScript + Vite
+# CaringWeb
 
-# Portfolio
-## demo image
-<img src="demo/1.png">
-<img src="demo/2.png">
-<img src="demo/3.png">
-<img src="demo/4.png">
-<img src="demo/5.png">
+A modern, responsive web application built with React, TypeScript, and Vite.
 
-admin login 
-- admin@gmail.com
-- 786
+## About
 
-<hr> 
+CaringWeb is designed to provide caring solutions for the web. Built with modern technologies and best practices, it offers a clean, professional interface with smooth animations and responsive design.
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
-Currently, two official plugins are available:
+## Tech Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **React 19** - Modern React with latest features
+- **TypeScript** - Type-safe development
+- **Vite** - Fast build tool and dev server
+- **Tailwind CSS** - Utility-first CSS framework
+- **Firebase** - Backend services (optional)
 
-## React Compiler
+## Getting Started
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### Prerequisites
 
-## Expanding the ESLint configuration
+- Node.js (v16 or higher)
+- npm or yarn
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### Installation
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
-
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
-
-
-
-## Installation
-
-### Create a Simple Project
-
-To create a new React project, you can use one of the following methods:
-
-- **Using Create React App:**
-  ```bash
-  npx create-react-app projectName
-  ```
-
-- **Using Vite + React (Recommended):**
-  ```bash
-  npm create vite@latest projectName
-  ```
-
-### Upgrade React
-
-To upgrade React to the latest version:
-
+1. Clone the repository:
 ```bash
-npm install react@latest react-dom@latest
+git clone <repository-url>
+cd caringweb
 ```
 
-## Usage
+2. Install dependencies:
+```bash
+npm install
+```
 
-### Run the Development Server
-
+3. Run the development server:
 ```bash
 npm run dev
 ```
+
+4. Open your browser and navigate to `http://localhost:5173`
+
+## Available Scripts
+
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run preview` - Preview production build
+- `npm run lint` - Run ESLint
+
+## Project Structure
+
+```
+caringweb/
+├── src/
+│   ├── App.tsx          # Main application component
+│   ├── App.css          # Application styles
+│   ├── main.tsx         # Application entry point
+│   ├── index.css        # Global styles
+│   ├── config/          # Configuration files
+│   └── assets/          # Static assets
+├── public/              # Public assets
+└── dist/                # Production build
+```
+
+## Firebase Setup (Optional)
+
+If you want to use Firebase services:
+
+1. Install Firebase:
+```bash
+npm install firebase
+```
+
+2. Configure Firebase in `src/config/fbconfig.tsx` with your credentials
+
+3. Initialize Firebase:
+```bash
+firebase init
+```
+
+4. Deploy to Firebase Hosting:
+```bash
+npm run build
+firebase deploy --only hosting
+```
+
+## Deployment
 
 ### Build for Production
 
@@ -125,271 +93,18 @@ npm run dev
 npm run build
 ```
 
-## Permissions and File Access
+The production-ready files will be in the `dist` directory.
 
-If you encounter permission issues when changing or adding folders and files:
-
-1. Change permissions:
-   ```bash
-   sudo chmod -R 755 /path/to/your/project/src
-   ```
-
-2. Change ownership:
-   ```bash
-   sudo chown -R $(whoami):$(id -gn) /path/to/your/project/src
-   ```
-
-## Cache and Dependencies
-
-### Clear NPM Cache
+### Firebase Hosting
 
 ```bash
-sudo chown -R $(whoami):$(id -gn) ~/.npm
-npm cache clean --force
+firebase deploy --only hosting:caringweb
 ```
 
-### Fix Audit Issues
+## License
 
-```bash
-sudo chown -R $(whoami):$(id -gn) ~/.npm
-npm audit fix --force
-```
+This project is private and proprietary.
 
-## Environment Variables
+## Contact
 
-If you encounter issues with environment variables, try:
-
-```bash
-export NODE_OPTIONS=--openssl-legacy-provider
-```
-
-
-# ------------------  firebase setup start -------------------
-- add this packge to package.json file
-```json
-"firebase": "^11.8.1",
-```
-- make a file a new file in any directory
-`fbconfig.tsx`
-configration file 
-```js
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
-import { getStorage } from "firebase/storage";
-
-// Your web app's Firebase configuration
-const firebaseConfig = {
-    apiKey: "AIzaSyBlp5hxn8uHFGEqhkDroq_khz8RpCQ-K7A",
-    authDomain: "emergencyapp786.firebaseapp.com",
-    projectId: "emergencyapp786",
-    storageBucket: "emergencyapp786.appspot.com", // Make sure this is correct
-    messagingSenderId: "714485189721",
-    appId: "1:714485189721:web:a552df09f28327e698f548"
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const storage = getStorage(app);
-
-export { db, storage };
-```
-- login and forgot password usage demo
-```js
-import React, { useState } from "react";
-import './login.css';
-import logo from './../../assets/appicons/logoh.png';
-import { Box, Button, Checkbox, CircularProgress, FormControlLabel, TextField, Typography, Divider, useMediaQuery, Snackbar, Alert } from '@mui/material';
-import { blueGrey, blue, red } from '@mui/material/colors';
-import { useNavigate } from "react-router-dom";
-import { db } from './../../hooks/fbconfig';
-import { getAuth, signInWithEmailAndPassword, sendPasswordResetEmail } from "firebase/auth";
-
-const LoginComp = () => {
-    const navigate = useNavigate();
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [error, setError] = useState("");
-    const [loading, setLoading] = useState(false);
-    const [open, setOpen] = useState(false);
-    const [message, setMessage] = useState('');
-    const [severity, setSeverity] = useState('success');
-    const isMobile = useMediaQuery('(max-width:600px)');
-    const auth = getAuth();
-
-    const handleClick = (severity, message) => {
-        setSeverity(severity);
-        setMessage(message);
-        setOpen(true);
-    };
-
-    const handleClose = (event, reason) => {
-        if (reason === 'clickaway') {
-            return;
-        }
-        setOpen(false);
-    };
-
-    const handleLogin = () => {
-        if (email === "") {
-            setError("Please enter your Email!");
-            return;
-        }
-        if (!email.includes('@')) {
-            setError("Please enter a valid Email!");
-            return;
-        }
-        if (password === "") {
-            setError("Please enter your Password!");
-            return;
-        }
-        setError("");
-        setLoading(true);
-        signInWithEmailAndPassword(auth, email, password)
-            .then((userCredential) => {
-                if (email !== "" && password !== "") {
-                    // handleClick('success', 'Login Success!');
-                }
-                setLoading(false);
-                const user = userCredential.user;
-                navigate("/home");
-            })
-            .catch((error) => {
-                const errorCode = error.code;
-                const errorMessage = error.message;
-                if (errorCode === "auth/invalid-email") setError("Invalid email!");
-                else if (errorCode === "auth/wrong-password") setError("Wrong password!");
-                else if (errorCode === "auth/user-not-found") setError("User not found!");
-                else if (errorCode === "auth/invalid-credential") setError("Wrong Email Or Password!");
-                else setError(errorMessage);
-                setLoading(false);
-                handleClick('error', errorMessage);
-            });
-    };
-
-    const handleForgotPassword = () => {
-        if (email === "") {
-            setError("Please enter your email!");
-            return;
-        }
-
-        if (!email.includes('@')) {
-            setError("Please enter a valid Email!");
-            return;
-        }
-
-        setLoading(true);
-        const actionCodeSettings = {
-            url: 'https://evacovation.web.app',
-            handleCodeInApp: true,
-        };
-
-        sendPasswordResetEmail(auth, email)
-            .then(() => {
-                setLoading(false);
-                handleClick('success', 'Password reset email sent!');
-            })
-            .catch((error) => {
-                const errorCode = error.code;
-                const errorMessage = error.message;
-                if (errorCode === "auth/invalid-email") setError("Invalid email!");
-                else if (errorCode === "auth/user-not-found") setError("User not found!");
-                else setError(errorMessage);
-                setLoading(false);
-                handleClick('error', errorMessage);
-            });
-    };
-
-    return (
-        <Box display="flex" paddingLeft={isMobile ? '7%' : 0} flexDirection={isMobile ? 'column' : 'row'} height="100vh" justifyContent="center" alignItems="center" margin='0'>
-            {!isMobile && <Box width="55%" display="flex" justifyContent="center" alignItems="center">
-                <img src={logo} alt="logo" style={{ width: '40%' }} />
-            </Box>}
-
-            {!isMobile && <Divider sx={{ height: '70ch', m: 0.5, mt: '10ch', width: '10px' }} orientation="vertical" />}
-
-            <Box width={isMobile ? '100%' : '45%'} sx={{ alignItems: 'center', justifyContent: 'center', display: 'flex', flexDirection: 'column', ml: isMobile ? 0 : '5%' }}>
-                <Typography variant="h4" fontWeight={'bold'} letterSpacing={5}>EVACOVATION</Typography>
-                <p style={{ color: 'grey' }}>Welcome! Please login to your account.</p>
-
-                <TextField
-                    sx={{ width: isMobile ? '100%' : '50ch' }}
-                    label="Email"
-                    variant="standard"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                />
-                <div style={{ height: '2em' }}></div>
-                <TextField
-                    sx={{ width: isMobile ? '100%' : '50ch' }}
-                    label="Password"
-                    type="password"
-                    variant="standard"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                />
-
-                {error && <Typography color={red[500]}>{error}</Typography>}
-
-                <Box display="flex" flexDirection="row" alignItems="center" sx={{ width: isMobile ? '100%' : '50ch', mt: 2 }}>
-                    <FormControlLabel control={<Checkbox />} label="Remember me" />
-                    <Typography variant="body2" component="a" href="#forgot-password" style={{ marginLeft: 'auto' }}>
-                        <Button sx={{ color: blueGrey[500], fontWeight: 'bold' }} onClick={handleForgotPassword} variant="text">Forgot password?</Button>
-                    </Typography>
-                </Box>
-
-                <Button
-                    onClick={handleLogin}
-                    sx={{ width: isMobile ? '100%' : '65ch', padding: '16px', backgroundColor: blue[600], fontWeight: 'bold', mt: 3 }}
-                    variant="contained"
-                    fullWidth
-                >
-                    {loading ? <CircularProgress size={20} color="inherit" /> : 'Sign In'}
-                </Button>
-            </Box>
-            <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
-                <Alert onClose={handleClose} severity={severity} sx={{ width: '100%' }}>
-                    {message}
-                </Alert>
-            </Snackbar>
-        </Box>
-    );
-}
-
-export default LoginComp;
-```
-
-# ------------------  firebase setup end -------------------
-
-
-
-# ---------------firebase Deploy ----------
-```bash
-    npm run build 
-```
-```bash
-    firebase init 
-```
-```bash
-    firebase deploy --only hosting 
-```
-
-# ---------------firebase Deploy on second side ----------
-like site 1 name : devbeast-786
-like site 2 name : devbest
-
-1. paste in firebase json
-```json
-{
-  "hosting": {
-    "site": "devbest",
-    "public": "public",
-  }
-}
-```
-
-2. run the command
-```bash
-    firebase deploy --only hosting:devbest
-```
+For more information, please contact the development team.

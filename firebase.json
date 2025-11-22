@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "site": "devbest",
+    "site": "caringweb",
     "public": "dist",
     "ignore": [
       "firebase.json",
