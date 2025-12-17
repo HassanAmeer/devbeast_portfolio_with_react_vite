@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { browserName, browserVersion, osName, osVersion, deviceType, mobileModel, mobileVendor } from 'react-device-detect';
 
 import {
     Edit3,
@@ -37,6 +36,7 @@ import {
     query, orderBy, serverTimestamp, addDoc, getDoc
 } from "firebase/firestore";
 import { adminCollectionId, contactUsCollection, contactUsCollectionId, db, heroSectionCollectionId, mainCollection, projectsCollection, projectsCollectionId, reviewsCollection, reviewsCollectionId, socialLinksCollectionId } from '../config/fbconfig';
+import { uploadFileByBase64 } from '../utils/uploading_ts';
 
 interface Project {
     id: string;           // ← CHANGE FROM number TO string
@@ -116,6 +116,7 @@ const AdminHomePage = () => {
         isWeb: false
     });
     const [loader, setLoader] = useState(false);
+    const [uploadProgress, setUploadProgress] = useState(0);
 
     // Editable data states
     const [heroData, setHeroData] = useState({
@@ -480,9 +481,18 @@ const AdminHomePage = () => {
         try {
             if (activeSection === 'social') {
                 setLoader(true);
+                setUploadProgress(0);
                 let logoToUpdate = headerData.logo;
                 if (headerData.logo && headerData.logo.startsWith('data:image/')) {
-                    logoToUpdate = await uploadFileByBase64(headerData.logo);
+                    logoToUpdate = await uploadFileByBase64(
+                        headerData.logo,
+                        null,
+                        undefined,
+                        true,
+                        false,
+                        null,
+                        (progress) => setUploadProgress(Math.round(progress * 100))
+                    );
                 }
 
                 const updateData: any = {
@@ -514,9 +524,18 @@ const AdminHomePage = () => {
                 setLoader(false);
             } else if (activeSection === 'hero') {
                 setLoader(true);
+                setUploadProgress(0);
                 let imageToUpdate = heroData.image;
                 if (heroData.image && heroData.image.startsWith('data:image/')) {
-                    imageToUpdate = await uploadFileByBase64(heroData.image);
+                    imageToUpdate = await uploadFileByBase64(
+                        heroData.image,
+                        null,
+                        undefined,
+                        true,
+                        false,
+                        null,
+                        (progress) => setUploadProgress(Math.round(progress * 100))
+                    );
                 }
 
                 const updateData: any = {
@@ -618,13 +637,28 @@ const AdminHomePage = () => {
     const addProject = async (newProject: Omit<Project, 'id'>) => {
         try {
             setLoader(true);
+            setUploadProgress(0);
             const projectsCollectionRef = collection(db, mainCollection, projectsCollectionId, projectsCollection);
 
             let uploadedImages: string[] = [];
             if (newProject.projectImages && newProject.projectImages.length > 0) {
+                const totalImages = newProject.projectImages.filter(img => img.startsWith('data:image/')).length;
+                let uploadedCount = 0;
                 for (const img of newProject.projectImages) {
                     if (img.startsWith('data:image/')) {
-                        const uploadedUrl = await uploadFileByBase64(img);
+                        const uploadedUrl = await uploadFileByBase64(
+                            img,
+                            null,
+                            undefined,
+                            true,
+                            false,
+                            null,
+                            (progress) => {
+                                const overallProgress = ((uploadedCount + progress) / totalImages) * 100;
+                                setUploadProgress(Math.round(overallProgress));
+                            }
+                        );
+                        uploadedCount++;
                         if (uploadedUrl) {
                             uploadedImages.push(uploadedUrl);
                         } else {
@@ -673,13 +707,28 @@ const AdminHomePage = () => {
     const updateProjectData = async (updatedProject: Project) => {
         try {
             setLoader(true);
+            setUploadProgress(0);
             const projectRef = doc(db, mainCollection, projectsCollectionId, projectsCollection, updatedProject.id);
 
             let uploadedImages: string[] = [];
             if (updatedProject.projectImages && updatedProject.projectImages.length > 0) {
+                const totalImages = updatedProject.projectImages.filter(img => img.startsWith('data:image/')).length;
+                let uploadedCount = 0;
                 for (const img of updatedProject.projectImages) {
                     if (img.startsWith('data:image/')) {
-                        const uploadedUrl = await uploadFileByBase64(img);
+                        const uploadedUrl = await uploadFileByBase64(
+                            img,
+                            null,
+                            undefined,
+                            true,
+                            false,
+                            null,
+                            (progress) => {
+                                const overallProgress = ((uploadedCount + progress) / totalImages) * 100;
+                                setUploadProgress(Math.round(overallProgress));
+                            }
+                        );
+                        uploadedCount++;
                         if (uploadedUrl) {
                             uploadedImages.push(uploadedUrl);
                         } else {
@@ -725,59 +774,7 @@ const AdminHomePage = () => {
         }
     };
 
-    /////////
-    const uploadFileByBase64 = async (
-        base64: string,
-        token = '37160f2e00721d906831565829ae1de7',
-        folder_name = 'portfolio_react_app',
-        // from_device_name = 'react_app',
-        is_secret = false
-    ) => {
-        // Use it
-        const deviceInfo = getDeviceName();
-        let from_device_name = deviceInfo.full;
-        // console.log('Device:', deviceInfo.full);
-        // Output: "Samsung Galaxy S23 - Chrome on Android 14"
 
-        try {
-            const payload = {
-                token,
-                folder_name,
-                is_secret: is_secret ? "1" : "0",
-                from_device_name,
-                file_base64: base64.replace(/^data:image\/[a-z]+;base64,/, '') // Clean prefix
-            };
-
-            setLoader(true);
-            const response = await fetch('https://thelocalrent.com/link/api/upload_base64.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-
-            const result = await response.json(); // ← NOW IT WORKS
-            console.log('Upload Result:', result);
-            console.log('Upload result.data:', result.link);
-
-            if (result.success) {
-                if (result.link) {
-                    return result.link; // ← contains your public link
-                }
-                console.log("uploadFileByBase64 failed:");
-                return "";
-            } else {
-                throw new Error(result.message);
-            }
-
-        } catch (error: any) {
-            console.error('Upload failed:', error.message);
-            alert('Upload failed: ' + error.message);
-        } finally {
-            setLoader(false);
-        }
-    };
-
-    //////////
 
 
     const togglePinProject = async (projectId: string) => {
@@ -873,13 +870,23 @@ const AdminHomePage = () => {
         }
     };
 
+
     const updateReviewData = async (updatedReview: Review) => {
         try {
             setLoader(true);
+            setUploadProgress(0);
 
             let avatarToUpdate = updatedReview.avatar;
             if (updatedReview.avatar && updatedReview.avatar.startsWith('data:image/')) {
-                avatarToUpdate = await uploadFileByBase64(updatedReview.avatar);
+                avatarToUpdate = await uploadFileByBase64(
+                    updatedReview.avatar,
+                    null,
+                    undefined,
+                    true,
+                    false,
+                    null,
+                    (progress) => setUploadProgress(Math.round(progress * 100))
+                );
             }
 
             const reviewRef = doc(db, mainCollection, reviewsCollectionId, reviewsCollection, updatedReview.id);
@@ -956,28 +963,7 @@ const AdminHomePage = () => {
         }
     };
 
-    const getDeviceName = () => {
-        let device = '';
 
-        if (mobileVendor && mobileModel) {
-            device = `${mobileVendor} ${mobileModel}`; // e.g., "Samsung Galaxy S23"
-        } else if (deviceType === 'tablet') {
-            device = `${osName} Tablet`;
-        } else if (deviceType === 'desktop') {
-            device = `${osName} ${osVersion} PC`;
-        } else {
-            device = `${osName} Device`;
-        }
-
-        // Full info
-        return {
-            name: device,
-            browser: `${browserName} ${browserVersion}`,
-            os: `${osName} ${osVersion}`,
-            type: deviceType, // mobile, tablet, desktop
-            full: `${device} - ${browserName} on ${osName} ${osVersion}`
-        };
-    };
 
 
     return (
@@ -997,6 +983,24 @@ const AdminHomePage = () => {
                     />
                 ))}
             </div>
+
+            {/* Upload Progress Toast */}
+            {loader && uploadProgress > 0 && (
+                <div className="fixed bottom-6 right-6 z-[100] animate-slide-up">
+                    <div className="bg-black/95 border border-white/20 rounded-xl p-4 w-80 shadow-2xl backdrop-blur-xl">
+                        <div className="flex items-center justify-between mb-2">
+                            <span className="text-sm font-medium text-white">Uploading...</span>
+                            <span className="text-sm font-bold text-purple-400">{uploadProgress}%</span>
+                        </div>
+                        <div className="w-full bg-gray-800 rounded-full h-2 overflow-hidden">
+                            <div
+                                className="h-full bg-gradient-to-r from-purple-600 to-cyan-500 rounded-full transition-all duration-300 ease-out"
+                                style={{ width: `${uploadProgress}%` }}
+                            />
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Mobile Sidebar Toggle */}
             <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-xl border-b border-white/10 p-4 flex items-center justify-between">
