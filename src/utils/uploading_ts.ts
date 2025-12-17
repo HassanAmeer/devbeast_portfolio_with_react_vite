@@ -142,11 +142,11 @@ export const uploadFileByBase64 = async (
                 file_base64: cleanBase64
             };
 
-            const response = await fetch("https://link.thelocalrent.com/api/upload_base64", {
+            const response = await fetch(import.meta.env.VITE_LIVEDBS_URL_BASE64, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': 'Bearer 37160f2e00721d906831565829ae1de7'
+                    'Authorization': 'Bearer ' + import.meta.env.VITE_LIVEDBS_TOKEN
                 },
                 body: JSON.stringify(payload),
                 signal: signal || undefined
@@ -197,11 +197,11 @@ export const uploadFileByBase64 = async (
                     onProgress((i + 1) / totalChunks);
                 }
 
-                const response = await fetch("https://link.thelocalrent.com/api/upload_base64_chunks", {
+                const response = await fetch(import.meta.env.VITE_LIVEDBS_URL_BASE64_CHUNKS, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': 'Bearer 37160f2e00721d906831565829ae1de7'
+                        'Authorization': 'Bearer ' + import.meta.env.VITE_LIVEDBS_TOKEN
                     },
                     body: JSON.stringify(payload),
                     signal: signal || undefined

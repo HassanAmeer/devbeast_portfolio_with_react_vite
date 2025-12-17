@@ -40,6 +40,8 @@ const contactUsCollection = 'contact_us';
 //
 const reviewsCollectionId = 'all_reviews_id';
 const reviewsCollection = 'reviews';
+//
+const siteSettingsCollectionId = 'site_settings';
 
-export { db, storage, mainCollection, adminCollectionId, heroSectionCollectionId, socialLinksCollectionId, projectsCollectionId, projectsCollection, contactUsCollectionId, contactUsCollection, reviewsCollectionId, reviewsCollection };
+export { db, storage, mainCollection, adminCollectionId, heroSectionCollectionId, socialLinksCollectionId, projectsCollectionId, projectsCollection, contactUsCollectionId, contactUsCollection, reviewsCollectionId, reviewsCollection, siteSettingsCollectionId };
 

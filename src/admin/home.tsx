@@ -35,8 +35,9 @@ import {
     collection, getDocs, doc, updateDoc, deleteDoc,
     query, orderBy, serverTimestamp, addDoc, getDoc
 } from "firebase/firestore";
-import { adminCollectionId, contactUsCollection, contactUsCollectionId, db, heroSectionCollectionId, mainCollection, projectsCollection, projectsCollectionId, reviewsCollection, reviewsCollectionId, socialLinksCollectionId } from '../config/fbconfig';
+import { adminCollectionId, contactUsCollection, contactUsCollectionId, db, heroSectionCollectionId, mainCollection, projectsCollection, projectsCollectionId, reviewsCollection, reviewsCollectionId, socialLinksCollectionId, siteSettingsCollectionId } from '../config/fbconfig';
 import { uploadFileByBase64 } from '../utils/uploading_ts';
+import { templateOptions } from '../home/LandingWrapper';
 
 interface Project {
     id: string;           // ← CHANGE FROM number TO string
@@ -117,6 +118,8 @@ const AdminHomePage = () => {
     });
     const [loader, setLoader] = useState(false);
     const [uploadProgress, setUploadProgress] = useState(0);
+    const [cvUrl, setCvUrl] = useState('');
+    const [cvUploading, setCvUploading] = useState(false);
 
     // Editable data states
     const [heroData, setHeroData] = useState({
@@ -261,6 +264,9 @@ const AdminHomePage = () => {
         rating: 5,
         avatar: ''
     });
+
+    // Template settings state
+    const [selectedTemplate, setSelectedTemplate] = useState('template1');
 
     // useEffect(() => {
     //     const handleMouseMove = (e: MouseEvent) => {
@@ -469,13 +475,69 @@ const AdminHomePage = () => {
             }
         };
 
+        // Load template settings
+        const loadTemplateSettings = async () => {
+            try {
+                const docRef = doc(db, mainCollection, siteSettingsCollectionId);
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    if (data.landingTemplate) {
+                        setSelectedTemplate(data.landingTemplate);
+                    }
+                    if (data.cvUrl) {
+                        setCvUrl(data.cvUrl);
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading template settings:', error);
+            }
+        };
+
         loadAdminData();
         loadHeroData();
         loadSocialLinsData();
         loadProjectsData();
         loadReviewsData();
         loadContactUsMessages();
+        loadTemplateSettings();
+        loadTemplateSettings();
     }, []);
+
+    const handleCvUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+
+        if (file.type !== 'application/pdf') {
+            alert('Please upload a PDF file');
+            return;
+        }
+
+        try {
+            setCvUploading(true);
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = async () => {
+                const base64 = reader.result as string;
+                const url = await uploadFileByBase64(base64, null, 'documents', true, undefined, null, (p) => setUploadProgress(p * 100));
+
+                // Save URL to firestore
+                const docRef = doc(db, mainCollection, siteSettingsCollectionId);
+                const { setDoc } = await import('firebase/firestore');
+                await setDoc(docRef, { cvUrl: url }, { merge: true });
+
+                setCvUrl(url);
+                alert('CV uploaded successfully!');
+                setUploadProgress(0);
+            };
+        } catch (error) {
+            console.error('Error uploading CV:', error);
+            alert('Failed to upload CV');
+        } finally {
+            setCvUploading(false);
+        }
+    };
+
 
     const handleSave = async () => {
         try {
@@ -631,6 +693,40 @@ const AdminHomePage = () => {
             setLoader(false);
             console.error('Password update error:', error);
             alert('Failed to update password. Please try again.');
+        }
+    };
+
+    // Save template settings
+    const saveTemplateSettings = async (templateId: string) => {
+        try {
+            setLoader(true);
+            const docRef = doc(db, mainCollection, siteSettingsCollectionId);
+            const docSnap = await getDoc(docRef);
+
+            if (docSnap.exists()) {
+                await updateDoc(docRef, {
+                    landingTemplate: templateId,
+                    updatedAt: serverTimestamp()
+                });
+            } else {
+                // Create the document if it doesn't exist
+                await addDoc(collection(db, mainCollection), {});
+                // Since we need to use a specific ID, we'll use updateDoc approach
+                const { setDoc } = await import('firebase/firestore');
+                await setDoc(docRef, {
+                    landingTemplate: templateId,
+                    createdAt: serverTimestamp(),
+                    updatedAt: serverTimestamp()
+                });
+            }
+
+            setSelectedTemplate(templateId);
+            alert('Template updated successfully! Refresh the homepage to see changes.');
+        } catch (error) {
+            console.error('Error saving template:', error);
+            alert('Failed to save template. Please try again.');
+        } finally {
+            setLoader(false);
         }
     };
 
@@ -1466,6 +1562,48 @@ const AdminHomePage = () => {
                                         );
                                     })}
                                 </div>
+
+                                {/* CV Section */}
+                                <div className="mt-8 pt-8 border-t border-white/10">
+                                    <h3 className="text-xl lg:text-2xl font-bold mb-6">Resume / CV</h3>
+                                    <div className="p-6 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10">
+                                        <div className="flex flex-col md:flex-row items-center gap-6">
+                                            <div className="flex-1 w-full">
+                                                <label className="block text-sm font-medium text-gray-400 mb-2">Upload PDF Resume</label>
+                                                <div className="relative">
+                                                    <input
+                                                        type="file"
+                                                        accept="application/pdf"
+                                                        onChange={handleCvUpload}
+                                                        disabled={cvUploading || !isEditing}
+                                                        className="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 focus:border-purple-500 outline-none text-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-purple-600 file:text-white hover:file:bg-purple-700 disabled:opacity-50"
+                                                    />
+                                                    {cvUploading && (
+                                                        <div className="absolute inset-x-0 -bottom-2 h-1 bg-gray-700 rounded-full overflow-hidden">
+                                                            <div
+                                                                className="h-full bg-purple-500 transition-all duration-300"
+                                                                style={{ width: `${uploadProgress}%` }}
+                                                            />
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                            {cvUrl && (
+                                                <div className="flex items-center gap-4">
+                                                    <a
+                                                        href={cvUrl}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="flex items-center space-x-2 px-6 py-3 rounded-xl bg-white/10 hover:bg-white/20 transition-all border border-white/10"
+                                                    >
+                                                        <Eye className="w-5 h-5" />
+                                                        <span>View Current CV</span>
+                                                    </a>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         )}
 
@@ -1655,6 +1793,52 @@ const AdminHomePage = () => {
                                         </button>
                                     </div>
                                 )}
+
+                                {/* Template Selector Section */}
+                                <div className="mt-10 pt-10 border-t border-white/10">
+                                    <div className="flex items-center space-x-3 mb-6">
+                                        <Globe className="w-6 h-6 text-purple-400" />
+                                        <h3 className="text-lg lg:text-xl font-bold text-purple-400">Landing Page Template</h3>
+                                    </div>
+                                    <p className="text-sm text-gray-400 mb-6">
+                                        Choose a template for your public landing page. Changes will be visible immediately after saving.
+                                    </p>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        {templateOptions.map((template) => (
+                                            <div
+                                                key={template.id}
+                                                onClick={() => !loader && saveTemplateSettings(template.id)}
+                                                className={`relative p-5 rounded-2xl border-2 cursor-pointer transition-all duration-300 ${selectedTemplate === template.id
+                                                    ? 'border-purple-500 bg-purple-500/10'
+                                                    : 'border-white/10 bg-white/5 hover:border-purple-500/50 hover:bg-white/10'
+                                                    }`}
+                                            >
+                                                {selectedTemplate === template.id && (
+                                                    <div className="absolute top-3 right-3">
+                                                        <div className="w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center">
+                                                            <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                                            </svg>
+                                                        </div>
+                                                    </div>
+                                                )}
+
+                                                <div className="mb-4">
+                                                    <div className={`w-full h-24 rounded-xl bg-gradient-to-br ${template.id === 'template1'
+                                                        ? 'from-purple-900 via-black to-cyan-900'
+                                                        : 'from-slate-950 via-slate-900 to-violet-950'
+                                                        } flex items-center justify-center`}>
+                                                        <span className="text-white/60 text-sm">{template.preview}</span>
+                                                    </div>
+                                                </div>
+
+                                                <h4 className="font-bold text-white mb-2">{template.name}</h4>
+                                                <p className="text-xs text-gray-400 leading-relaxed">{template.description}</p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
                             </div>
                         )}
                     </section>

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 
 import { Github, Linkedin, Twitter, Code2, Smartphone, Globe, Star, Award, Users, CheckCircle, Menu, X, ArrowRight, ExternalLink, Instagram, Facebook, Youtube, Music2, Send, DessertIcon, Camera, Link, ArrowBigDownDashIcon } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import person1 from '../assets/person1.png';
 import services1 from '../assets/services1.png';
 import services2 from '../assets/services2.png';
@@ -71,8 +71,16 @@ interface Review {
 
 const Portfolio = () => {
     const navigate = useNavigate();
+    const location = useLocation();
 
-    const [activeTab, setActiveTab] = useState('all');
+    // Determine default tab based on URL path
+    const getDefaultTab = () => {
+        if (location.pathname === '/apps') return 'app';
+        if (location.pathname === '/web') return 'web';
+        return 'all';
+    };
+
+    const [activeTab, setActiveTab] = useState(getDefaultTab());
     // const [formData, setFormData] = useState({ name: '', email: '', message: '' });
     const [scrolled] = useState(false);
     const [mousePosition] = useState({ x: 0, y: 0 });
@@ -82,6 +90,7 @@ const Portfolio = () => {
 
 
     const [logoSrc, setLogoSrc] = useState(services1);
+
 
 
     useEffect(() => {
@@ -555,7 +564,7 @@ const Portfolio = () => {
                 <header className={`fixed top-0 w-full z-50 transition-all duration-500 ${scrolled ? 'bg-black/60 backdrop-blur-2xl border-b border-white/5 shadow-2xl' : 'bg-transparent'}`}>
                     <div className="container mx-auto px-4 py-4">
                         <div className="flex justify-between items-center">
-                            <div className="flex items-center space-x-3 group cursor-pointer">
+                            <a href="/" className="flex items-center space-x-3 group cursor-pointer">
 
                                 {/* <img src={services1} alt="" className="w-20" /> */}
                                 <div className="relative animate-pulse w-14 h-8">
@@ -575,7 +584,7 @@ const Portfolio = () => {
                                         {headerData.subtitle}
                                     </p>
                                 </div>
-                            </div>
+                            </a>
 
                             <nav className="hidden md:flex items-center space-x-1">
                                 {['Home', 'Skills', 'Projects', 'Contact'].map((item) => (
