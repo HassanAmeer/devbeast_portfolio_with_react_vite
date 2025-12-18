@@ -16,6 +16,7 @@ import {
     Instagram
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useTheme } from '../context/ThemeContext';
 import { collection, getDocs, query, orderBy, doc, getDoc, where } from 'firebase/firestore';
 import { db, mainCollection, projectsCollection, projectsCollectionId, socialLinksCollectionId } from '../config/fbconfig';
 import { preloadProjectImages } from '../utils/imageCache';
@@ -66,6 +67,7 @@ interface ContactInfo {
 
 const AllItems = () => {
     const navigate = useNavigate();
+    const { isDarkMode } = useTheme();
     const [activeTab, setActiveTab] = useState('all');
     const [scrolled, setScrolled] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -218,30 +220,32 @@ const AllItems = () => {
     };
 
     return (
-        <div className="min-h-screen bg-black text-white overflow-hidden relative">
+        <div className={`min-h-screen ${isDarkMode ? 'bg-black text-white' : 'bg-slate-50 text-slate-900'} overflow-hidden relative`}>
             {/* Animated Background */}
             <div className="fixed inset-0 z-0">
-                <div className="absolute inset-0 bg-gradient-to-br from-purple-900/20 via-black to-cyan-900/20" />
-                <div className="absolute inset-0 bg-[linear-gradient(rgba(139,92,246,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(139,92,246,0.03)_1px,transparent_1px)] bg-[size:100px_100px]" />
+                <div className={`absolute inset-0 bg-gradient-to-br ${isDarkMode ? 'from-purple-900/20 via-black to-cyan-900/20' : 'from-purple-100 via-slate-50 to-cyan-100'}`} />
+                <div className={`absolute inset-0 ${isDarkMode ? 'bg-[linear-gradient(rgba(139,92,246,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(139,92,246,0.03)_1px,transparent_1px)]' : 'bg-[linear-gradient(rgba(139,92,246,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(139,92,246,0.05)_1px,transparent_1px)]'} bg-[size:100px_100px]`} />
             </div>
 
             {/* Sticky Header with Projects Title */}
-            <header className={`sticky top-0 z-50 transition-all duration-500 ${scrolled ? 'bg-black/80 backdrop-blur-2xl border-b border-white/10 shadow-2xl' : 'bg-black/60 backdrop-blur-xl border-b border-white/5'}`}>
+            <header className={`sticky top-0 z-50 transition-all duration-500 ${scrolled
+                ? (isDarkMode ? 'bg-black/80 backdrop-blur-2xl border-b border-white/10 shadow-2xl' : 'bg-white/80 backdrop-blur-2xl border-b border-slate-200 shadow-xl')
+                : (isDarkMode ? 'bg-black/60 backdrop-blur-xl border-b border-white/5' : 'bg-white/60 backdrop-blur-xl border-b border-slate-100')}`}>
                 <div className="container mx-auto px-4 py-4">
                     <div className="flex items-center justify-between">
                         {/* Left Side - Projects Title */}
                         <div className="flex items-center space-x-4">
                             <button
                                 onClick={() => navigate('/')}
-                                className="p-2 hover:bg-white/10 rounded-xl transition-all"
+                                className={`p-2 ${isDarkMode ? 'hover:bg-white/10 text-white' : 'hover:bg-slate-100 text-slate-700'} rounded-xl transition-all`}
                             >
                                 <Home className="w-5 h-5" />
                             </button>
-                            <div className="hidden md:block h-6 w-px bg-white/20" />
-                            <h1 className="text-2xl md:text-3xl font-black bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">
+                            <div className={`hidden md:block h-6 w-px ${isDarkMode ? 'bg-white/20' : 'bg-slate-200'}`} />
+                            <h1 className={`text-2xl md:text-3xl font-black bg-gradient-to-r ${isDarkMode ? 'from-purple-400 via-pink-400 to-cyan-400' : 'from-purple-600 via-pink-600 to-cyan-600'} bg-clip-text text-transparent`}>
                                 All Projects
                             </h1>
-                            <span className="hidden md:inline-block px-3 py-1 bg-purple-600/20 rounded-full text-sm font-semibold text-purple-300 border border-purple-500/30">
+                            <span className={`hidden md:inline-block px-3 py-1 ${isDarkMode ? 'bg-purple-600/20 text-purple-300 border-purple-500/30' : 'bg-purple-100 text-purple-700 border-purple-200'} rounded-full text-sm font-semibold border`}>
                                 {filteredProjects.length} Projects
                             </span>
                         </div>
@@ -268,16 +272,16 @@ const AllItems = () => {
                             </nav>
 
                             {/* Social Icons */}
-                            <div className="hidden lg:flex items-center space-x-2 pl-2 border-l border-white/10">
-                                {socialLinks.find((e) => e.platform == "Github")?.platform !== "" ? <a href={socialLinks.find((e) => e.platform === "Github")?.url} className="p-2 hover:bg-white/10 rounded-lg transition-all">
+                            <div className={`hidden lg:flex items-center space-x-2 pl-2 border-l ${isDarkMode ? 'border-white/10' : 'border-slate-200'}`}>
+                                {socialLinks.find((e) => e.platform == "Github")?.platform !== "" ? <a href={socialLinks.find((e) => e.platform === "Github")?.url} className={`p-2 ${isDarkMode ? 'hover:bg-white/10 text-gray-400 hover:text-white' : 'hover:bg-slate-100 text-slate-500 hover:text-slate-900'} rounded-lg transition-all`}>
                                     <Github className="w-4 h-4" />
                                 </a> : <></>}
                                 {socialLinks.find((e) => e.platform == "Linkedin")?.platform !== "" ? <a href={socialLinks.find((e) => e.platform === "Linkedin")?.url}
-                                    className="p-2 hover:bg-white/10 rounded-lg transition-all">
+                                    className={`p-2 ${isDarkMode ? 'hover:bg-white/10 text-gray-400 hover:text-white' : 'hover:bg-slate-100 text-slate-500 hover:text-slate-900'} rounded-lg transition-all`}>
                                     <Linkedin className="w-4 h-4" />
                                 </a> : <></>}
                                 {socialLinks.find((e) => e.platform == "Instagram")?.platform !== "" ? <a href={socialLinks.find((e) => e.platform === "Instagram")?.url}
-                                    className="p-2 hover:bg-white/10 rounded-lg transition-all">
+                                    className={`p-2 ${isDarkMode ? 'hover:bg-white/10 text-gray-400 hover:text-white' : 'hover:bg-slate-100 text-slate-500 hover:text-slate-900'} rounded-lg transition-all`}>
                                     <Instagram className="w-4 h-4" />
                                 </a> : <></>}
                             </div>
@@ -285,7 +289,7 @@ const AllItems = () => {
                             {/* Mobile Menu Toggle */}
                             <button
                                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                                className="md:hidden p-2 rounded-xl bg-white/5 hover:bg-white/10 transition-all"
+                                className={`md:hidden p-2 rounded-xl ${isDarkMode ? 'bg-white/5 hover:bg-white/10 text-white' : 'bg-slate-100 hover:bg-slate-200 text-slate-700'} transition-all`}
                             >
                                 {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
                             </button>
@@ -295,7 +299,7 @@ const AllItems = () => {
 
                 {/* Mobile Menu */}
                 {mobileMenuOpen && (
-                    <div className="md:hidden absolute top-full left-0 w-full bg-black/95 backdrop-blur-2xl border-b border-white/5">
+                    <div className={`md:hidden absolute top-full left-0 w-full ${isDarkMode ? 'bg-black/95 border-white/5' : 'bg-white/95 border-slate-200'} backdrop-blur-2xl border-b`}>
                         <nav className="container mx-auto px-4 py-6 flex flex-col space-y-2">
                             {/* <button
                                 onClick={() => { navigate('/'); setMobileMenuOpen(false); }}
@@ -312,12 +316,12 @@ const AllItems = () => {
                                 <User className="w-5 h-5" />
                                 <span className="font-medium">About</span>
                             </button> */}
-                            {contactInfo.phone !== "" ? <button onClick={() => handleWhatsAppClick(contactInfo.phone)} className="flex items-center space-x-3 px-4 py-3 bg-gradient-to-r from-purple-600 to-cyan-600 rounded-xl font-bold">
+                            {contactInfo.phone !== "" ? <button onClick={() => handleWhatsAppClick(contactInfo.phone)} className="flex items-center space-x-3 px-4 py-3 bg-gradient-to-r from-purple-600 to-cyan-600 rounded-xl font-bold text-white">
                                 <MessageCircle className="w-5 h-5" />
                                 <span>Contact</span>
                             </button> : <></>}
-                            <div className="flex items-center space-x-3 px-4 pt-4 border-t border-white/10">
-                                {socialLinks.find((e) => e.platform == "github")?.platform !== "" ? <a href={socialLinks.find((e) => e.platform == "github")?.url} className="p-2 hover:bg-white/10 rounded-lg transition-all">
+                            <div className={`flex items-center space-x-3 px-4 pt-4 border-t ${isDarkMode ? 'border-white/10' : 'border-slate-200'}`}>
+                                {socialLinks.find((e) => e.platform == "github")?.platform !== "" ? <a href={socialLinks.find((e) => e.platform == "github")?.url} className={`p-2 ${isDarkMode ? 'hover:bg-white/10 text-gray-400' : 'hover:bg-slate-100 text-slate-500'} rounded-lg transition-all`}>
                                     <Github className="w-4 h-4" />
                                 </a> : <></>}
                                 {socialLinks.find((e) => e.platform == "linkdin")?.platform !== "" ? <a href={socialLinks.find((e) => e.platform == "linkdin")?.url}
@@ -339,7 +343,7 @@ const AllItems = () => {
                 <div className="container mx-auto px-4 relative z-10">
                     {/* Filter Tabs */}
                     <div className="flex flex-wrap items-center justify-center gap-3 mb-12">
-                        <div className="flex items-center space-x-2 text-gray-400 mr-2">
+                        <div className={`flex items-center space-x-2 ${isDarkMode ? 'text-gray-400' : 'text-slate-500'} mr-2`}>
                             <Filter className="w-4 h-4" />
                             <span className="text-sm font-semibold">Filter:</span>
                         </div>
@@ -352,8 +356,8 @@ const AllItems = () => {
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id)}
                                 className={`group relative md:px-6 px-2 md:py-3 py-2 rounded-xl font-bold transition-all transform hover:scale-105 flex items-center space-x-2 ${activeTab === tab.id
-                                    ? 'bg-gradient-to-r from-purple-600 to-cyan-600 shadow-lg shadow-purple-500/30'
-                                    : 'bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 backdrop-blur-xl'
+                                    ? 'bg-gradient-to-r from-purple-600 to-cyan-600 shadow-lg shadow-purple-500/30 text-white'
+                                    : (isDarkMode ? 'bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 backdrop-blur-xl text-gray-400 hover:text-white' : 'bg-white border border-slate-200 hover:border-slate-300 shadow-sm text-slate-500 hover:text-slate-900')
                                     }`}
                             >
                                 {tab.icon}
@@ -369,8 +373,8 @@ const AllItems = () => {
 
                     {loading ? (
                         <center className='md:pt-40 pt-20'>
-                            <div className="w-6 h-6 lg:w-8 lg:h-8 border-4 border-purple-200
-                            border-t-transparent rounded-full animate-spin" />
+                            <div className={`w-6 h-6 lg:w-8 lg:h-8 border-4 ${isDarkMode ? 'border-purple-200' : 'border-purple-600'}
+                            border-t-transparent rounded-full animate-spin`} />
                         </center>
                     ) : (
                         <></>
@@ -388,7 +392,7 @@ const AllItems = () => {
                             >
                                 <div className={`absolute inset-0 bg-gradient-to-r ${project.isWeb ? 'from-cyan-500 to-blue-500' : 'from-purple-500 to-pink-500'} opacity-10 group-hover:opacity-20 transition-all duration-500 blur-xl`} />
 
-                                <div className="relative bg-black/40 backdrop-blur-xl border border-white/10 hover:border-white/30 transition-all rounded-3xl overflow-hidden h-full">
+                                <div className={`relative ${isDarkMode ? 'bg-black/40 border-white/10 hover:border-white/30' : 'bg-white border-slate-100 hover:border-slate-200 shadow-xl shadow-slate-200/50'} backdrop-blur-xl border transition-all rounded-3xl overflow-hidden h-full`}>
                                     {project.projectLink && (
                                         <div className="absolute top-4 right-4 z-20">
                                             <div className="flex items-center space-x-2 px-2 py-1.5  opacity-60 hover:opacity-100 hover:bg-cyan-800/90  bg-purple-600/90 backdrop-blur-xl rounded-full text-xs font-bold shadow-lg">
@@ -399,7 +403,7 @@ const AllItems = () => {
                                     )}
 
                                     <div className="relative h-48 overflow-hidden">
-                                        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent z-10" />
+                                        <div className={`absolute inset-0 bg-gradient-to-t ${isDarkMode ? 'from-black via-black/50 to-transparent' : 'from-slate-900/40 via-transparent to-transparent'} z-10`} />
                                         <img
                                             src={project.projectImages[0] || 'https://via.placeholder.com/400x300'}
                                             alt={project.title}
@@ -408,10 +412,10 @@ const AllItems = () => {
                                     </div>
 
                                     <div className="p-5">
-                                        <h4 className="text-lg font-bold mb-2 text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-cyan-400 transition-all line-clamp-1">
+                                        <h4 className={`text-lg font-bold mb-2 ${isDarkMode ? 'text-white' : 'text-slate-900'} group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r ${isDarkMode ? 'group-hover:from-purple-400 group-hover:to-cyan-400' : 'group-hover:from-purple-600 group-hover:to-cyan-600'} transition-all line-clamp-1`}>
                                             {project.title}
                                         </h4>
-                                        <p className="text-sm text-gray-400 mb-4 line-clamp-2 leading-relaxed">
+                                        <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-slate-500'} mb-4 line-clamp-2 leading-relaxed`}>
                                             {project.desc}
                                         </p>
 
@@ -419,7 +423,7 @@ const AllItems = () => {
                                             {project.tags.slice(0, 3).map((tag, tagIdx) => (
                                                 <span
                                                     key={tagIdx}
-                                                    className="px-3 py-1 bg-white/5 border border-white/10 rounded-full text-xs font-medium hover:bg-white/10 hover:border-white/20 transition-all"
+                                                    className={`px-3 py-1 ${isDarkMode ? 'bg-white/5 border-white/10 text-gray-400' : 'bg-slate-50 border-slate-200 text-slate-600'} border rounded-full text-xs font-medium hover:bg-white/10 transition-all`}
                                                 >
                                                     {tag}
                                                 </span>
@@ -445,8 +449,8 @@ const AllItems = () => {
                     {filteredProjects.length === 0 && (
                         <div className="text-center py-20">
                             <div className="text-6xl mb-4">🔍</div>
-                            <h3 className="text-2xl font-bold mb-2 text-gray-300">No Projects Found</h3>
-                            <p className="text-gray-500">Try selecting a different filter</p>
+                            <h3 className={`text-2xl font-bold mb-2 ${isDarkMode ? 'text-gray-300' : 'text-slate-700'}`}>No Projects Found</h3>
+                            <p className={`${isDarkMode ? 'text-gray-500' : 'text-slate-400'}`}>Try selecting a different filter</p>
                         </div>
                     )}
                 </div>

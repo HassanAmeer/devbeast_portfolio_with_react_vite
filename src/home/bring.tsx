@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Smartphone, Code2, Database, Brain, Globe, Cloud } from 'lucide-react';
 
-const BringSection = () => {
+const BringSection = ({ isDarkMode = true }: { isDarkMode?: boolean }) => {
     const [isVisible, setIsVisible] = useState(false);
     const sectionRef = useRef(null);
 
@@ -77,10 +77,10 @@ const BringSection = () => {
                     {/* <div className="inline-block px-4 py-2 bg-gradient-to-r from-purple-600/20 to-cyan-600/20 rounded-full text-sm font-bold text-purple-300 border border-purple-500/30 mb-6">
                EXPERTISE
             </div> */}
-                    <h3 className="text-3xl md:text-6xl font-black mb-6 bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">
+                    <h3 className={`text-3xl md:text-6xl font-black mb-6 bg-gradient-to-r ${isDarkMode ? 'from-purple-400 via-pink-400 to-cyan-400' : 'from-purple-600 via-pink-600 to-cyan-600'} bg-clip-text text-transparent`}>
                         What I Bring
                     </h3>
-                    <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+                    <p className={`${isDarkMode ? 'text-gray-400' : 'text-slate-500'} text-lg max-w-2xl mx-auto`}>
                         Full-stack expertise with cutting-edge technologies
                     </p>
                 </div>
@@ -93,14 +93,14 @@ const BringSection = () => {
                             style={{ animationDelay: `${feature.delay}ms` }}
                         >
                             <div className={`absolute inset-0 bg-gradient-to-r ${feature.color} rounded-3xl blur-xl opacity-0 group-hover:opacity-30 transition-all duration-500`} />
-                            <div className="relative p-8 rounded-3xl bg-black/40 backdrop-blur-xl border border-white/10 hover:border-white/30 transition-all transform hover:scale-105 hover:-translate-y-2 duration-500">
+                            <div className={`relative p-8 rounded-3xl ${isDarkMode ? 'bg-black/40 border-white/10 hover:border-white/30' : 'bg-white border-slate-200 hover:border-slate-300 shadow-xl shadow-slate-200/50'} backdrop-blur-xl border transition-all transform hover:scale-105 hover:-translate-y-2 duration-500`}>
                                 <div className={`w-16 h-16 bg-gradient-to-r ${feature.color} rounded-2xl flex items-center justify-center mb-6 shadow-2xl group-hover:scale-110 group-hover:rotate-6 transition-all duration-500`}>
                                     {feature.icon}
                                 </div>
-                                <h4 className="text-2xl font-bold mb-4 text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-cyan-400 transition-all">
+                                <h4 className={`text-2xl font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-slate-900'} group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r ${isDarkMode ? 'group-hover:from-purple-400 group-hover:to-cyan-400' : 'group-hover:from-purple-600 group-hover:to-cyan-600'} transition-all`}>
                                     {feature.title}
                                 </h4>
-                                <p className="text-gray-400 leading-relaxed">{feature.desc}</p>
+                                <p className={`${isDarkMode ? 'text-gray-400' : 'text-slate-500'} leading-relaxed`}>{feature.desc}</p>
                             </div>
                         </div>
                     ))}

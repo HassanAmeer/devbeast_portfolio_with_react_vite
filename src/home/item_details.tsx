@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useTheme } from '../context/ThemeContext';
 import {
     ArrowLeft,
     ExternalLink,
@@ -17,6 +18,7 @@ import { preloadImages } from '../utils/imageCache';
 const ItemDetails = () => {
     const location = useLocation();
     const navigate = useNavigate();
+    const { isDarkMode } = useTheme();
     const item = location.state;
     const [scrollY, setScrollY] = useState(0);
     const [contactInfo, setContactInfo] = useState<{ email: string; phone: string; location: string } | null>(null);
@@ -106,7 +108,7 @@ const ItemDetails = () => {
 
     if (!item) {
         return (
-            <div className="min-h-screen bg-black text-white flex items-center justify-center">
+            <div className={`min-h-screen ${isDarkMode ? 'bg-black text-white' : 'bg-slate-50 text-slate-900'} flex items-center justify-center`}>
                 <div className="text-center">
                     <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent">
                         No Project Data Available
@@ -164,7 +166,7 @@ const ItemDetails = () => {
     const imageScale = 1 - (scrollY / 2000);
 
     return (
-        <div className="min-h-screen bg-black text-white relative">
+        <div className={`min-h-screen ${isDarkMode ? 'bg-black text-white' : 'bg-slate-50 text-slate-900'} relative`}>
             {/* Fixed Full-Height Hero Image */}
             <div
                 className="fixed inset-0 z-0"
@@ -179,14 +181,14 @@ const ItemDetails = () => {
                     className="w-full h-full object-cover"
                 />
                 {/* Lighter gradient overlay */}
-                <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/50 to-black" />
+                <div className={`absolute inset-0 bg-gradient-to-b ${isDarkMode ? 'from-black/30 via-black/50 to-black' : 'from-black/10 via-black/30 to-slate-50'}`} />
             </div>
 
             {/* Back Button */}
             <div className="fixed top-6 left-6 z-50">
                 <button
                     onClick={() => navigate(-1)}
-                    className="group flex items-center space-x-2 px-6 py-3 bg-black/60 hover:bg-black/80 backdrop-blur-xl rounded-2xl transition-all border border-white/20 hover:border-white/40"
+                    className={`group flex items-center space-x-2 px-6 py-3 ${isDarkMode ? 'bg-black/60 hover:bg-black/80 border-white/20 hover:border-white/40 text-white' : 'bg-white/60 hover:bg-white/80 border-slate-200 hover:border-slate-300 text-slate-900'} backdrop-blur-xl rounded-2xl transition-all border shadow-lg`}
                 >
                     <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
                     <span className="font-semibold">Back</span>
@@ -211,11 +213,15 @@ const ItemDetails = () => {
 
                 {/* Main Content Card */}
                 <div
-                    className="bg-black rounded-t-[3rem] shadow-2xl"
+                    className={`${isDarkMode ? 'bg-[#050505]' : 'bg-white'} rounded-t-[3rem] shadow-2xl relative overflow-hidden`}
                     style={{
-                        boxShadow: '0 -20px 60px rgba(0, 0, 0, 0.8)'
+                        boxShadow: isDarkMode ? '0 -20px 60px rgba(0, 0, 0, 0.8)' : '0 -20px 60px rgba(0, 0, 0, 0.05)'
                     }}
                 >
+                    {/* Decorative elements for light mode */}
+                    {!isDarkMode && (
+                        <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
+                    )}
                     <div className="container mx-auto px-6 py-12 max-w-5xl">
                         {/* Title Section */}
                         <div className="mb-12">
@@ -253,24 +259,24 @@ const ItemDetails = () => {
                             )}
 
                             <h1 className="text-5xl md:text-7xl font-black leading-tight mb-6">
-                                <span className="bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">
+                                <span className={`bg-gradient-to-r ${isDarkMode ? 'from-purple-400 via-pink-400 to-cyan-400' : 'from-purple-600 via-pink-600 to-cyan-600'} bg-clip-text text-transparent`}>
                                     {item.title}
                                 </span>
                             </h1>
 
-                            <p className="text-xl md:text-2xl text-gray-300 leading-relaxed">
+                            <p className={`text-xl md:text-2xl ${isDarkMode ? 'text-gray-300' : 'text-slate-600'} leading-relaxed`}>
                                 {item.description}
                             </p>
                         </div>
 
                         {/* Technologies Tags */}
                         <div className="mb-12">
-                            <h3 className="text-2xl font-bold mb-6 text-white">Technologies</h3>
+                            <h3 className={`text-2xl font-bold mb-6 ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>Technologies</h3>
                             <div className="flex flex-wrap gap-3">
                                 {item.tags.map((tag: string, idx: number) => (
                                     <span
                                         key={idx}
-                                        className="px-6 py-3 bg-gradient-to-r from-purple-600/30 to-cyan-600/30 rounded-full border border-purple-500/50 font-semibold text-white hover:scale-105 hover:border-purple-400 transition-all cursor-pointer backdrop-blur-xl"
+                                        className={`px-6 py-3 ${isDarkMode ? 'bg-gradient-to-r from-purple-600/30 to-cyan-600/30 border-purple-500/50 text-white hover:border-purple-400' : 'bg-slate-50 border-slate-200 text-slate-700 hover:border-slate-300 shadow-sm'} rounded-full border font-semibold hover:scale-105 transition-all cursor-pointer backdrop-blur-xl`}
                                     >
                                         {tag}
                                     </span>
@@ -283,12 +289,12 @@ const ItemDetails = () => {
                             {/* Team Size */}
                             <div className="group relative">
                                 <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-cyan-600/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-all duration-500" />
-                                <div className="relative p-6 bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 hover:border-white/30 transition-all">
+                                <div className={`relative p-6 ${isDarkMode ? 'bg-white/5 border-white/10 hover:border-white/30' : 'bg-slate-50 border-slate-100 hover:border-slate-200 shadow-sm'} backdrop-blur-xl rounded-2xl border transition-all`}>
                                     <div className="flex items-center space-x-3 mb-2">
                                         <Users className="w-6 h-6 text-cyan-400" />
-                                        <span className="text-gray-400 text-sm">Team Size</span>
+                                        <span className={`${isDarkMode ? 'text-gray-400' : 'text-slate-500'} text-sm`}>Team Size</span>
                                     </div>
-                                    <p className="text-2xl font-bold text-white">{teamSize}</p>
+                                    <p className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>{teamSize}</p>
                                 </div>
                             </div>
 
@@ -301,14 +307,14 @@ const ItemDetails = () => {
                                     className="group relative"
                                 >
                                     <div className="absolute inset-0 bg-gradient-to-r from-gray-600/20 to-gray-800/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-all duration-500" />
-                                    <div className="relative p-6 bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 hover:border-white/30 transition-all h-full flex flex-col justify-between">
+                                    <div className={`relative p-6 ${isDarkMode ? 'bg-white/5 border-white/10 hover:border-white/30' : 'bg-slate-50 border-slate-100 hover:border-slate-200 shadow-sm'} backdrop-blur-xl rounded-2xl border transition-all h-full flex flex-col justify-between`}>
                                         <div className="flex items-center space-x-3 mb-2">
-                                            <Github className="w-6 h-6 text-gray-300" />
-                                            <span className="text-gray-400 text-sm">Source Code</span>
+                                            <Github className={`w-6 h-6 ${isDarkMode ? 'text-gray-300' : 'text-slate-700'}`} />
+                                            <span className={`${isDarkMode ? 'text-gray-400' : 'text-slate-500'} text-sm`}>Source Code</span>
                                         </div>
                                         <div className="flex items-center space-x-2">
-                                            <p className="text-lg font-bold text-white">View on GitHub</p>
-                                            <ExternalLink className="w-4 h-4 text-gray-400 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+                                            <p className={`text-lg font-bold ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>View on GitHub</p>
+                                            <ExternalLink className={`w-4 h-4 ${isDarkMode ? 'text-gray-400' : 'text-slate-400'} group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform`} />
                                         </div>
                                     </div>
                                 </a>
@@ -320,17 +326,17 @@ const ItemDetails = () => {
                                     href={liveUrl}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="group relative"
+                                    className="group relative text-white"
                                 >
                                     <div className="absolute inset-0 bg-gradient-to-r from-purple-600/20 to-pink-600/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-all duration-500" />
-                                    <div className="relative p-6 bg-gradient-to-r from-purple-600/30 to-pink-600/30 backdrop-blur-xl rounded-2xl border border-purple-500/50 hover:border-purple-400 transition-all h-full flex flex-col justify-between">
+                                    <div className={`relative p-6 ${isDarkMode ? 'bg-gradient-to-r from-purple-600/30 to-pink-600/30 border-purple-500/50' : 'bg-gradient-to-r from-purple-600 to-pink-600 border-transparent'} backdrop-blur-xl rounded-2xl border hover:border-purple-400 transition-all h-full flex flex-col justify-between shadow-lg shadow-purple-500/10`}>
                                         <div className="flex items-center space-x-3 mb-2">
-                                            <ExternalLink className="w-6 h-6 text-purple-300" />
-                                            <span className="text-purple-200 text-sm">Live Demo</span>
+                                            <ExternalLink className={`w-6 h-6 ${isDarkMode ? 'text-purple-300' : 'text-purple-100'}`} />
+                                            <span className={`${isDarkMode ? 'text-purple-200' : 'text-purple-50'} text-sm`}>Live Demo</span>
                                         </div>
                                         <div className="flex items-center space-x-2">
-                                            <p className="text-lg font-bold text-white">Visit Website</p>
-                                            <ExternalLink className="w-4 h-4 text-purple-300 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+                                            <p className="text-lg font-bold">Visit Website</p>
+                                            <ExternalLink className={`w-4 h-4 ${isDarkMode ? 'text-purple-300' : 'text-purple-100'} group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform`} />
                                         </div>
                                     </div>
                                 </a>
@@ -339,7 +345,7 @@ const ItemDetails = () => {
 
                         {/* Demo Images Gallery */}
                         <div className="mb-12">
-                            <h3 className="text-2xl font-bold mb-6 text-white">Project Gallery</h3>
+                            <h3 className={`text-2xl font-bold mb-6 ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>Project Gallery</h3>
                             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                                 {demoImages.map((img: string, idx: number) => (
                                     <div
@@ -362,11 +368,11 @@ const ItemDetails = () => {
                         {/* CTA Section */}
                         <div className="relative group mt-16">
                             <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-cyan-600 rounded-3xl blur-2xl opacity-20 group-hover:opacity-40 transition-all duration-500" />
-                            <div className="relative p-8 md:p-12 bg-gradient-to-r from-purple-600/10 to-cyan-600/10 backdrop-blur-xl rounded-3xl border border-purple-500/30 text-center">
-                                <h3 className="text-3xl md:text-4xl font-black mb-4 bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent">
+                            <div className={`relative p-8 md:p-12 ${isDarkMode ? 'bg-gradient-to-r from-purple-600/10 to-cyan-600/10 border-purple-500/30' : 'bg-slate-50 border-slate-200 shadow-sm'} backdrop-blur-xl rounded-3xl border text-center`}>
+                                <h3 className={`text-3xl md:text-4xl font-black mb-4 bg-gradient-to-r ${isDarkMode ? 'from-purple-400 to-cyan-400' : 'from-purple-600 to-cyan-600'} bg-clip-text text-transparent`}>
                                     Interested in This Project?
                                 </h3>
-                                <p className="text-lg text-gray-300 mb-8 max-w-2xl mx-auto">
+                                <p className={`text-lg ${isDarkMode ? 'text-gray-300' : 'text-slate-600'} mb-8 max-w-2xl mx-auto`}>
                                     Let's discuss how we can create something amazing together
                                 </p>
                                 <button

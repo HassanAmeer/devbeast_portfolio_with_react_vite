@@ -3,7 +3,7 @@ import { Mail, Phone, MapPin, Send, Github, Linkedin, Twitter, MessageCircle, Ch
 import { doc, getDoc, collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { contactUsCollection, contactUsCollectionId, db, mainCollection, socialLinksCollectionId } from '../config/fbconfig';
 
-const ContactSection = () => {
+const ContactSection = ({ isDarkMode = true }: { isDarkMode?: boolean }) => {
     const [formData, setFormData] = useState({ name: '', phone: '', email: '', message: '' });
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitted, setSubmitted] = useState(false);
@@ -133,16 +133,16 @@ const ContactSection = () => {
     return (
         <section id="contact" className="py-16 relative overflow-hidden">
             {/* Background Effects */}
-            <div className="absolute inset-0 bg-gradient-to-b from-black via-purple-950/5 to-black" />
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-purple-600/10 rounded-full blur-3xl" />
+            <div className={`absolute inset-0 bg-gradient-to-b ${isDarkMode ? 'from-black via-purple-950/5 to-black' : 'from-slate-50 via-purple-50 to-slate-50'}`} />
+            <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] ${isDarkMode ? 'bg-purple-600/10' : 'bg-purple-600/5'} rounded-full blur-3xl`} />
 
             <div className="container mx-auto px-4 relative z-10 max-w-7xl">
                 {/* Header */}
                 <div className="text-center mb-12">
-                    <h3 className="text-3xl md:text-6xl font-black mb-4 bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">
+                    <h3 className={`text-3xl md:text-6xl font-black mb-4 bg-gradient-to-r ${isDarkMode ? 'from-purple-400 via-pink-400 to-cyan-400' : 'from-purple-600 via-pink-600 to-cyan-600'} bg-clip-text text-transparent`}>
                         Let's Create Together
                     </h3>
-                    <p className="text-gray-400 text-base md:text-lg max-w-2xl mx-auto">
+                    <p className={`${isDarkMode ? 'text-gray-400' : 'text-slate-500'} text-base md:text-lg max-w-2xl mx-auto`}>
                         Have an exciting project? Let's bring your vision to life
                     </p>
                 </div>
@@ -162,13 +162,13 @@ const ContactSection = () => {
                                     className="group relative block"
                                 >
                                     <div className={`absolute inset-0 bg-gradient-to-r ${item.color} rounded-xl blur-lg opacity-0 group-hover:opacity-20 transition-all duration-300`} />
-                                    <div className="relative flex items-center space-x-4 p-4 rounded-xl bg-black/40 backdrop-blur-xl border border-white/10 hover:border-white/20 transition-all">
-                                        <div className={`w-12 h-12 bg-gradient-to-r ${item.color} rounded-lg flex items-center justify-center flex-shrink-0`}>
+                                    <div className={`relative flex items-center space-x-4 p-4 rounded-xl ${isDarkMode ? 'bg-black/40 border-white/10 hover:border-white/20' : 'bg-white border-slate-200 hover:border-slate-300 shadow-sm shadow-slate-200/50'} backdrop-blur-xl border transition-all`}>
+                                        <div className={`w-12 h-12 bg-gradient-to-r ${item.color} rounded-lg flex items-center justify-center flex-shrink-0 text-white`}>
                                             {item.icon}
                                         </div>
                                         <div className="flex-1 min-w-0">
-                                            <p className="text-gray-400 text-xs mb-0.5">{item.label}</p>
-                                            <p className="font-semibold text-white text-sm truncate">{item.value}</p>
+                                            <p className={`${isDarkMode ? 'text-gray-400' : 'text-slate-500'} text-xs mb-0.5`}>{item.label}</p>
+                                            <p className={`font-semibold ${isDarkMode ? 'text-white' : 'text-slate-900'} text-sm truncate`}>{item.value}</p>
                                         </div>
                                     </div>
                                 </a>
@@ -178,7 +178,7 @@ const ContactSection = () => {
                         {/* Social Links */}
                         {socialLinks.length > 0 && (
                             <div className="pt-4">
-                                <h5 className="text-lg font-bold mb-4 text-white">Connect With Me</h5>
+                                <h5 className={`text-lg font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>Connect With Me</h5>
                                 <div className="flex flex-wrap gap-3">
                                     {socialLinks.map((social, idx) => (
                                         <a
@@ -190,7 +190,7 @@ const ContactSection = () => {
                                             title={social.label}
                                         >
                                             <div className={`absolute inset-0 bg-gradient-to-r ${social.color} rounded-lg blur-md opacity-0 group-hover:opacity-30 transition-all`} />
-                                            <div className={`relative h-12 w-12 bg-gradient-to-r ${social.color} rounded-lg flex items-center justify-center transition-all hover:scale-105`}>
+                                            <div className={`relative h-12 w-12 bg-gradient-to-r ${social.color} rounded-lg flex items-center justify-center transition-all hover:scale-105 text-white`}>
                                                 {social.icon}
                                             </div>
                                         </a>
@@ -202,13 +202,13 @@ const ContactSection = () => {
                         {/* Quick Stats */}
                         <div className="hidden lg:block pt-4">
                             <div className="grid grid-cols-2 gap-3">
-                                <div className="p-4 rounded-xl bg-gradient-to-br from-purple-600/10 to-pink-600/10 border border-purple-500/20 backdrop-blur-xl">
-                                    <div className="text-2xl font-black bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">24/7</div>
-                                    <div className="text-xs text-gray-400">Available</div>
+                                <div className={`p-4 rounded-xl bg-gradient-to-br ${isDarkMode ? 'from-purple-600/10 to-pink-600/10 border-purple-500/20' : 'from-purple-600/5 to-pink-600/5 border-purple-200'} border backdrop-blur-xl`}>
+                                    <div className={`text-2xl font-black bg-gradient-to-r ${isDarkMode ? 'from-purple-400 to-pink-400' : 'from-purple-600 to-pink-600'} bg-clip-text text-transparent`}>24/7</div>
+                                    <div className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>Available</div>
                                 </div>
-                                <div className="p-4 rounded-xl bg-gradient-to-br from-cyan-600/10 to-blue-600/10 border border-cyan-500/20 backdrop-blur-xl">
-                                    <div className="text-2xl font-black bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">2h</div>
-                                    <div className="text-xs text-gray-400">Response</div>
+                                <div className={`p-4 rounded-xl bg-gradient-to-br ${isDarkMode ? 'from-cyan-600/10 to-blue-600/10 border-cyan-500/20' : 'from-cyan-600/5 to-blue-600/5 border-cyan-200'} border backdrop-blur-xl`}>
+                                    <div className={`text-2xl font-black bg-gradient-to-r ${isDarkMode ? 'from-cyan-400 to-blue-400' : 'from-cyan-600 to-blue-600'} bg-clip-text text-transparent`}>2h</div>
+                                    <div className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>Response</div>
                                 </div>
                             </div>
                         </div>
@@ -218,19 +218,19 @@ const ContactSection = () => {
                     <div className="lg:col-span-3">
                         <div className="relative group">
                             <div className="absolute inset-0 bg-gradient-to-r from-purple-600/10 to-cyan-600/10 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-all duration-500" />
-                            <div className="relative p-6 md:p-8 rounded-2xl bg-black/40 backdrop-blur-xl border border-white/10">
+                            <div className={`relative p-6 md:p-8 rounded-2xl ${isDarkMode ? 'bg-black/40 border-white/10' : 'bg-white border-slate-200 shadow-xl shadow-slate-200/50'} backdrop-blur-xl border`}>
                                 {submitted ? (
                                     <div className="flex flex-col items-center justify-center py-12">
                                         <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center mb-4 animate-bounce">
                                             <CheckCircle className="w-8 h-8 text-white" />
                                         </div>
-                                        <h4 className="text-2xl font-bold text-white mb-2">Message Sent!</h4>
-                                        <p className="text-gray-400">I'll get back to you soon.</p>
+                                        <h4 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-slate-900'} mb-2`}>Message Sent!</h4>
+                                        <p className={`${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>I'll get back to you soon.</p>
                                     </div>
                                 ) : (
                                     <div className="space-y-5">
                                         <div>
-                                            <label className="block text-sm font-semibold text-gray-300 mb-2">
+                                            <label className={`block text-sm font-semibold ${isDarkMode ? 'text-gray-300' : 'text-slate-700'} mb-2`}>
                                                 Your Name
                                             </label>
                                             <input
@@ -238,12 +238,12 @@ const ContactSection = () => {
                                                 placeholder="John Doe"
                                                 value={formData.name}
                                                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                                className="w-full px-5 py-3.5 rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 outline-none transition-all text-white placeholder-gray-500"
+                                                className={`w-full px-5 py-3.5 rounded-xl ${isDarkMode ? 'bg-white/5 border-white/10 text-white placeholder-gray-500' : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400'} backdrop-blur-xl border focus:border-purple-500 focus:ring-2 ${isDarkMode ? 'focus:ring-purple-500/20' : 'focus:ring-purple-500/10'} outline-none transition-all`}
                                             />
                                         </div>
 
                                         <div>
-                                            <label className="block text-sm font-semibold text-gray-300 mb-2">
+                                            <label className={`block text-sm font-semibold ${isDarkMode ? 'text-gray-300' : 'text-slate-700'} mb-2`}>
                                                 Your Phone
                                             </label>
                                             <input
@@ -251,12 +251,12 @@ const ContactSection = () => {
                                                 placeholder="+1 (555) 123-4567"
                                                 value={formData.phone}
                                                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                                                className="w-full px-5 py-3.5 rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 outline-none transition-all text-white placeholder-gray-500"
+                                                className={`w-full px-5 py-3.5 rounded-xl ${isDarkMode ? 'bg-white/5 border-white/10 text-white placeholder-gray-500' : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400'} backdrop-blur-xl border focus:border-purple-500 focus:ring-2 ${isDarkMode ? 'focus:ring-purple-500/20' : 'focus:ring-purple-500/10'} outline-none transition-all`}
                                             />
                                         </div>
 
                                         <div>
-                                            <label className="block text-sm font-semibold text-gray-300 mb-2">
+                                            <label className={`block text-sm font-semibold ${isDarkMode ? 'text-gray-300' : 'text-slate-700'} mb-2`}>
                                                 Your Email
                                             </label>
                                             <input
@@ -264,12 +264,12 @@ const ContactSection = () => {
                                                 placeholder="john@example.com"
                                                 value={formData.email}
                                                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                                className="w-full px-5 py-3.5 rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 outline-none transition-all text-white placeholder-gray-500"
+                                                className={`w-full px-5 py-3.5 rounded-xl ${isDarkMode ? 'bg-white/5 border-white/10 text-white placeholder-gray-500' : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400'} backdrop-blur-xl border focus:border-purple-500 focus:ring-2 ${isDarkMode ? 'focus:ring-purple-500/20' : 'focus:ring-purple-500/10'} outline-none transition-all`}
                                             />
                                         </div>
 
                                         <div>
-                                            <label className="block text-sm font-semibold text-gray-300 mb-2">
+                                            <label className={`block text-sm font-semibold ${isDarkMode ? 'text-gray-300' : 'text-slate-700'} mb-2`}>
                                                 Your Message
                                             </label>
                                             <textarea
@@ -277,7 +277,7 @@ const ContactSection = () => {
                                                 value={formData.message}
                                                 onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                                                 rows={5}
-                                                className="w-full px-5 py-3.5 rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 outline-none transition-all resize-none text-white placeholder-gray-500"
+                                                className={`w-full px-5 py-3.5 rounded-xl ${isDarkMode ? 'bg-white/5 border-white/10 text-white placeholder-gray-500' : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400'} backdrop-blur-xl border focus:border-purple-500 focus:ring-2 ${isDarkMode ? 'focus:ring-purple-500/20' : 'focus:ring-purple-500/10'} outline-none transition-all resize-none`}
                                             />
                                         </div>
 
@@ -303,7 +303,7 @@ const ContactSection = () => {
                                             </span>
                                         </button>
 
-                                        <p className="text-xs text-center text-gray-500">
+                                        <p className={`text-xs text-center ${isDarkMode ? 'text-gray-500' : 'text-slate-400'}`}>
                                             By sending a message, you agree to our privacy policy
                                         </p>
                                     </div>

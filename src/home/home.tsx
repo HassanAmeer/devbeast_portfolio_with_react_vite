@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-import { Github, Linkedin, Twitter, Code2, Smartphone, Globe, Star, Award, Users, CheckCircle, Menu, X, ArrowRight, ExternalLink, Instagram, Facebook, Youtube, Music2, Send, DessertIcon, Camera, Link, ArrowBigDownDashIcon } from 'lucide-react';
+import { Github, Linkedin, Twitter, Code2, Smartphone, Globe, Star, Award, Users, CheckCircle, Menu, X, ArrowRight, ExternalLink, Instagram, Facebook, Youtube, Music2, Send, DessertIcon, Camera, Link, ArrowBigDownDashIcon, Sun, Moon } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
 import person1 from '../assets/person1.png';
@@ -11,6 +11,7 @@ import BringSection from './bring';
 import { doc, getDoc, collection, getDocs, query, orderBy, where, serverTimestamp, addDoc } from 'firebase/firestore';
 import { db, heroSectionCollectionId, mainCollection, projectsCollection, projectsCollectionId, reviewsCollection, reviewsCollectionId, socialLinksCollectionId } from '../config/fbconfig';
 import { preloadProjectImages } from '../utils/imageCache';
+import { useTheme } from '../context/ThemeContext';
 
 
 
@@ -87,6 +88,7 @@ const Portfolio = () => {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [loading, setLoading] = useState(false);
     const [loader, setLoader] = useState(false);
+    const { isDarkMode, toggleTheme } = useTheme();
 
 
     const [logoSrc, setLogoSrc] = useState(services1);
@@ -529,18 +531,18 @@ const Portfolio = () => {
 
 
     return (
-        <div className="min-h-screen bg-black text-white overflow-hidden relative">
+        <div className={`min-h-screen transition-colors duration-700 ${isDarkMode ? 'bg-black text-white' : 'bg-slate-50 text-slate-900'} overflow-hidden relative`}>
             {/* Animated Gradient Background */}
             <div className="fixed inset-0 z-0">
-                <div className="absolute inset-0 bg-gradient-to-br from-purple-900/20 via-black to-cyan-900/20" />
+                <div className={`absolute inset-0 bg-gradient-to-br ${isDarkMode ? 'from-purple-900/20 via-black to-cyan-900/20' : 'from-purple-100 via-slate-50 to-cyan-100'}`} />
                 <div
                     className="absolute inset-0 opacity-30"
                     style={{
-                        background: `radial-gradient(circle at ${mousePosition.x}% ${mousePosition.y}%, rgba(139, 92, 246, 0.15) 0%, transparent 50%)`
+                        background: `radial-gradient(circle at ${mousePosition.x}% ${mousePosition.y}%, ${isDarkMode ? 'rgba(139, 92, 246, 0.15)' : 'rgba(139, 92, 246, 0.1)'} 0%, transparent 50%)`
                     }}
                 />
                 {/* Grid Pattern */}
-                <div className="absolute inset-0 bg-[linear-gradient(rgba(139,92,246,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(139,92,246,0.03)_1px,transparent_1px)] bg-[size:100px_100px]" />
+                <div className={`absolute inset-0 ${isDarkMode ? 'bg-[linear-gradient(rgba(139,92,246,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(139,92,246,0.03)_1px,transparent_1px)]' : 'bg-[linear-gradient(rgba(139,92,246,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(139,92,246,0.05)_1px,transparent_1px)]'} bg-[size:100px_100px]`} />
             </div>
 
             {/* Floating Particles */}
@@ -561,7 +563,7 @@ const Portfolio = () => {
 
             <div className="relative z-10">
                 {/* Modern Header */}
-                <header className={`fixed top-0 w-full z-50 transition-all duration-500 ${scrolled ? 'bg-black/60 backdrop-blur-2xl border-b border-white/5 shadow-2xl' : 'bg-transparent'}`}>
+                <header className={`fixed top-0 w-full z-50 transition-all duration-500 ${scrolled ? (isDarkMode ? 'bg-black/60 backdrop-blur-2xl border-b border-white/5 shadow-2xl' : 'bg-white/70 backdrop-blur-2xl border-b border-slate-200 shadow-xl') : 'bg-transparent'}`}>
                     <div className="container mx-auto px-4 py-4">
                         <div className="flex justify-between items-center">
                             <a href="/" className="flex items-center space-x-3 group cursor-pointer">
@@ -577,10 +579,10 @@ const Portfolio = () => {
 
 
                                 <div>
-                                    <h1 className="text-xl font-black bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">
+                                    <h1 className={`text-xl font-black bg-gradient-to-r ${isDarkMode ? 'from-purple-400 via-pink-400 to-cyan-400' : 'from-purple-600 via-pink-600 to-cyan-600'} bg-clip-text text-transparent`}>
                                         {headerData.title}
                                     </h1>
-                                    <p className="text-xs text-gray-400 font-medium">
+                                    <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-slate-500'} font-medium`}>
                                         {headerData.subtitle}
                                     </p>
                                 </div>
@@ -591,33 +593,49 @@ const Portfolio = () => {
                                     <a
                                         key={item}
                                         href={item === 'Projects' ? '/allitems' : `#${item.toLowerCase()}`}
-                                        className="relative group px-5 py-2.5 text-sm font-semibold text-gray-300 hover:text-white transition-all"
+                                        className={`relative group px-5 py-2.5 text-sm font-semibold ${isDarkMode ? 'text-gray-300 hover:text-white' : 'text-slate-600 hover:text-slate-900'} transition-all`}
                                     >
                                         <span className="relative z-10">{item}</span>
-                                        <span className="absolute inset-0 bg-gradient-to-r from-purple-600/0 via-purple-600/10 to-cyan-600/0 rounded-xl opacity-0 group-hover:opacity-100 transition-all duration-300" />
-                                        <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-gradient-to-r from-purple-400 to-cyan-400 group-hover:w-3/4 transition-all duration-300" />
+                                        <span className={`absolute inset-0 bg-gradient-to-r ${isDarkMode ? 'from-purple-600/0 via-purple-600/10 to-cyan-600/0' : 'from-purple-500/0 via-purple-500/5 to-cyan-500/0'} rounded-xl opacity-0 group-hover:opacity-100 transition-all duration-300`} />
+                                        <span className={`absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-gradient-to-r ${isDarkMode ? 'from-purple-400 to-cyan-400' : 'from-purple-600 to-cyan-600'} group-hover:w-3/4 transition-all duration-300`} />
                                     </a>
                                 ))}
+
+                                {/* Theme Toggle Desktop */}
+                                <button
+                                    onClick={toggleTheme}
+                                    className={`ml-4 p-2.5 rounded-xl ${isDarkMode ? 'bg-white/5 border-white/10 text-yellow-400 hover:bg-white/10' : 'bg-slate-100 border-slate-200 text-slate-700 hover:bg-slate-200'} border transition-all duration-300 shadow-lg`}
+                                >
+                                    {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+                                </button>
                             </nav>
 
-                            <button
-                                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                                className="md:hidden p-2 rounded-xl bg-white/5 hover:bg-white/10 transition-all"
-                            >
-                                {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-                            </button>
+                            <div className="flex items-center space-x-2 md:hidden">
+                                <button
+                                    onClick={toggleTheme}
+                                    className={`p-2 rounded-xl border ${isDarkMode ? 'bg-white/5 border-white/10 text-yellow-400' : 'bg-slate-100 border-slate-200 text-slate-700'}`}
+                                >
+                                    {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+                                </button>
+                                <button
+                                    onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                                    className={`p-2 rounded-xl border ${isDarkMode ? 'bg-white/5 border-white/10 hover:bg-white/10' : 'bg-slate-100 border-slate-200 hover:bg-slate-200'} transition-all`}
+                                >
+                                    {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+                                </button>
+                            </div>
                         </div>
                     </div>
 
                     {/* Mobile Menu */}
                     {mobileMenuOpen && (
-                        <div className="md:hidden absolute top-full left-0 w-full bg-black/95 backdrop-blur-2xl border-b border-white/5">
+                        <div className={`md:hidden absolute top-full left-0 w-full ${isDarkMode ? 'bg-black/95' : 'bg-white/95'} backdrop-blur-2xl border-b ${isDarkMode ? 'border-white/5' : 'border-slate-200'}`}>
                             <nav className="container mx-auto px-4 py-6 flex flex-col space-y-2">
                                 {['Home', 'Skills', 'Projects', 'Contact'].map((item) => (
                                     <a
                                         key={item}
                                         href={item === 'Projects' ? '/allitems' : `#${item.toLowerCase()}`}
-                                        className="px-4 py-3 rounded-xl hover:bg-white/5 transition-all font-medium"
+                                        className={`px-4 py-3 rounded-xl ${isDarkMode ? 'hover:bg-white/5 text-gray-300 hover:text-white' : 'hover:bg-slate-100 text-slate-600 hover:text-slate-900'} transition-all font-medium`}
                                     >
                                         {item}
                                     </a>
@@ -631,11 +649,11 @@ const Portfolio = () => {
                 <section id="home" className="relative flex items-center justify-center pt-20">
                     {/* Workspace Background Image */}
                     <div className="absolute inset-0 z-0">
-                        <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-black/60 to-black z-10" />
+                        <div className={`absolute inset-0 bg-gradient-to-b ${isDarkMode ? 'from-black/10 via-black/60 to-black' : 'from-slate-50/10 via-slate-50/60 to-slate-50'} z-10`} />
                         <img
                             src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=1920&q=80"
                             alt="Workspace"
-                            className="w-full h-full object-cover opacity-20"
+                            className={`w-full h-full object-cover ${isDarkMode ? 'opacity-20' : 'opacity-10'}`}
                         />
                     </div>
 
@@ -660,10 +678,10 @@ const Portfolio = () => {
                                 initial={{ y: 50, opacity: 0 }}
                                 animate={{ y: 0, opacity: 1 }}
                                 transition={{ duration: 0.8, delay: 0.4 }}
-                                className="text-xl md:text-2xl text-gray-300 mb-6 max-w-3xl mx-auto leading-relaxed font-light">
+                                className={`text-xl md:text-2xl ${isDarkMode ? 'text-gray-300' : 'text-slate-600'} mb-6 max-w-3xl mx-auto leading-relaxed font-light`}>
                                 {heroData.desc.split('--').map((part, index) =>
                                     index % 2 === 1 ? (
-                                        <span key={index} className="bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent font-bold">
+                                        <span key={index} className={`bg-gradient-to-r ${isDarkMode ? 'from-purple-400 to-cyan-400' : 'from-purple-600 to-cyan-600'} bg-clip-text text-transparent font-bold`}>
                                             {part}
                                         </span>
                                     ) : (
@@ -681,51 +699,51 @@ const Portfolio = () => {
                                 transition={{ duration: 0.8, delay: 0.6 }}
                                 className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
                                 <div className="group relative">
-                                    <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl blur-xl opacity-10 group-hover:opacity-60 transition-all duration-500" />
-                                    <div className="relative p-4 rounded-2xl bg-black/40 backdrop-blur-xl hover:border-white/20 transition-all transform hover:scale-120 hover:-translate-y-1 duration-300">
-                                        <div className="flex justify-center mb-3 bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">
+                                    <div className={`absolute inset-0 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl blur-xl opacity-10 group-hover:opacity-60 transition-all duration-500`} />
+                                    <div className={`relative p-4 rounded-2xl ${isDarkMode ? 'bg-black/40 hover:border-white/20' : 'bg-white hover:border-slate-200 shadow-sm shadow-slate-200/50'} backdrop-blur-xl transition-all transform hover:scale-120 hover:-translate-y-1 duration-300 border ${isDarkMode ? 'border-white/5' : 'border-slate-100'}`}>
+                                        <div className={`flex justify-center mb-3 bg-gradient-to-r ${isDarkMode ? 'from-purple-500 to-pink-500' : 'from-purple-600 to-pink-600'} bg-clip-text text-transparent`}>
                                             <Award className="w-8 h-8" />
                                         </div>
-                                        <div className="text-4xl font-black bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent mb-1">
+                                        <div className={`text-4xl font-black bg-gradient-to-r ${isDarkMode ? 'from-purple-500 to-pink-500' : 'from-purple-600 to-pink-600'} bg-clip-text text-transparent mb-1`}>
                                             {heroData.card_title_1}
                                         </div>
-                                        <div className="text-sm text-gray-400 font-medium">{heroData.card_subtitle_1}</div>
+                                        <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-slate-500'} font-medium`}>{heroData.card_subtitle_1}</div>
                                     </div>
                                 </div>
                                 <div className="group relative">
-                                    <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl blur-xl opacity-10 group-hover:opacity-60 transition-all duration-500" />
-                                    <div className="relative p-4 rounded-2xl bg-black/40 backdrop-blur-xl hover:border-white/20 transition-all transform hover:scale-120 hover:-translate-y-1 duration-300">
-                                        <div className="flex justify-center mb-3 bg-gradient-to-r from-blue-500 to-cyan-500 bg-clip-text text-transparent">
+                                    <div className={`absolute inset-0 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl blur-xl opacity-10 group-hover:opacity-60 transition-all duration-500`} />
+                                    <div className={`relative p-4 rounded-2xl ${isDarkMode ? 'bg-black/40 hover:border-white/20' : 'bg-white hover:border-slate-200 shadow-sm shadow-slate-200/50'} backdrop-blur-xl transition-all transform hover:scale-120 hover:-translate-y-1 duration-300 border ${isDarkMode ? 'border-white/5' : 'border-slate-100'}`}>
+                                        <div className={`flex justify-center mb-3 bg-gradient-to-r ${isDarkMode ? 'from-blue-500 to-cyan-500' : 'from-blue-600 to-cyan-600'} bg-clip-text text-transparent`}>
                                             <CheckCircle className="w-8 h-8" />
                                         </div>
-                                        <div className="text-4xl font-black bg-gradient-to-r from-blue-500 to-cyan-500 bg-clip-text text-transparent mb-1">
+                                        <div className={`text-4xl font-black bg-gradient-to-r ${isDarkMode ? 'from-blue-500 to-cyan-500' : 'from-blue-600 to-cyan-600'} bg-clip-text text-transparent mb-1`}>
                                             {heroData.card_title_2}
                                         </div>
-                                        <div className="text-sm text-gray-400 font-medium">{heroData.card_subtitle_2}</div>
+                                        <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-slate-500'} font-medium`}>{heroData.card_subtitle_2}</div>
                                     </div>
                                 </div>
                                 <div className="group relative">
-                                    <div className="absolute inset-0 bg-gradient-to-r from-green-500 to-emerald-500 rounded-2xl blur-xl opacity-10 group-hover:opacity-60 transition-all duration-500" />
-                                    <div className="relative p-4 rounded-2xl bg-black/40 backdrop-blur-xl hover:border-white/20 transition-all transform hover:scale-120 hover:-translate-y-1 duration-300">
-                                        <div className="flex justify-center mb-3 bg-gradient-to-r from-green-500 to-emerald-500 bg-clip-text text-transparent">
+                                    <div className={`absolute inset-0 bg-gradient-to-r from-green-500 to-emerald-500 rounded-2xl blur-xl opacity-10 group-hover:opacity-60 transition-all duration-500`} />
+                                    <div className={`relative p-4 rounded-2xl ${isDarkMode ? 'bg-black/40 hover:border-white/20' : 'bg-white hover:border-slate-200 shadow-sm shadow-slate-200/50'} backdrop-blur-xl transition-all transform hover:scale-120 hover:-translate-y-1 duration-300 border ${isDarkMode ? 'border-white/5' : 'border-slate-100'}`}>
+                                        <div className={`flex justify-center mb-3 bg-gradient-to-r ${isDarkMode ? 'from-green-500 to-emerald-500' : 'from-green-600 to-emerald-600'} bg-clip-text text-transparent`}>
                                             <Users className="w-8 h-8" />
                                         </div>
-                                        <div className="text-4xl font-black bg-gradient-to-r from-green-500 to-emerald-500 bg-clip-text text-transparent mb-1">
+                                        <div className={`text-4xl font-black bg-gradient-to-r ${isDarkMode ? 'from-green-500 to-emerald-500' : 'from-green-600 to-emerald-600'} bg-clip-text text-transparent mb-1`}>
                                             {heroData.card_title_3}
                                         </div>
-                                        <div className="text-sm text-gray-400 font-medium">{heroData.card_subtitle_3}</div>
+                                        <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-slate-500'} font-medium`}>{heroData.card_subtitle_3}</div>
                                     </div>
                                 </div>
                                 <div className="group relative">
-                                    <div className="absolute inset-0 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-2xl blur-xl opacity-10 group-hover:opacity-60 transition-all duration-500" />
-                                    <div className="relative p-4 rounded-2xl bg-black/40 backdrop-blur-xl hover:border-white/20 transition-all transform hover:scale-120 hover:-translate-y-1 duration-300">
-                                        <div className="flex justify-center mb-3 bg-gradient-to-r from-yellow-500 to-orange-500 bg-clip-text text-transparent">
+                                    <div className={`absolute inset-0 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-2xl blur-xl opacity-10 group-hover:opacity-60 transition-all duration-500`} />
+                                    <div className={`relative p-4 rounded-2xl ${isDarkMode ? 'bg-black/40 hover:border-white/20' : 'bg-white hover:border-slate-200 shadow-sm shadow-slate-200/50'} backdrop-blur-xl transition-all transform hover:scale-120 hover:-translate-y-1 duration-300 border ${isDarkMode ? 'border-white/5' : 'border-slate-100'}`}>
+                                        <div className={`flex justify-center mb-3 bg-gradient-to-r ${isDarkMode ? 'from-yellow-500 to-orange-500' : 'from-yellow-600 to-orange-600'} bg-clip-text text-transparent`}>
                                             <Star className="w-8 h-8" />
                                         </div>
-                                        <div className="text-4xl font-black bg-gradient-to-r from-yellow-500 to-orange-500 bg-clip-text text-transparent mb-1">
+                                        <div className={`text-4xl font-black bg-gradient-to-r ${isDarkMode ? 'from-yellow-500 to-orange-500' : 'from-yellow-600 to-orange-600'} bg-clip-text text-transparent mb-1`}>
                                             {heroData.card_title_4}
                                         </div>
-                                        <div className="text-sm text-gray-400 font-medium">{heroData.card_subtitle_4}</div>
+                                        <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-slate-500'} font-medium`}>{heroData.card_subtitle_4}</div>
                                     </div>
                                 </div>
                             </motion.div>
@@ -736,9 +754,9 @@ const Portfolio = () => {
                                 className="flex flex-wrap justify-center gap-4 pt-8">
                                 {heroData.btn_link_1 ? <a
                                     href={heroData.btn_link_1}
-                                    className="group relative px-8 py-4 rounded-2xl font-bold overflow-hidden">
-                                    <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-cyan-600 transition-all duration-300" />
-                                    <div className="absolute inset-0 bg-gradient-to-r from-cyan-600 to-purple-600 opacity-0 group-hover:opacity-100 transition-all duration-300" />
+                                    className="group relative px-8 py-4 rounded-2xl font-bold overflow-hidden shadow-lg hover:shadow-purple-500/25 transition-all">
+                                    <div className={`absolute inset-0 bg-gradient-to-r ${isDarkMode ? 'from-purple-600 to-cyan-600' : 'from-purple-700 to-cyan-700'} transition-all duration-300`} />
+                                    <div className={`absolute inset-0 bg-gradient-to-r ${isDarkMode ? 'from-cyan-600 to-purple-600' : 'from-cyan-700 to-purple-700'} opacity-0 group-hover:opacity-100 transition-all duration-300`} />
                                     <span className="relative flex items-center space-x-2 text-white">
                                         <span>{heroData.btn_name_1}</span>
                                         <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
@@ -749,8 +767,8 @@ const Portfolio = () => {
                                     <a
                                         href={heroData.btn_link_2}
                                         target="_blank"
-                                        className="group relative px-8 py-4 rounded-2xl font-bold border-2 border-purple-500/30 hover:border-purple-500 backdrop-blur-xl bg-white/5 hover:bg-white/10 transition-all">
-                                        <span className="flex items-center space-x-2">
+                                        className={`group relative px-8 py-4 rounded-2xl font-bold border-2 ${isDarkMode ? 'border-purple-500/30 hover:border-purple-500 bg-white/5 hover:bg-white/10' : 'border-purple-200 hover:border-purple-400 bg-white hover:bg-slate-50 shadow-sm shadow-slate-200/50'} backdrop-blur-xl transition-all`}>
+                                        <span className={`flex items-center space-x-2 ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
                                             <Link className="w-5 h-5 group-hover:translate-y-1 transition-transform" />
                                             <span>{heroData.btn_name_2}</span>
                                         </span>
@@ -777,25 +795,25 @@ const Portfolio = () => {
                     viewport={{ once: true }}
                     className="py-8 relative inline-flex " >
                     {/* <div className="absolute inset-0 bg-gradient-to-r from-black via-purple-950/20 to-black" /> */}
-                    <div className="hidden md:inline-flex mb-2 items-center space-x-2 px-6 py-3 rounded-half backdrop-blur-xl">
-                        <ArrowRight className="w-5 h-5 text-purple-400 animate-pulse" />
-                        <span className="text-sm font-bold bg-gradient-to-r from-purple-300 to-cyan-300 bg-clip-text text-transparent">
+                    <div className={`hidden md:inline-flex mb-2 items-center space-x-2 px-6 py-3 rounded-half backdrop-blur-xl ${isDarkMode ? '' : 'bg-white shadow-sm shadow-slate-200/50'}`}>
+                        <ArrowRight className={`w-5 h-5 ${isDarkMode ? 'text-purple-400' : 'text-purple-600'} animate-pulse`} />
+                        <span className={`text-sm font-bold bg-gradient-to-r ${isDarkMode ? 'from-purple-300 to-cyan-300' : 'from-purple-600 to-cyan-600'} bg-clip-text text-transparent`}>
                             Services
                         </span>
                     </div>
                     <div className="relative overflow-hidden">
-                        <div className="animate-marquee-slow whitespace-nowrap items-center space-x-2 overflow-x-scroll">
+                        <div className="animate-marquee-slow whitespace-nowrap items-center space-x-2 overflow-x-scroll custom-scrollbar pb-4">
                             {[...platforms, ...platforms, ...platforms].map((platform, idx) => (
                                 <div key={idx} className="inline-flex mx-4">
                                     <div className="group relative">
                                         <div className={`absolute inset-0 bg-gradient-to-r ${platform.color} rounded-2xl blur-xl opacity-0 group-hover:opacity-50 transition-all duration-500`} />
-                                        <div className="relative flex items-center space-x-4 px-2 md:px-6 py-2 bg-black/40 backdrop-blur-xl rounded-2xl transition-all hover:scale-110 transform duration-300">
+                                        <div className={`relative flex items-center space-x-4 px-2 md:px-6 py-2 ${isDarkMode ? 'bg-black/40 hover:border-white/10' : 'bg-white hover:border-slate-200 shadow-sm shadow-slate-200/50'} backdrop-blur-xl rounded-2xl transition-all hover:scale-110 transform duration-300 border ${isDarkMode ? 'border-white/5' : 'border-slate-100'}`}>
                                             <img
                                                 src={platform.logo}
                                                 alt={platform.name}
                                                 className="w-10 h-10 object-contain opacity-80 group-hover:opacity-100 transition-all"
                                             />
-                                            <span className="text-lg font-bold text-white">{platform.name}</span>
+                                            <span className={`text-lg font-bold ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>{platform.name}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -804,7 +822,7 @@ const Portfolio = () => {
                     </div>
 
                 </motion.section>
-                <hr style={{ border: 0, height: 1 }} className="bg-gray-700" />
+                <hr style={{ border: 0, height: 1 }} className={isDarkMode ? 'bg-gray-800' : 'bg-slate-200'} />
 
                 {/* Services Showcase Section */}
                 <motion.section
@@ -815,10 +833,10 @@ const Portfolio = () => {
                     className="py-8 relative">
                     <div className="container mx-auto px-4">
                         <div className="text-center mb-16">
-                            <h3 className="text-3xl md:text-6xl font-black mb-6 bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">
+                            <h3 className={`text-3xl md:text-6xl font-black mb-6 bg-gradient-to-r ${isDarkMode ? 'from-purple-400 via-pink-400 to-cyan-400' : 'from-purple-600 via-pink-600 to-cyan-600'} bg-clip-text text-transparent`}>
                                 Our Services
                             </h3>
-                            <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+                            <p className={`${isDarkMode ? 'text-gray-400' : 'text-slate-500'} text-lg max-w-2xl mx-auto`}>
                                 Perfect solutions for mobile and web development that bring your ideas to life with stunning animations and seamless experiences.
                             </p>
                         </div>
@@ -827,8 +845,8 @@ const Portfolio = () => {
                     </div>
                 </motion.section>
 
-                <BringSection />
-                <hr style={{ border: 0, height: 1 }} className="bg-gray-700 mt-0" />
+                <BringSection isDarkMode={isDarkMode} />
+                <hr style={{ border: 0, height: 1 }} className={`${isDarkMode ? 'bg-gray-800' : 'bg-slate-200'} mt-0`} />
 
                 {/* Projects with Real Images */}
                 <motion.section
@@ -838,7 +856,7 @@ const Portfolio = () => {
                     transition={{ duration: 0.8 }}
                     viewport={{ once: true }}
                     className="py-24 relative">
-                    <div className="absolute inset-0 bg-gradient-to-b from-black via-purple-950/10 to-black" />
+                    <div className={`absolute inset-0 bg-gradient-to-b ${isDarkMode ? 'from-black via-purple-950/10 to-black' : 'from-slate-50 via-purple-100/10 to-slate-50'}`} />
                     <div className="container mx-auto px-2 relative z-10">
                         <div className="text-center mb-12">
                             {/* <div className="inline-block px-4 py-2 bg-gradient-to-r from-purple-600/20 to-cyan-600/20 rounded-full text-sm font-bold text-purple-300 border border-purple-500/30 mb-6">
@@ -849,7 +867,7 @@ const Portfolio = () => {
                                 whileInView={{ y: 0, opacity: 1 }}
                                 transition={{ duration: 0.6 }}
                                 viewport={{ once: true }}
-                                className="text-3xl md:text-6xl font-black mb-6 bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">
+                                className={`text-3xl md:text-6xl font-black mb-6 bg-gradient-to-r ${isDarkMode ? 'from-purple-400 via-pink-400 to-cyan-400' : 'from-purple-600 via-pink-600 to-cyan-600'} bg-clip-text text-transparent`}>
                                 Featured Projects
                             </motion.h3>
                             {/* <p className="text-gray-400 text-lg max-w-2xl mx-auto mb-12">
@@ -872,9 +890,9 @@ const Portfolio = () => {
                                     key={tab.id}
                                     onClick={() => setActiveTab(tab.id)}
                                     className={`group relative px-4 py-4 rounded-2xl font-bold transition-all transform hover:scale-105 flex items-center space-x-2 ${activeTab === tab.id
-                                        ? 'bg-gradient-to-r from-purple-600 to-cyan-600 shadow-2xl shadow-purple-500/50'
-                                        : 'bg-black/40 border border-white/10 hover:border-white/30 backdrop-blur-xl'
-                                        }`}
+                                        ? 'bg-gradient-to-r from-purple-600 to-cyan-600 shadow-2xl shadow-purple-500/50 text-white'
+                                        : (isDarkMode ? 'bg-black/40 border-white/10 hover:border-white/30 text-gray-400 hover:text-white' : 'bg-white border-slate-200 hover:border-slate-300 text-slate-500 hover:text-slate-900 shadow-sm shadow-slate-200/50')
+                                        } backdrop-blur-xl border`}
                                 >
                                     {tab.icon}
                                     <span>{tab.label}</span>
@@ -882,7 +900,7 @@ const Portfolio = () => {
                             ))}
                             <button
                                 onClick={() => navigate('/allitems')} // passing full data
-                                className="flex items-center space-x-2 text-purple-400 hover:text-cyan-400 transition-all group/btn">
+                                className={`flex items-center space-x-2 ${isDarkMode ? 'text-purple-400' : 'text-purple-600'} hover:text-cyan-400 transition-all group/btn`}>
                                 <span className="text-sm font-bold">View All</span>
                                 <ExternalLink className="w-4 h-4 group-hover/btn:translate-x-1 group-hover/btn:-translate-y-1 transition-transform" />
                             </button>
@@ -890,7 +908,7 @@ const Portfolio = () => {
 
                         {loading ? (
                             <center className='md:pt-20 pt-20'>
-                                <div className="w-6 h-6 lg:w-8 lg:h-8 border-4 border-purple-200 border-t-transparent rounded-full animate-spin" />
+                                <div className={`w-6 h-6 lg:w-8 lg:h-8 border-4 ${isDarkMode ? 'border-purple-200' : 'border-purple-600'} border-t-transparent rounded-full animate-spin`} />
                             </center>
                         ) : (
                             <></>
@@ -909,7 +927,7 @@ const Portfolio = () => {
                                 >
                                     <div className={`absolute inset-0 bg-gradient-to-r ${project.isWeb ? 'from-cyan-500 to-blue-500' : 'from-purple-500 to-pink-500'} opacity-0 group-hover:opacity-20 transition-all duration-500 blur-xl`} />
 
-                                    <div className="relative bg-black/40 backdrop-blur-xl border border-white/20 hover:border-white/30 transition-all rounded-3xl overflow-hidden">
+                                    <div className={`relative ${isDarkMode ? 'bg-black/40 border-white/20 hover:border-white/30' : 'bg-white border-slate-200 hover:border-slate-300 shadow-xl shadow-slate-200/50'} backdrop-blur-xl border transition-all rounded-3xl overflow-hidden`}>
                                         {project.projectLink && (
                                             <div className="absolute top-4 right-4 z-20">
                                                 <div className="flex items-center space-x-2 px-2 py-1 bg-purple-500/90 opacity-70 backdrop-blur-xl rounded-full text-xs font-bold shadow-lg">
@@ -920,7 +938,7 @@ const Portfolio = () => {
                                         )}
 
                                         <div className="relative h-60 overflow-hidden">
-                                            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent z-10" />
+                                            <div className={`absolute inset-0 bg-gradient-to-t ${isDarkMode ? 'from-black via-black/50 to-transparent' : 'from-slate-900/40 via-transparent to-transparent'} z-10`} />
                                             <img
                                                 src={project.projectImages[0] || 'https://via.placeholder.com/400x300'}
                                                 alt={project.title}
@@ -929,10 +947,10 @@ const Portfolio = () => {
                                         </div>
 
                                         <div className="p-2">
-                                            <h4 className="text-xl font-bold mb-3 text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-cyan-400 transition-all">
+                                            <h4 className={`text-xl font-bold mb-3 ${isDarkMode ? 'text-white' : 'text-slate-900'} group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r ${isDarkMode ? 'group-hover:from-purple-400 group-hover:to-cyan-400' : 'group-hover:from-purple-600 group-hover:to-cyan-600'} transition-all`}>
                                                 {project.title}
                                             </h4>
-                                            <p className="text-sm text-gray-400 mb-4 line-clamp-2 leading-relaxed">
+                                            <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-slate-500'} mb-4 line-clamp-2 leading-relaxed`}>
                                                 {project.desc}
                                             </p>
 
@@ -940,7 +958,7 @@ const Portfolio = () => {
                                                 {project.tags.map((tag, tagIdx) => (
                                                     <span
                                                         key={tagIdx}
-                                                        className="px-2 py-1 bg-white/5 border border-white/10 rounded-full text-xs font-medium hover:bg-white/10 hover:border-white/20 transition-all cursor-pointer"
+                                                        className={`px-2 py-1 ${isDarkMode ? 'bg-white/5 border-white/10 text-gray-400' : 'bg-slate-50 border-slate-200 text-slate-600'} border rounded-full text-xs font-medium hover:bg-white/10 hover:border-white/20 transition-all cursor-pointer`}
                                                     >
                                                         {tag}
                                                     </span>
@@ -965,11 +983,11 @@ const Portfolio = () => {
                         onClick={() => navigate('/allitems')} // passing full data
                         className="flex items-center md:mb-20 mb-10 space-x-2 text-purple-400 hover:text-cyan-400 transition-all group/btn">
                         <ArrowBigDownDashIcon className="w-4 h-4 group-hover/btn:translate-x-1 group-hover/btn:-translate-y-1 transition-transform animate-bounce" />
-                        <span className="text-lg font-bold">View More</span>
+                        <span className={`text-lg font-bold ${isDarkMode ? 'text-purple-400' : 'text-purple-600'} group-hover:text-cyan-400 transition-colors`}>View More</span>
                     </button>
                 </center>
 
-                <hr style={{ border: 0, height: 1 }} className="bg-gray-700" />
+                <hr style={{ border: 0, height: 1 }} className={isDarkMode ? 'bg-gray-800' : 'bg-slate-200'} />
 
                 {/* Testimonials */}
                 <motion.section
@@ -988,14 +1006,14 @@ const Portfolio = () => {
                                 whileInView={{ x: 0, opacity: 1 }}
                                 transition={{ duration: 0.6 }}
                                 viewport={{ once: true }}
-                                className="text-2xl md:text-6xl font-black bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">
+                                className={`text-2xl md:text-6xl font-black bg-gradient-to-r ${isDarkMode ? 'from-purple-400 via-pink-400 to-cyan-400' : 'from-purple-600 via-pink-600 to-cyan-600'} bg-clip-text text-transparent`}>
                                 Client Success Stories
                             </motion.h3>
                             <button
                                 onClick={() => setShowReviewModal(true)}
-                                className="group relative px-6 py-3 rounded-2xl font-bold border border-white/40 hover:border-white/70 transition-all transform hover:scale-105 shadow-lg shadow-white/10"
+                                className={`group relative px-6 py-3 rounded-2xl font-bold border ${isDarkMode ? 'border-white/40 hover:border-white/70 shadow-white/10' : 'border-slate-200 hover:border-slate-400 shadow-slate-200/50'} transition-all transform hover:scale-105 shadow-lg shadow-white/10`}
                             >
-                                <span className="flex items-center space-x-2 text-white">
+                                <span className={`flex items-center space-x-2 ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
                                     <span>Add Review</span>
                                     <Star className="w-5 h-5 group-hover:fill-yellow-400 group-hover:text-yellow-400 transition-all" />
                                 </span>
@@ -1008,20 +1026,20 @@ const Portfolio = () => {
                         whileInView={{ opacity: 1 }}
                         transition={{ duration: 0.8, delay: 0.2 }}
                         viewport={{ once: true }}
-                        className="gap-4 flex flex-row items-center overflow-x-auto">
+                        className="gap-4 flex flex-row items-center overflow-x-auto custom-scrollbar pb-6">
                         {reviews.map((r, idx) => (
                             <div
                                 key={idx}
                                 className="group relative flex-shrink-0 w-[280px] md:w-1/3 lg:w-1/3"
                             >
                                 <div className="absolute inset-0 bg-gradient-to-r from-purple-600/20 to-cyan-600/20 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-all duration-500" />
-                                <div className="relative p-8 rounded-3xl bg-black/40 backdrop-blur-xl border border-white/10 hover:border-white/30 transition-all transform scale-90 hover:scale-95 hover:-translate-y-2 duration-500">
+                                <div className={`relative p-8 rounded-3xl ${isDarkMode ? 'bg-black/40 border-white/10 hover:border-white/30' : 'bg-white border-slate-200 hover:border-slate-300 shadow-xl shadow-slate-200/50'} backdrop-blur-xl border transition-all transform scale-90 hover:scale-95 hover:-translate-y-2 duration-500`}>
                                     <div className="flex mb-4">
                                         {[...Array(r.rating)].map((_, i) => (
                                             <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />
                                         ))}
                                     </div>
-                                    <p className="text-gray-300 mb-6 italic leading-relaxed text-sm">
+                                    <p className={`${isDarkMode ? 'text-gray-300' : 'text-slate-600'} mb-6 italic leading-relaxed text-sm`}>
                                         "{r.text}"
                                     </p>
                                     <div className="flex items-center space-x-4">
@@ -1031,8 +1049,8 @@ const Portfolio = () => {
                                             className="w-14 h-14 rounded-full object-cover border-2 border-purple-500/50"
                                         />
                                         <div>
-                                            <div className="font-bold text-white">{r.name}</div>
-                                            <div className="text-sm text-gray-400">{r.role}</div>
+                                            <div className={`font-bold ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>{r.name}</div>
+                                            <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>{r.role}</div>
                                         </div>
                                     </div>
                                 </div>
@@ -1045,10 +1063,10 @@ const Portfolio = () => {
                 {
                     showReviewModal && (
                         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                            <div className="bg-black/90 backdrop-blur-xl rounded-3xl border border-white/20 max-w-md w-full max-h-[90vh] overflow-y-auto">
+                            <div className={`${isDarkMode ? 'bg-black/90' : 'bg-white'} backdrop-blur-xl rounded-3xl border ${isDarkMode ? 'border-white/20' : 'border-slate-200 shadow-2xl'} max-w-md w-full max-h-[90vh] overflow-y-auto`}>
                                 <div className="p-6">
                                     <div className="flex justify-between items-center mb-6">
-                                        <h3 className="text-2xl font-black bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent">
+                                        <h3 className={`text-2xl font-black bg-gradient-to-r ${isDarkMode ? 'from-purple-400 to-cyan-400' : 'from-purple-600 to-cyan-600'} bg-clip-text text-transparent`}>
                                             Add Your Review
                                         </h3>
                                         <button
@@ -1080,30 +1098,30 @@ const Portfolio = () => {
                                         }
                                     }} className="space-y-4">
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-300 mb-2">Name *</label>
+                                            <label className={`block text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-slate-600'} mb-2`}>Name *</label>
                                             <input
                                                 type="text"
                                                 value={reviewForm.name}
                                                 onChange={(e) => setReviewForm({ ...reviewForm, name: e.target.value })}
-                                                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400 focus:border-purple-500 focus:outline-none transition-all"
+                                                className={`w-full px-4 py-3 ${isDarkMode ? 'bg-white/5 border-white/10 text-white placeholder-gray-400' : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400'} rounded-xl focus:border-purple-500 focus:outline-none transition-all`}
                                                 placeholder="Your name"
                                                 required
                                             />
                                         </div>
 
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-300 mb-2">Project Name</label>
+                                            <label className={`block text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-slate-600'} mb-2`}>Project Name</label>
                                             <input
                                                 type="text"
                                                 value={reviewForm.role}
                                                 onChange={(e) => setReviewForm({ ...reviewForm, role: e.target.value })}
-                                                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400 focus:border-purple-500 focus:outline-none transition-all"
+                                                className={`w-full px-4 py-3 ${isDarkMode ? 'bg-white/5 border-white/10 text-white placeholder-gray-400' : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400'} rounded-xl focus:border-purple-500 focus:outline-none transition-all`}
                                                 placeholder="e.g. Ecommerce, chating App"
                                             />
                                         </div>
 
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-300 mb-2">Avatar Image</label>
+                                            <label className={`block text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-slate-600'} mb-2`}>Avatar Image</label>
                                             <input
                                                 type="file"
                                                 accept="image/*"
@@ -1120,7 +1138,7 @@ const Portfolio = () => {
                                                         reader.readAsDataURL(file);
                                                     }
                                                 }}
-                                                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400 focus:border-purple-500 focus:outline-none transition-all file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-purple-600 file:text-white hover:file:bg-purple-700"
+                                                className={`w-full px-4 py-3 ${isDarkMode ? 'bg-white/5 border-white/10 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'} rounded-xl focus:border-purple-500 focus:outline-none transition-all file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-purple-600 file:text-white hover:file:bg-purple-700`}
                                             />
                                             {reviewForm.avatar && reviewForm.avatar.startsWith('data:image/') && (
                                                 <div className="mt-4">
@@ -1134,7 +1152,7 @@ const Portfolio = () => {
                                         </div>
 
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-300 mb-2">Rating</label>
+                                            <label className={`block text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-slate-600'} mb-2`}>Rating</label>
                                             <div className="flex space-x-1">
                                                 {[1, 2, 3, 4, 5].map((star) => (
                                                     <button
@@ -1152,11 +1170,11 @@ const Portfolio = () => {
                                         </div>
 
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-300 mb-2">Review *</label>
+                                            <label className={`block text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-slate-600'} mb-2`}>Review *</label>
                                             <textarea
                                                 value={reviewForm.text}
                                                 onChange={(e) => setReviewForm({ ...reviewForm, text: e.target.value })}
-                                                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400 focus:border-purple-500 focus:outline-none transition-all resize-none"
+                                                className={`w-full px-4 py-3 ${isDarkMode ? 'bg-white/5 border-white/10 text-white placeholder-gray-400' : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400'} rounded-xl focus:border-purple-500 focus:outline-none transition-all resize-none`}
                                                 rows={4}
                                                 placeholder="Share your experience..."
                                                 required
@@ -1167,7 +1185,7 @@ const Portfolio = () => {
                                             <button
                                                 type="button"
                                                 onClick={() => setShowReviewModal(false)}
-                                                className="flex-1 px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-gray-300 hover:bg-white/10 transition-all"
+                                                className={`flex-1 px-4 py-3 ${isDarkMode ? 'bg-white/5 border-white/10 text-gray-300 hover:bg-white/10' : 'bg-slate-100 border-slate-200 text-slate-600 hover:bg-slate-200'} rounded-xl transition-all`}
                                             >
                                                 Cancel
                                             </button>
@@ -1191,7 +1209,7 @@ const Portfolio = () => {
                 }
 
                 {/* Contact Section */}
-                <ContactSection></ContactSection>
+                <ContactSection isDarkMode={isDarkMode}></ContactSection>
 
 
                 {/* Modern Footer */}
@@ -1200,7 +1218,7 @@ const Portfolio = () => {
                     whileInView={{ opacity: 1 }}
                     transition={{ duration: 0.8 }}
                     viewport={{ once: true }}
-                    className="border-t border-white/5 bg-black/60 backdrop-blur-xl py-12">
+                    className={`border-t ${isDarkMode ? 'border-white/5 bg-black/60' : 'border-slate-200 bg-white/60'} backdrop-blur-xl py-12`}>
                     <div className="container mx-auto px-4">
                         <div className="grid md:grid-cols-4 gap-8 mb-4">
                             <div className="md:col-span-2">
@@ -1212,11 +1230,11 @@ const Portfolio = () => {
                                             <img src={headerData.logo} alt="" />
                                         </div>
                                     </div>
-                                    <span className="text-2xl font-black bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent">
+                                    <span className={`text-2xl font-black bg-gradient-to-r ${isDarkMode ? 'from-purple-400 to-cyan-400' : 'from-purple-600 to-cyan-600'} bg-clip-text text-transparent`}>
                                         {headerData.title}
                                     </span>
                                 </div>
-                                <p className="text-gray-400 mb-6 max-w-md leading-relaxed">
+                                <p className={`${isDarkMode ? 'text-gray-400' : 'text-slate-500'} mb-6 max-w-md leading-relaxed`}>
                                     Senior Full-Stack Developer crafting exceptional digital experiences with cutting-edge technologies. Let's build something amazing together.
                                 </p>
                                 <div className="flex space-x-4 flex-wrap">
@@ -1241,7 +1259,7 @@ const Portfolio = () => {
                                                 href={link.url}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                className="mb-2 md:mb-0 group relative w-10 h-10 bg-white/5 hover:bg-white/10 rounded-xl flex items-center justify-center transition-all transform hover:scale-110 border border-white/10 hover:border-white/20"
+                                                className={`mb-2 md:mb-0 group relative w-10 h-10 ${isDarkMode ? 'bg-white/5 border-white/10 hover:bg-white/10' : 'bg-slate-50 border-slate-200 hover:bg-slate-100 shadow-sm shadow-slate-200/50'} rounded-xl flex items-center justify-center transition-all transform hover:scale-110 border`}
                                             >
                                                 <Icon className="w-5 h-5" />
                                             </a>
@@ -1251,11 +1269,11 @@ const Portfolio = () => {
                             </div>
 
                             <div>
-                                <h5 className="font-bold mb-4 text-lg text-white">Quick Links</h5>
+                                <h5 className={`font-bold mb-4 text-lg ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>Quick Links</h5>
                                 <ul className="space-y-2">
                                     {['Home', 'Skills', 'Projects', 'Contact'].map((item) => (
                                         <li key={item}>
-                                            <a href={item === 'Projects' ? '/allitems' : `#${item.toLowerCase()}`} className="text-gray-400 hover:text-purple-400 transition-all">
+                                            <a href={item === 'Projects' ? '/allitems' : `#${item.toLowerCase()}`} className={`${isDarkMode ? 'text-gray-400 hover:text-purple-400' : 'text-slate-500 hover:text-purple-600'} transition-all`}>
                                                 {item}
                                             </a>
                                         </li>
@@ -1264,8 +1282,8 @@ const Portfolio = () => {
                             </div>
 
                             <div>
-                                <h5 className="font-bold mb-4 text-lg text-white">Services</h5>
-                                <ul className="space-y-2 text-gray-400">
+                                <h5 className={`font-bold mb-4 text-lg ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>Services</h5>
+                                <ul className={`space-y-2 ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>
                                     <li>Mobile App Development</li>
                                     <li>Web Development</li>
                                     <li>UI/UX Design</li>
@@ -1275,12 +1293,12 @@ const Portfolio = () => {
                             </div>
                         </div>
 
-                        <div className="border-t border-white/5 pt-8">
+                        <div className={`border-t ${isDarkMode ? 'border-white/5' : 'border-slate-200'} pt-8`}>
                             <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-                                <p className="text-gray-400 text-sm">
+                                <p className={`${isDarkMode ? 'text-gray-400' : 'text-slate-500'} text-sm`}>
                                     © 2026 {headerData.title}. All rights reserved.
                                 </p>
-                                <div className="flex items-center space-x-6 text-sm text-gray-400">
+                                <div className={`flex items-center space-x-6 text-sm ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>
                                     <a href="#" className="hover:text-purple-400 transition-all">Privacy Policy</a>
                                     <a href="#" className="hover:text-purple-400 transition-all">Terms of Service</a>
                                 </div>
@@ -1328,6 +1346,28 @@ const Portfolio = () => {
          .animate-services {
            animation: fade-in 1s ease-out;
          }
+         .custom-scrollbar::-webkit-scrollbar {
+            height: 6px;
+          }
+          .custom-scrollbar::-webkit-scrollbar-track {
+            background: ${isDarkMode ? 'rgba(255, 255, 255, 0.02)' : 'rgba(0, 0, 0, 0.05)'};
+            border-radius: 10px;
+          }
+          .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: ${isDarkMode ? 'rgba(139, 92, 246, 0.3)' : 'rgba(139, 92, 246, 0.5)'};
+            border-radius: 10px;
+            border: 1px solid transparent;
+            background-clip: content-box;
+          }
+          .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: ${isDarkMode ? 'rgba(139, 92, 246, 0.5)' : 'rgba(139, 92, 246, 0.7)'};
+            background-clip: content-box;
+          }
+          /* Firefox */
+          .custom-scrollbar {
+            scrollbar-width: thin;
+            scrollbar-color: ${isDarkMode ? 'rgba(139, 92, 246, 0.3)' : 'rgba(139, 92, 246, 0.5)'} transparent;
+          }
       `}</style>
         </div>
     );

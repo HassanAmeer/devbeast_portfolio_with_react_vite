@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
-import { Github, Linkedin, Twitter, Globe, Star, Menu, X, ArrowRight, ExternalLink, Instagram, Facebook, Youtube, Music2, ChevronDown, Sparkles, Zap, Code2, Smartphone, Database, Brain, Cloud, Layers } from 'lucide-react';
+import { Github, Linkedin, Twitter, Globe, Star, Menu, X, ArrowRight, ExternalLink, Instagram, Facebook, Youtube, Music2, ChevronDown, Sparkles, Zap, Code2, Smartphone, Database, Brain, Cloud, Layers, Sun, Moon } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { doc, getDoc, collection, getDocs, query, orderBy, where } from 'firebase/firestore';
 import { db, heroSectionCollectionId, mainCollection, projectsCollection, projectsCollectionId, reviewsCollection, reviewsCollectionId, socialLinksCollectionId } from '../config/fbconfig';
 import { preloadProjectImages } from '../utils/imageCache';
 import ContactSection from './contact';
+import { useTheme } from '../context/ThemeContext';
 
 interface Project {
     id: string;
@@ -62,6 +63,7 @@ const HomeTemplate2 = () => {
     const [loading, setLoading] = useState(false);
     const [currentReviewIndex, setCurrentReviewIndex] = useState(0);
     const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+    const { isDarkMode, toggleTheme } = useTheme();
 
     const [heroData, setHeroData] = useState({
         title: 'Creative Developer',
@@ -259,17 +261,18 @@ const HomeTemplate2 = () => {
     };
 
     return (
-        <div ref={containerRef} className="min-h-screen bg-[#0a0a0f] text-white overflow-hidden">
+        <div ref={containerRef} className={`min-h-screen transition-colors duration-700 ${isDarkMode ? 'bg-[#0a0a0f] text-white' : 'bg-[#f8fafc] text-slate-900'} overflow-hidden`}>
             {/* Animated Background Effects */}
             <div className="fixed inset-0 pointer-events-none">
                 {/* Gradient Mesh */}
                 <div
-                    className="absolute inset-0 opacity-40"
+                    className="absolute inset-0 transition-opacity duration-700"
                     style={{
+                        opacity: isDarkMode ? 0.4 : 0.2,
                         background: `
-                            radial-gradient(ellipse at ${mousePosition.x}% ${mousePosition.y}%, rgba(120, 80, 255, 0.15) 0%, transparent 50%),
-                            radial-gradient(ellipse at ${100 - mousePosition.x}% ${100 - mousePosition.y}%, rgba(0, 200, 255, 0.1) 0%, transparent 50%),
-                            radial-gradient(ellipse at 50% 50%, rgba(255, 100, 200, 0.05) 0%, transparent 70%)
+                            radial-gradient(ellipse at ${mousePosition.x}% ${mousePosition.y}%, ${isDarkMode ? 'rgba(120, 80, 255, 0.15)' : 'rgba(120, 80, 255, 0.1)'} 0%, transparent 50%),
+                            radial-gradient(ellipse at ${100 - mousePosition.x}% ${100 - mousePosition.y}%, ${isDarkMode ? 'rgba(0, 200, 255, 0.1)' : 'rgba(0, 200, 255, 0.05)'} 0%, transparent 50%),
+                            radial-gradient(ellipse at 50% 50%, ${isDarkMode ? 'rgba(255, 100, 200, 0.05)' : 'rgba(255, 100, 200, 0.02)'} 0%, transparent 70%)
                         `,
                         transition: 'all 0.3s ease-out'
                     }}
@@ -282,7 +285,7 @@ const HomeTemplate2 = () => {
                         y: [0, -50, 0],
                     }}
                     transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
-                    className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-gradient-to-r from-purple-600/20 to-pink-600/20 rounded-full blur-[100px]"
+                    className={`absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-gradient-to-r ${isDarkMode ? 'from-purple-600/20 to-pink-600/20' : 'from-purple-400/10 to-pink-400/10'} rounded-full blur-[100px]`}
                 />
                 <motion.div
                     animate={{
@@ -290,14 +293,14 @@ const HomeTemplate2 = () => {
                         y: [0, 100, 0],
                     }}
                     transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
-                    className="absolute bottom-1/4 right-1/4 w-[600px] h-[600px] bg-gradient-to-r from-cyan-600/20 to-blue-600/20 rounded-full blur-[120px]"
+                    className={`absolute bottom-1/4 right-1/4 w-[600px] h-[600px] bg-gradient-to-r ${isDarkMode ? 'from-cyan-600/20 to-blue-600/20' : 'from-cyan-400/10 to-blue-400/10'} rounded-full blur-[120px]`}
                 />
 
                 {/* Noise Texture */}
-                <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIj48ZmlsdGVyIGlkPSJhIiB4PSIwIiB5PSIwIj48ZmVUdXJidWxlbmNlIGJhc2VGcmVxdWVuY3k9Ii43NSIgc3RpdGNoVGlsZXM9InN0aXRjaCIgdHlwZT0iZnJhY3RhbE5vaXNlIi8+PC9maWx0ZXI+PHJlY3Qgd2lkdGg9IjMwMCIgaGVpZ2h0PSIzMDAiIGZpbHRlcj0idXJsKCNhKSIgb3BhY2l0eT0iMC4wNSIvPjwvc3ZnPg==')] opacity-50" />
+                <div className={`absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIj48ZmlsdGVyIGlkPSJhIiB4PSIwIiB5PSIwIj48ZmVUdXJidWxlbmNlIGJhc2VGcmVxdWVuY3k9Ii43NSIgc3RpdGNoVGlsZXM9InN0aXRjaCIgdHlwZT0iZnJhY3RhbE5vaXNlIi8+PC9maWx0ZXI+PHJlY3Qgd2lkdGg9IjMwMCIgaGVpZ2h0PSIzMDAiIGZpbHRlcj0idXJsKCNhKSIgb3BhY2l0eT0iMC4wNSIvPjwvc3ZnPg==')] ${isDarkMode ? 'opacity-50' : 'opacity-20'}`} />
 
                 {/* Grid Pattern */}
-                <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:60px_60px]" />
+                <div className={`absolute inset-0 ${isDarkMode ? 'bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)]' : 'bg-[linear-gradient(rgba(0,0,0,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(0,0,0,0.03)_1px,transparent_1px)]'} bg-[size:60px_60px]`} />
             </div>
 
             {/* Floating Particles */}
@@ -319,7 +322,7 @@ const HomeTemplate2 = () => {
                             repeat: Infinity,
                             delay: Math.random() * 2
                         }}
-                        className="absolute w-1 h-1 bg-white rounded-full"
+                        className={`absolute w-1 h-1 ${isDarkMode ? 'bg-white' : 'bg-purple-400'} rounded-full`}
                     />
                 ))}
             </div>
@@ -327,7 +330,7 @@ const HomeTemplate2 = () => {
             {/* Glassmorphism Header */}
             <header className="fixed top-0 w-full z-50">
                 <div className="mx-4 mt-4">
-                    <div className="bg-white/[0.03] backdrop-blur-2xl border border-white/[0.05] rounded-2xl shadow-2xl shadow-black/20">
+                    <div className={`${isDarkMode ? 'bg-white/[0.03] border-white/[0.05]' : 'bg-white/70 border-slate-200'} backdrop-blur-2xl border rounded-2xl shadow-2xl ${isDarkMode ? 'shadow-black/20' : 'shadow-slate-200/50'}`}>
                         <div className="container mx-auto px-6 py-4">
                             <div className="flex justify-between items-center">
                                 <a href="/" className="flex items-center space-x-4 group">
@@ -345,33 +348,55 @@ const HomeTemplate2 = () => {
                                         </div>
                                     )}
                                     <div>
-                                        <h1 className="text-xl font-bold bg-gradient-to-r from-white to-white/60 bg-clip-text text-transparent">
+                                        <h1 className={`text-xl font-bold ${isDarkMode ? 'bg-gradient-to-r from-white to-white/60' : 'bg-gradient-to-r from-slate-900 to-slate-700'} bg-clip-text text-transparent`}>
                                             {headerData.title}
                                         </h1>
-                                        <p className="text-xs text-white/40">{headerData.subtitle}</p>
+                                        <p className={`text-xs ${isDarkMode ? 'text-white/40' : 'text-slate-500'}`}>{headerData.subtitle}</p>
                                     </div>
                                 </a>
 
                                 <nav className="hidden md:flex items-center">
-                                    <div className="flex items-center bg-white/[0.03] rounded-full p-1">
+                                    <div className={`flex items-center ${isDarkMode ? 'bg-white/[0.03]' : 'bg-slate-100'} rounded-full p-1 mr-4`}>
                                         {['Home', 'Projects', 'Contact'].map((item) => (
                                             <a
                                                 key={item}
                                                 href={item === 'Projects' ? '#projects' : item === 'Contact' ? '#contact' : '#'}
-                                                className="px-5 py-2 text-sm font-medium text-white/60 hover:text-white rounded-full hover:bg-white/[0.05] transition-all"
+                                                className={`px-5 py-2 text-sm font-medium ${isDarkMode ? 'text-white/60 hover:text-white hover:bg-white/[0.05]' : 'text-slate-600 hover:text-slate-900 hover:bg-white'} rounded-full transition-all`}
                                             >
                                                 {item}
                                             </a>
                                         ))}
                                     </div>
+
+                                    {/* Theme Toggle Button */}
+                                    <button
+                                        onClick={toggleTheme}
+                                        className={`p-2.5 rounded-xl border transition-all duration-300 ${isDarkMode
+                                            ? 'bg-white/[0.05] border-white/[0.1] hover:bg-white/[0.1] text-yellow-400'
+                                            : 'bg-slate-100 border-slate-200 hover:bg-slate-200 text-purple-600'}`}
+                                    >
+                                        {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+                                    </button>
                                 </nav>
 
-                                <button
-                                    onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                                    className="md:hidden p-3 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] transition-all border border-white/[0.05]"
-                                >
-                                    {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-                                </button>
+                                <div className="flex items-center md:hidden gap-3">
+                                    <button
+                                        onClick={toggleTheme}
+                                        className={`p-2.5 rounded-xl border transition-all duration-300 ${isDarkMode
+                                            ? 'bg-white/[0.05] border-white/[0.1] text-yellow-400'
+                                            : 'bg-slate-100 border-slate-200 text-purple-600'}`}
+                                    >
+                                        {isDarkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+                                    </button>
+                                    <button
+                                        onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                                        className={`p-2.5 rounded-xl border transition-all ${isDarkMode
+                                            ? 'bg-white/[0.05] border-white/[0.1] text-white'
+                                            : 'bg-slate-100 border-slate-200 text-slate-900'}`}
+                                    >
+                                        {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -384,7 +409,7 @@ const HomeTemplate2 = () => {
                             initial={{ opacity: 0, y: -20 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: -20 }}
-                            className="mx-4 mt-2 bg-black/90 backdrop-blur-2xl border border-white/[0.05] rounded-2xl overflow-hidden"
+                            className={`mx-4 mt-2 ${isDarkMode ? 'bg-black/90' : 'bg-white/95'} backdrop-blur-2xl border ${isDarkMode ? 'border-white/[0.05]' : 'border-slate-200'} rounded-2xl overflow-hidden shadow-2xl`}
                         >
                             <nav className="p-4 flex flex-col space-y-2">
                                 {['Home', 'Projects', 'Contact'].map((item) => (
@@ -392,7 +417,9 @@ const HomeTemplate2 = () => {
                                         key={item}
                                         href={item === 'Projects' ? '#projects' : item === 'Contact' ? '#contact' : '#'}
                                         onClick={() => setMobileMenuOpen(false)}
-                                        className="px-4 py-3 text-white/60 hover:text-white hover:bg-white/[0.05] rounded-xl transition-all"
+                                        className={`px-4 py-3 rounded-xl transition-all ${isDarkMode
+                                            ? 'text-white/60 hover:text-white hover:bg-white/[0.05]'
+                                            : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'}`}
                                     >
                                         {item}
                                     </a>
@@ -422,13 +449,13 @@ const HomeTemplate2 = () => {
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 0.6 }}
-                                className="inline-flex items-center gap-2 px-4 py-2 mb-8 bg-white/[0.03] backdrop-blur-sm rounded-full border border-white/[0.08]"
+                                className={`inline-flex items-center gap-2 px-4 py-2 mb-8 ${isDarkMode ? 'bg-white/[0.03] border-white/[0.08]' : 'bg-slate-100 border-slate-200'} backdrop-blur-sm rounded-full border`}
                             >
                                 <span className="relative flex h-2 w-2">
                                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                                     <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                                 </span>
-                                <span className="text-sm text-white/70">Open for opportunities</span>
+                                <span className={`text-sm ${isDarkMode ? 'text-white/70' : 'text-slate-600'}`}>Open for opportunities</span>
                             </motion.div>
 
                             {/* Main Heading */}
@@ -438,9 +465,9 @@ const HomeTemplate2 = () => {
                                 transition={{ duration: 0.7, delay: 0.1 }}
                             >
                                 <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.1] mb-6">
-                                    <span className="text-white">{heroData.title}</span>
+                                    <span className={isDarkMode ? 'text-white' : 'text-slate-900'}>{heroData.title}</span>
                                     <br />
-                                    <span className="bg-gradient-to-r from-violet-400 via-purple-400 to-fuchsia-400 bg-clip-text text-transparent">
+                                    <span className={`bg-gradient-to-r ${isDarkMode ? 'from-violet-400 via-purple-400 to-fuchsia-400' : 'from-violet-600 via-purple-600 to-fuchsia-600'} bg-clip-text text-transparent`}>
                                         {heroData.subtitle}
                                     </span>
                                 </h1>
@@ -451,11 +478,11 @@ const HomeTemplate2 = () => {
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 0.7, delay: 0.2 }}
-                                className="text-lg text-white/50 max-w-xl mx-auto lg:mx-0 mb-8 leading-relaxed"
+                                className={`text-lg ${isDarkMode ? 'text-white/50' : 'text-slate-500'} max-w-xl mx-auto lg:mx-0 mb-8 leading-relaxed`}
                             >
                                 {heroData.desc.split('--').map((part, index) =>
                                     index % 2 === 1 ? (
-                                        <span key={index} className="text-violet-400 font-medium">{part}</span>
+                                        <span key={index} className={isDarkMode ? 'text-violet-400 font-medium' : 'text-violet-600 font-semibold'}>{part}</span>
                                     ) : (
                                         part
                                     )
@@ -476,8 +503,8 @@ const HomeTemplate2 = () => {
                                     { value: heroData.card_title_4, label: heroData.card_subtitle_4 },
                                 ].map((stat, idx) => (
                                     <div key={idx} className="text-center lg:text-left">
-                                        <div className="text-2xl md:text-3xl font-bold text-white">{stat.value}</div>
-                                        <div className="text-sm text-white/40">{stat.label}</div>
+                                        <div className={`text-2xl md:text-3xl font-bold ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>{stat.value}</div>
+                                        <div className={`text-sm ${isDarkMode ? 'text-white/40' : 'text-slate-500'}`}>{stat.label}</div>
                                     </div>
                                 ))}
                             </motion.div>
@@ -492,7 +519,7 @@ const HomeTemplate2 = () => {
                                 {heroData.btn_link_1 && (
                                     <a
                                         href={heroData.btn_link_1}
-                                        className="group inline-flex items-center gap-2 px-7 py-3.5 bg-white text-black font-semibold rounded-xl hover:bg-white/90 transition-all duration-300 hover:shadow-lg hover:shadow-white/10"
+                                        className={`group inline-flex items-center gap-2 px-7 py-3.5 ${isDarkMode ? 'bg-white text-black hover:bg-white/90 shadow-white/10' : 'bg-slate-900 text-white hover:bg-slate-800 shadow-slate-900/10'} font-semibold rounded-xl transition-all duration-300 hover:shadow-lg`}
                                     >
                                         {heroData.btn_name_1}
                                         <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -501,7 +528,7 @@ const HomeTemplate2 = () => {
                                 {heroData.btn_link_2 && (
                                     <a
                                         href={heroData.btn_link_2}
-                                        className="inline-flex items-center gap-2 px-7 py-3.5 bg-white/[0.05] text-white font-semibold rounded-xl border border-white/[0.1] hover:bg-white/[0.1] hover:border-white/[0.2] transition-all duration-300"
+                                        className={`inline-flex items-center gap-2 px-7 py-3.5 ${isDarkMode ? 'bg-white/[0.05] text-white border-white/[0.1] hover:bg-white/[0.1] hover:border-white/[0.2]' : 'bg-slate-100 text-slate-900 border-slate-200 hover:bg-slate-200 hover:border-slate-300'} font-semibold rounded-xl border transition-all duration-300`}
                                     >
                                         {heroData.btn_name_2}
                                     </a>
@@ -521,7 +548,9 @@ const HomeTemplate2 = () => {
                                         href={link.url}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="p-2.5 rounded-lg bg-white/[0.03] border border-white/[0.06] text-white/50 hover:text-white hover:bg-white/[0.08] hover:border-white/[0.15] transition-all duration-300"
+                                        className={`p-2.5 rounded-lg border transition-all duration-300 ${isDarkMode
+                                            ? 'bg-white/[0.03] border-white/[0.06] text-white/50 hover:text-white hover:bg-white/[0.08] hover:border-white/[0.15]'
+                                            : 'bg-slate-100 border-slate-200 text-slate-400 hover:text-slate-900 hover:bg-slate-200 hover:border-slate-300'}`}
                                     >
                                         {getSocialIcon(link.icon)}
                                     </a>
@@ -562,7 +591,7 @@ const HomeTemplate2 = () => {
                                 animate={{ y: [0, 6, 0] }}
                                 transition={{ duration: 1.5, repeat: Infinity }}
                             >
-                                <ChevronDown className="w-5 h-5 text-white/20 group-hover:text-white/50 transition-colors" />
+                                <ChevronDown className={`w-5 h-5 ${isDarkMode ? 'text-white/20' : 'text-slate-300'} group-hover:${isDarkMode ? 'text-white/50' : 'text-slate-500'} transition-colors`} />
                             </motion.div>
                         </a>
                     </motion.div>
@@ -578,13 +607,13 @@ const HomeTemplate2 = () => {
             >
                 <div className="text-center mb-24 mt-20 relative px-4">
                     {/* Background Ambience */}
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[300px] bg-gradient-to-r from-purple-500/10 via-fuchsia-500/10 to-cyan-500/10 rounded-full blur-[100px] pointer-events-none animate-pulse" />
+                    <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[300px] bg-gradient-to-r ${isDarkMode ? 'from-purple-500/10 via-fuchsia-500/10 to-cyan-500/10' : 'from-purple-500/5 via-fuchsia-500/5 to-cyan-500/5'} rounded-full blur-[100px] pointer-events-none animate-pulse`} />
 
                     {/* Decorative Stars */}
                     <motion.div
                         animate={{ rotate: 360, scale: [1, 1.2, 1] }}
                         transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
-                        className="absolute top-0 right-[20%] text-purple-400/30"
+                        className={`absolute top-0 right-[20%] ${isDarkMode ? 'text-purple-400/30' : 'text-purple-600/20'}`}
                     >
                         <Sparkles className="w-8 h-8" />
                     </motion.div>
@@ -597,20 +626,20 @@ const HomeTemplate2 = () => {
                     </motion.div>
 
                     <h3 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-8 tracking-tight relative z-10">
-                        <span className="block text-white mb-2 drop-shadow-lg">
+                        <span className={`block ${isDarkMode ? 'text-white' : 'text-slate-900'} mb-2 drop-shadow-lg`}>
                             Building Exceptional
                         </span>
-                        <span className="bg-gradient-to-r from-violet-400 via-fuchsia-400 to-cyan-400 bg-[length:200%_auto] animate-gradient bg-clip-text text-transparent drop-shadow-lg">
+                        <span className={`bg-gradient-to-r ${isDarkMode ? 'from-violet-400 via-fuchsia-400 to-cyan-400' : 'from-violet-600 via-fuchsia-600 to-cyan-600'} bg-[length:200%_auto] animate-gradient bg-clip-text text-transparent drop-shadow-lg`}>
                             Digital Experiences
                         </span>
                     </h3>
 
                     <div className="flex items-center justify-center gap-6 relative z-10">
-                        <div className="h-[1px] w-12 md:w-24 bg-gradient-to-r from-transparent via-white/30 to-transparent" />
-                        <p className="text-sm md:text-base text-white/60 font-medium tracking-[0.2em] uppercase">
+                        <div className={`h-[1px] w-12 md:w-24 bg-gradient-to-r from-transparent ${isDarkMode ? 'via-white/30' : 'via-slate-400/30'} to-transparent`} />
+                        <p className={`text-sm md:text-base ${isDarkMode ? 'text-white/60' : 'text-slate-500'} font-medium tracking-[0.2em] uppercase`}>
                             with modern technologies
                         </p>
-                        <div className="h-[1px] w-12 md:w-24 bg-gradient-to-r from-transparent via-white/30 to-transparent" />
+                        <div className={`h-[1px] w-12 md:w-24 bg-gradient-to-r from-transparent ${isDarkMode ? 'via-white/30' : 'via-slate-400/30'} to-transparent`} />
                     </div>
                 </div>
 
@@ -696,14 +725,14 @@ const HomeTemplate2 = () => {
 
                                 {/* Icon container */}
                                 <div
-                                    className="relative w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-white/[0.03] border border-white/[0.08] flex items-center justify-center group-hover:border-white/20 transition-all duration-300"
+                                    className={`relative w-16 h-16 md:w-20 md:h-20 rounded-2xl ${isDarkMode ? 'bg-white/[0.03] border-white/[0.08]' : 'bg-white border-slate-200 shadow-sm'} flex items-center justify-center group-hover:border-white/20 transition-all duration-300`}
                                     style={{ color: tech.color }}
                                 >
                                     {tech.icon}
                                 </div>
 
                                 {/* Name */}
-                                <span className="text-sm text-white/50 group-hover:text-white transition-colors">
+                                <span className={`text-sm ${isDarkMode ? 'text-white/50' : 'text-slate-500'} group-hover:${isDarkMode ? 'text-white' : 'text-slate-900'} transition-colors`}>
                                     {tech.name}
                                 </span>
                             </motion.div>
@@ -715,8 +744,8 @@ const HomeTemplate2 = () => {
             <section className="py-24 relative overflow-hidden">
                 {/* Background Elements */}
                 <div className="absolute inset-0 pointer-events-none">
-                    <div className="absolute top-1/4 left-0 w-96 h-96 bg-violet-600/10 rounded-full blur-[150px]" />
-                    <div className="absolute bottom-1/4 right-0 w-96 h-96 bg-fuchsia-600/10 rounded-full blur-[150px]" />
+                    <div className={`absolute top-1/4 left-0 w-96 h-96 ${isDarkMode ? 'bg-violet-600/10' : 'bg-violet-600/5'} rounded-full blur-[150px]`} />
+                    <div className={`absolute bottom-1/4 right-0 w-96 h-96 ${isDarkMode ? 'bg-fuchsia-600/10' : 'bg-fuchsia-600/5'} rounded-full blur-[150px]`} />
                 </div>
 
                 <div className="container mx-auto px-6 relative">
@@ -728,15 +757,15 @@ const HomeTemplate2 = () => {
                         viewport={{ once: true }}
                         className="text-center mb-16"
                     >
-                        <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/[0.03] rounded-full border border-white/[0.08] mb-6">
+                        <div className={`inline-flex items-center gap-2 px-4 py-2 ${isDarkMode ? 'bg-white/[0.03] border-white/[0.08]' : 'bg-slate-100 border-slate-200'} rounded-full border mb-6`}>
                             <Layers className="w-4 h-4 text-violet-400" />
-                            <span className="text-sm text-white/60">What I Offer</span>
+                            <span className={`text-sm ${isDarkMode ? 'text-white/60' : 'text-slate-600'}`}>What I Offer</span>
                         </div>
                         <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
-                            <span className="text-white">Services & </span>
-                            <span className="bg-gradient-to-r from-violet-400 via-purple-400 to-fuchsia-400 bg-clip-text text-transparent">Expertise</span>
+                            <span className={isDarkMode ? 'text-white' : 'text-slate-900'}>Services & </span>
+                            <span className={`bg-gradient-to-r ${isDarkMode ? 'from-violet-400 via-purple-400 to-fuchsia-400' : 'from-violet-600 via-purple-600 to-fuchsia-600'} bg-clip-text text-transparent`}>Expertise</span>
                         </h2>
-                        <p className="text-white/50 max-w-2xl mx-auto text-lg">
+                        <p className={`${isDarkMode ? 'text-white/50' : 'text-slate-500'} max-w-2xl mx-auto text-lg`}>
                             Full-stack development with cutting-edge technologies
                         </p>
                     </motion.div>
@@ -793,17 +822,17 @@ const HomeTemplate2 = () => {
                                 {/* Hover glow */}
                                 <div className={`absolute -inset-1 bg-gradient-to-r ${service.gradient} rounded-2xl opacity-0 group-hover:opacity-20 blur-xl transition-all duration-500`} />
 
-                                <div className="relative p-8 rounded-2xl bg-white/[0.02] border border-white/[0.06] hover:border-white/[0.15] backdrop-blur-sm transition-all duration-300">
+                                <div className={`relative p-8 rounded-2xl ${isDarkMode ? 'bg-white/[0.02] border-white/[0.06] hover:border-white/[0.15]' : 'bg-white border-slate-100 hover:border-slate-300 shadow-sm'} backdrop-blur-sm transition-all duration-300`}>
                                     {/* Icon */}
                                     <div className={`w-14 h-14 mb-6 rounded-xl bg-gradient-to-br ${service.gradient} flex items-center justify-center text-white shadow-lg`}>
                                         {service.icon}
                                     </div>
 
                                     {/* Content */}
-                                    <h3 className="text-xl font-bold text-white mb-3 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-violet-400 group-hover:to-fuchsia-400 transition-all">
+                                    <h3 className={`text-xl font-bold ${isDarkMode ? 'text-white' : 'text-slate-900'} mb-3 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-violet-400 group-hover:to-fuchsia-400 transition-all`}>
                                         {service.title}
                                     </h3>
-                                    <p className="text-white/50 leading-relaxed">
+                                    <p className={`${isDarkMode ? 'text-white/50' : 'text-slate-500'} leading-relaxed`}>
                                         {service.desc}
                                     </p>
                                 </div>
@@ -825,15 +854,15 @@ const HomeTemplate2 = () => {
                         viewport={{ once: true }}
                         className="text-center mb-16"
                     >
-                        <div className="inline-flex items-center space-x-2 px-4 py-2 bg-white/[0.03] rounded-full border border-white/[0.05] mb-6">
+                        <div className={`inline-flex items-center space-x-2 px-4 py-2 ${isDarkMode ? 'bg-white/[0.03] border-white/[0.05]' : 'bg-slate-100 border-slate-200'} rounded-full border mb-6`}>
                             <Zap className="w-4 h-4 text-cyan-400" />
-                            <span className="text-sm text-white/60">Featured Projects</span>
+                            <span className={`text-sm ${isDarkMode ? 'text-white/60' : 'text-slate-600'}`}>Featured Projects</span>
                         </div>
                         <h2 className="text-4xl md:text-6xl font-black mb-6">
-                            <span className="bg-gradient-to-r from-white to-white/40 bg-clip-text text-transparent">Selected </span>
-                            <span className="bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent">Work</span>
+                            <span className={`bg-gradient-to-r ${isDarkMode ? 'from-white to-white/40' : 'from-slate-900 to-slate-500'} bg-clip-text text-transparent`}>Selected </span>
+                            <span className={`bg-gradient-to-r ${isDarkMode ? 'from-purple-400 to-cyan-400' : 'from-purple-600 to-cyan-600'} bg-clip-text text-transparent`}>Work</span>
                         </h2>
-                        <p className="text-white/40 max-w-xl mx-auto">
+                        <p className={`${isDarkMode ? 'text-white/40' : 'text-slate-500'} max-w-xl mx-auto`}>
                             A collection of projects showcasing expertise in modern development
                         </p>
                     </motion.div>
@@ -845,7 +874,7 @@ const HomeTemplate2 = () => {
                         viewport={{ once: true }}
                         className="flex justify-center mb-12"
                     >
-                        <div className="inline-flex p-1.5 bg-white/[0.03] backdrop-blur-xl rounded-2xl border border-white/[0.05]">
+                        <div className={`inline-flex p-1.5 ${isDarkMode ? 'bg-white/[0.03] border-white/[0.05] shadow-black/20' : 'bg-slate-100 border-slate-200 shadow-slate-200/50'} backdrop-blur-xl rounded-2xl border shadow-xl`}>
                             {[
                                 { id: 'all', label: 'All', icon: <Globe className="w-4 h-4" /> },
                                 { id: 'app', label: 'Mobile', icon: <Smartphone className="w-4 h-4" /> },
@@ -855,8 +884,8 @@ const HomeTemplate2 = () => {
                                     key={tab.id}
                                     onClick={() => setActiveTab(tab.id)}
                                     className={`flex items-center space-x-2 px-6 py-3 rounded-xl text-sm font-medium transition-all ${activeTab === tab.id
-                                        ? 'bg-white text-black'
-                                        : 'text-white/50 hover:text-white hover:bg-white/[0.05]'
+                                        ? (isDarkMode ? 'bg-white text-black shadow-lg shadow-white/10' : 'bg-white text-slate-900 shadow-md shadow-slate-200')
+                                        : (isDarkMode ? 'text-white/50 hover:text-white hover:bg-white/[0.05]' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50')
                                         }`}
                                 >
                                     {tab.icon}
@@ -868,7 +897,7 @@ const HomeTemplate2 = () => {
 
                     {loading ? (
                         <div className="flex justify-center py-20">
-                            <div className="w-10 h-10 border-4 border-white/20 border-t-purple-500 rounded-full animate-spin" />
+                            <div className={`w-10 h-10 border-4 ${isDarkMode ? 'border-white/20 border-t-purple-500' : 'border-slate-200 border-t-purple-600'} rounded-full animate-spin`} />
                         </div>
                     ) : (
                         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -882,10 +911,10 @@ const HomeTemplate2 = () => {
                                     onClick={() => navigate('/item', { state: project })}
                                     className="group cursor-pointer"
                                 >
-                                    <div className="relative h-full bg-gradient-to-br from-white/[0.08] to-white/[0.02] backdrop-blur-xl border border-white/[0.08] rounded-3xl overflow-hidden transition-all duration-500 hover:border-purple-500/30 hover:shadow-2xl hover:shadow-purple-500/10">
+                                    <div className={`relative h-full ${isDarkMode ? 'bg-gradient-to-br from-white/[0.08] to-white/[0.02] border-white/[0.08] hover:border-purple-500/30 hover:shadow-purple-500/10' : 'bg-white border-slate-200 hover:border-purple-500/20 hover:shadow-slate-200/50 shadow-sm shadow-slate-200/30'} backdrop-blur-xl border rounded-3xl overflow-hidden transition-all duration-500 hover:shadow-2xl`}>
                                         {/* Image */}
                                         <div className="relative h-56 overflow-hidden">
-                                            <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0f] via-transparent to-transparent z-10" />
+                                            <div className={`absolute inset-0 bg-gradient-to-t ${isDarkMode ? 'from-[#0a0a0f]' : 'from-slate-900/10'} via-transparent to-transparent z-10`} />
                                             <img
                                                 src={project.projectImages[0] || 'https://via.placeholder.com/400x300'}
                                                 alt={project.title}
@@ -916,21 +945,21 @@ const HomeTemplate2 = () => {
                                         <div className="p-6">
                                             <div className="flex items-center justify-between mb-3">
                                                 <span className={`px-3 py-1 text-xs font-medium rounded-full ${project.isWeb
-                                                    ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30'
-                                                    : 'bg-purple-500/20 text-purple-400 border border-purple-500/30'
-                                                    }`}>
+                                                    ? (isDarkMode ? 'bg-cyan-500/20 text-cyan-400 border-cyan-500/30' : 'bg-cyan-100 text-cyan-700 border-cyan-200')
+                                                    : (isDarkMode ? 'bg-purple-500/20 text-purple-400 border-purple-500/30' : 'bg-purple-100 text-purple-700 border-purple-200')
+                                                    } border`}>
                                                     {project.isWeb ? 'Web' : 'Mobile'}
                                                 </span>
                                             </div>
 
-                                            <h3 className="text-xl font-bold text-white mb-2 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-cyan-400 group-hover:bg-clip-text transition-all">
+                                            <h3 className={`text-xl font-bold ${isDarkMode ? 'text-white' : 'text-slate-900'} mb-2 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-cyan-400 group-hover:bg-clip-text transition-all`}>
                                                 {project.title}
                                             </h3>
-                                            <p className="text-sm text-white/40 line-clamp-2 mb-4">{project.desc}</p>
+                                            <p className={`text-sm ${isDarkMode ? 'text-white/40' : 'text-slate-500'} line-clamp-2 mb-4`}>{project.desc}</p>
 
                                             <div className="flex flex-wrap gap-2">
                                                 {project.tags.slice(0, 3).map((tag, tagIdx) => (
-                                                    <span key={tagIdx} className="px-2 py-1 text-xs bg-white/[0.05] text-white/50 rounded-lg border border-white/[0.05]">
+                                                    <span key={tagIdx} className={`px-2 py-1 text-xs ${isDarkMode ? 'bg-white/[0.05] text-white/50 border-white/[0.05]' : 'bg-slate-100 text-slate-500 border-slate-200'} rounded-lg border`}>
                                                         {tag}
                                                     </span>
                                                 ))}
@@ -958,7 +987,7 @@ const HomeTemplate2 = () => {
                         >
                             <button
                                 onClick={() => navigate('/allitems')}
-                                className="inline-flex items-center space-x-3 px-8 py-4 bg-white/[0.05] hover:bg-white/[0.1] border border-white/[0.1] rounded-2xl font-medium transition-all group"
+                                className={`inline-flex items-center space-x-3 px-8 py-4 ${isDarkMode ? 'bg-white/[0.05] hover:bg-white/[0.1] border-white/[0.1] text-white' : 'bg-slate-100 hover:bg-slate-200 border-slate-200 text-slate-900'} rounded-2xl font-medium border transition-all group shadow-xl ${isDarkMode ? 'shadow-black/20' : 'shadow-slate-200/50'}`}
                             >
                                 <span>View All Projects</span>
                                 <ExternalLink className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -973,9 +1002,9 @@ const HomeTemplate2 = () => {
                 <section className="py-32 relative overflow-hidden">
                     {/* Enhanced Background decoration */}
                     <div className="absolute inset-0 pointer-events-none">
-                        <div className="absolute top-1/4 left-0 w-[500px] h-[500px] bg-violet-600/10 rounded-full blur-[150px]" />
-                        <div className="absolute bottom-1/4 right-0 w-[500px] h-[500px] bg-fuchsia-600/10 rounded-full blur-[150px]" />
-                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-purple-600/5 rounded-full blur-[200px]" />
+                        <div className={`absolute top-1/4 left-0 w-[500px] h-[500px] ${isDarkMode ? 'bg-violet-600/10' : 'bg-violet-600/5'} rounded-full blur-[150px]`} />
+                        <div className={`absolute bottom-1/4 right-0 w-[500px] h-[500px] ${isDarkMode ? 'bg-fuchsia-600/10' : 'bg-fuchsia-600/5'} rounded-full blur-[150px]`} />
+                        <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] ${isDarkMode ? 'bg-purple-600/5' : 'bg-purple-600/2'} rounded-full blur-[200px]`} />
 
                         {/* Floating Stars Decoration */}
                         {[...Array(6)].map((_, i) => (
@@ -998,7 +1027,7 @@ const HomeTemplate2 = () => {
                                     right: i % 2 === 1 ? `${5 + i * 3}%` : 'auto',
                                 }}
                             >
-                                <Star className="w-4 h-4 text-yellow-400/30 fill-yellow-400/30" />
+                                <Star className={`w-4 h-4 ${isDarkMode ? 'text-yellow-400/30 fill-yellow-400/30' : 'text-yellow-500/40 fill-yellow-500/40'}`} />
                             </motion.div>
                         ))}
                     </div>
@@ -1016,10 +1045,10 @@ const HomeTemplate2 = () => {
 
 
                             <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
-                                <span className="text-white">What Clients </span>
-                                <span className="bg-gradient-to-r from-violet-400 via-purple-400 to-fuchsia-400 bg-clip-text text-transparent">Say</span>
+                                <span className={isDarkMode ? 'text-white' : 'text-slate-900'}>What Clients </span>
+                                <span className={`bg-gradient-to-r ${isDarkMode ? 'from-violet-400 via-purple-400 to-fuchsia-400' : 'from-violet-600 via-purple-600 to-fuchsia-600'} bg-clip-text text-transparent`}>Say</span>
                             </h2>
-                            <p className="text-white/50 max-w-2xl mx-auto text-lg">
+                            <p className={`${isDarkMode ? 'text-white/50' : 'text-slate-500'} max-w-2xl mx-auto text-lg`}>
                                 Real experiences from clients who trusted us with their vision
                             </p>
                         </motion.div>
@@ -1042,10 +1071,10 @@ const HomeTemplate2 = () => {
                                 className="absolute -inset-4 bg-gradient-to-r from-violet-600/30 via-purple-600/20 to-fuchsia-600/30 rounded-[3rem] blur-2xl"
                             />
 
-                            <div className="relative bg-gradient-to-br from-white/[0.08] to-white/[0.02] backdrop-blur-xl border border-white/[0.1] rounded-[2.5rem] p-6 md:p-10 overflow-hidden">
+                            <div className={`relative ${isDarkMode ? 'bg-gradient-to-br from-white/[0.08] to-white/[0.02] border-white/[0.1] shadow-black/20' : 'bg-white border-slate-200 shadow-slate-200/50'} backdrop-blur-xl border rounded-[2.5rem] p-6 md:p-10 overflow-hidden shadow-2xl`}>
                                 {/* Decorative corner elements */}
-                                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-violet-500/10 to-transparent rounded-bl-full" />
-                                <div className="absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-tr from-fuchsia-500/10 to-transparent rounded-tr-full" />
+                                <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl ${isDarkMode ? 'from-violet-500/10' : 'from-violet-500/5'} to-transparent rounded-bl-full`} />
+                                <div className={`absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-tr ${isDarkMode ? 'from-fuchsia-500/10' : 'from-fuchsia-500/5'} to-transparent rounded-tr-full`} />
 
                                 {/* Large Quote Icon - Left */}
                                 <div className="absolute -top-6 left-10 md:left-16">
@@ -1103,7 +1132,7 @@ const HomeTemplate2 = () => {
                                         </div>
 
                                         {/* Review Text */}
-                                        <p className="text-xl md:text-2xl lg:text-3xl font-light text-white/90 mb-10 leading-relaxed text-center">
+                                        <p className={`text-xl md:text-2xl lg:text-3xl font-light ${isDarkMode ? 'text-white/90' : 'text-slate-800'} mb-10 leading-relaxed text-center`}>
                                             "{reviews[currentReviewIndex]?.text}"
                                         </p>
 
@@ -1124,7 +1153,7 @@ const HomeTemplate2 = () => {
                                                 </div>
                                             )}
                                             <div className="text-center">
-                                                <div className="flex items-center justify-center gap-2 font-bold text-white text-xl md:text-2xl mb-1">
+                                                <div className={`flex items-center justify-center gap-2 font-bold ${isDarkMode ? 'text-white' : 'text-slate-900'} text-xl md:text-2xl mb-1`}>
                                                     {reviews[currentReviewIndex]?.name}
                                                     {/* Verified Badge */}
                                                     <span className="inline-flex items-center justify-center w-5 h-5 bg-blue-500 rounded-full">
@@ -1133,11 +1162,11 @@ const HomeTemplate2 = () => {
                                                         </svg>
                                                     </span>
                                                 </div>
-                                                <div className="text-white/50 text-lg mb-2">
+                                                <div className={`${isDarkMode ? 'text-white/50' : 'text-slate-500'} text-lg mb-2`}>
                                                     {reviews[currentReviewIndex]?.role}
                                                 </div>
                                                 {/* Verified Client Badge */}
-                                                <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-green-500/10 border border-green-500/20 rounded-full text-xs text-green-400">
+                                                <span className={`inline-flex items-center gap-1.5 px-3 py-1 ${isDarkMode ? 'bg-green-500/10 border-green-500/20 text-green-400' : 'bg-green-50 border-green-200 text-green-600'} rounded-full text-xs font-medium`}>
                                                     <span className="relative flex h-2 w-2">
                                                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                                                         <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
@@ -1157,7 +1186,7 @@ const HomeTemplate2 = () => {
                             <div className="absolute top-1/2 -translate-y-1/2 left-0 right-0 flex justify-between pointer-events-none" style={{ left: '-140px', right: '-140px' }}>
                                 <button
                                     onClick={() => setCurrentReviewIndex((prev) => (prev - 1 + reviews.length) % reviews.length)}
-                                    className="pointer-events-auto w-14 h-14 md:w-16 md:h-16 rounded-full bg-white/[0.05] backdrop-blur-sm border border-white/[0.1] flex items-center justify-center text-white/50 hover:text-white hover:bg-violet-500/20 hover:border-violet-500/30 transition-all duration-300 shadow-lg hidden lg:flex"
+                                    className={`pointer-events-auto w-14 h-14 md:w-16 md:h-16 rounded-full ${isDarkMode ? 'bg-white/[0.05] border-white/[0.1] text-white/50 hover:text-white hover:bg-violet-500/20 hover:border-violet-500/30 shadow-black/20' : 'bg-white border-slate-200 text-slate-400 hover:text-slate-900 hover:bg-slate-50 hover:border-slate-300 shadow-slate-200/50'} backdrop-blur-sm border flex items-center justify-center transition-all duration-300 shadow-lg hidden lg:flex`}
                                 >
                                     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -1165,7 +1194,7 @@ const HomeTemplate2 = () => {
                                 </button>
                                 <button
                                     onClick={() => setCurrentReviewIndex((prev) => (prev + 1) % reviews.length)}
-                                    className="pointer-events-auto w-14 h-14 md:w-16 md:h-16 rounded-full bg-white/[0.05] backdrop-blur-sm border border-white/[0.1] flex items-center justify-center text-white/50 hover:text-white hover:bg-violet-500/20 hover:border-violet-500/30 transition-all duration-300 shadow-lg hidden lg:flex"
+                                    className={`pointer-events-auto w-14 h-14 md:w-16 md:h-16 rounded-full ${isDarkMode ? 'bg-white/[0.05] border-white/[0.1] text-white/50 hover:text-white hover:bg-violet-500/20 hover:border-violet-500/30 shadow-black/20' : 'bg-white border-slate-200 text-slate-400 hover:text-slate-900 hover:bg-slate-50 hover:border-slate-300 shadow-slate-200/50'} backdrop-blur-sm border flex items-center justify-center transition-all duration-300 shadow-lg hidden lg:flex`}
                                 >
                                     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -1177,7 +1206,7 @@ const HomeTemplate2 = () => {
                             <div className="flex justify-center gap-4 mt-6 lg:hidden">
                                 <button
                                     onClick={() => setCurrentReviewIndex((prev) => (prev - 1 + reviews.length) % reviews.length)}
-                                    className="w-12 h-12 rounded-full bg-white/[0.05] border border-white/[0.1] flex items-center justify-center text-white/50 hover:text-white hover:bg-violet-500/20 transition-all"
+                                    className={`w-12 h-12 rounded-full ${isDarkMode ? 'bg-white/[0.05] border-white/[0.1] text-white/50' : 'bg-white border-slate-200 text-slate-400 shadow-sm'} flex items-center justify-center hover:text-white hover:bg-violet-500/20 transition-all`}
                                 >
                                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -1185,7 +1214,7 @@ const HomeTemplate2 = () => {
                                 </button>
                                 <button
                                     onClick={() => setCurrentReviewIndex((prev) => (prev + 1) % reviews.length)}
-                                    className="w-12 h-12 rounded-full bg-white/[0.05] border border-white/[0.1] flex items-center justify-center text-white/50 hover:text-white hover:bg-violet-500/20 transition-all"
+                                    className={`w-12 h-12 rounded-full ${isDarkMode ? 'bg-white/[0.05] border-white/[0.1] text-white/50' : 'bg-white border-slate-200 text-slate-400 shadow-sm'} flex items-center justify-center hover:text-white hover:bg-violet-500/20 transition-all`}
                                 >
                                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -1201,14 +1230,14 @@ const HomeTemplate2 = () => {
                                         onClick={() => setCurrentReviewIndex(idx)}
                                         className={`h-2.5 rounded-full transition-all duration-300 ${idx === currentReviewIndex
                                             ? 'w-10 bg-gradient-to-r from-violet-500 to-fuchsia-500'
-                                            : 'w-2.5 bg-white/20 hover:bg-white/40'
+                                            : (isDarkMode ? 'w-2.5 bg-white/20 hover:bg-white/40' : 'w-2.5 bg-slate-200 hover:bg-slate-300')
                                             }`}
                                     />
                                 ))}
                             </div>
 
                             {/* Review Counter */}
-                            <div className="text-center mt-6 text-white/40 text-sm">
+                            <div className={`text-center mt-6 ${isDarkMode ? 'text-white/40' : 'text-slate-400'} text-sm`}>
                                 {currentReviewIndex + 1} / {reviews.length}
                             </div>
                         </motion.div>
@@ -1235,15 +1264,17 @@ const HomeTemplate2 = () => {
             </motion.div> */}
 
             {/* Contact Section with Form */}
-            <ContactSection />
+            <ContactSection isDarkMode={isDarkMode} />
 
             {/* Footer - Enhanced */}
-            <footer className="relative pt-16 pb-8 overflow-hidden">
+            <footer className={`relative pt-16 pb-8 overflow-hidden ${isDarkMode ? '' : 'bg-slate-50/50'}`}>
                 {/* Gradient line at top */}
-                <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-violet-500/50 to-transparent" />
+                <div className={`absolute top-0 left-0 right-0 h-px bg-gradient-to-r ${isDarkMode ? 'from-transparent via-violet-500/50 to-transparent' : 'from-transparent via-violet-200 to-transparent'}`} />
 
                 {/* Background glow */}
-                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-violet-600/10 rounded-full blur-[100px]" />
+                {isDarkMode && (
+                    <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-violet-600/10 rounded-full blur-[100px]" />
+                )}
 
                 <div className="container mx-auto px-6 relative">
                     <div className="flex flex-col items-center text-center mb-12">
@@ -1254,7 +1285,7 @@ const HomeTemplate2 = () => {
                             viewport={{ once: true }}
                             className="mb-6"
                         >
-                            <span className="text-2xl font-bold bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">
+                            <span className={`text-2xl font-bold bg-gradient-to-r ${isDarkMode ? 'from-violet-400 to-fuchsia-400' : 'from-violet-600 to-fuchsia-600'} bg-clip-text text-transparent`}>
                                 {headerData.title}
                             </span>
                         </motion.div>
@@ -1268,21 +1299,21 @@ const HomeTemplate2 = () => {
                             className="relative mb-16 max-w-3xl mx-auto"
                         >
                             {/* Ambient Glow */}
-                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-gradient-to-r from-violet-500/10 via-fuchsia-500/10 to-cyan-500/10 blur-[80px] rounded-full pointer-events-none" />
+                            <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-gradient-to-r ${isDarkMode ? 'from-violet-500/10 via-fuchsia-500/10 to-cyan-500/10' : 'from-violet-100 via-fuchsia-100 to-cyan-100'} blur-[80px] rounded-full pointer-events-none`} />
 
                             <h3 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight mb-6 relative z-10">
-                                <span className="text-white drop-shadow-lg">Building </span>
-                                <span className="bg-gradient-to-r from-violet-400 via-fuchsia-400 to-cyan-400 bg-[length:200%_auto] animate-gradient bg-clip-text text-transparent drop-shadow-lg">
+                                <span className={`${isDarkMode ? 'text-white' : 'text-slate-900'} drop-shadow-lg`}>Building </span>
+                                <span className={`bg-gradient-to-r ${isDarkMode ? 'from-violet-400 via-fuchsia-400 to-cyan-400' : 'from-violet-600 via-fuchsia-600 to-cyan-600'} bg-[length:200%_auto] animate-gradient bg-clip-text text-transparent drop-shadow-lg`}>
                                     Exceptional
                                 </span>
                                 <br />
-                                <span className="text-white/80">Digital Experiences</span>
+                                <span className={isDarkMode ? 'text-white/80' : 'text-slate-800'}>Digital Experiences</span>
                             </h3>
 
-                            <div className="flex items-center justify-center gap-4 text-white/40 mb-8 relative z-10">
-                                <span className="h-px w-8 bg-white/20" />
+                            <div className={`flex items-center justify-center gap-4 ${isDarkMode ? 'text-white/40' : 'text-slate-400'} mb-8 relative z-10`}>
+                                <span className={`h-px w-8 ${isDarkMode ? 'bg-white/20' : 'bg-slate-200'}`} />
                                 <span className="uppercase tracking-[0.2em] text-sm font-medium">with modern technologies</span>
-                                <span className="h-px w-8 bg-white/20" />
+                                <span className={`h-px w-8 ${isDarkMode ? 'bg-white/20' : 'bg-slate-200'}`} />
                             </div>
 
                             {/* Tech Stack Icons - Floating */}
@@ -1294,8 +1325,8 @@ const HomeTemplate2 = () => {
                                         whileInView={{ opacity: 1, y: 0 }}
                                         viewport={{ once: true }}
                                         transition={{ delay: 0.3 + idx * 0.1 }}
-                                        whileHover={{ y: -5, backgroundColor: 'rgba(255,255,255,0.1)' }}
-                                        className="px-4 py-2 bg-white/[0.03] backdrop-blur-md border border-white/[0.08] rounded-xl text-sm text-white/60 cursor-default transition-colors shadow-lg shadow-black/20"
+                                        whileHover={{ y: -5, backgroundColor: isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,1)' }}
+                                        className={`px-4 py-2 ${isDarkMode ? 'bg-white/[0.03] border-white/[0.08] text-white/60 shadow-black/20' : 'bg-white border-slate-200 text-slate-600 shadow-slate-200/30'} backdrop-blur-md border rounded-xl text-sm cursor-default transition-colors shadow-lg`}
                                     >
                                         {tech}
                                     </motion.div>
@@ -1311,7 +1342,7 @@ const HomeTemplate2 = () => {
                                     href={link.url}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="w-10 h-10 rounded-xl bg-white/[0.03] border border-white/[0.06] flex items-center justify-center text-white/40 hover:text-white hover:bg-violet-500/20 hover:border-violet-500/30 transition-all duration-300"
+                                    className={`w-10 h-10 rounded-xl ${isDarkMode ? 'bg-white/[0.03] border-white/[0.06] text-white/40 shadow-black/20' : 'bg-white border-slate-200 text-slate-400 shadow-slate-200/30'} flex items-center justify-center hover:text-white hover:bg-violet-500/20 hover:border-violet-500/30 transition-all duration-300 shadow-lg`}
                                 >
                                     {getSocialIcon(link.icon)}
                                 </a>
@@ -1322,9 +1353,9 @@ const HomeTemplate2 = () => {
                         <motion.button
                             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
                             whileHover={{ y: -3 }}
-                            className="group flex flex-col items-center gap-2 text-white/30 hover:text-white/60 transition-colors"
+                            className={`group flex flex-col items-center gap-2 ${isDarkMode ? 'text-white/30 hover:text-white/60' : 'text-slate-400 hover:text-slate-600'} transition-colors`}
                         >
-                            <div className="w-10 h-10 rounded-full border border-white/[0.1] flex items-center justify-center group-hover:border-violet-500/30 group-hover:bg-violet-500/10 transition-all">
+                            <div className={`w-10 h-10 rounded-full border ${isDarkMode ? 'border-white/[0.1]' : 'border-slate-200'} flex items-center justify-center group-hover:border-violet-500/30 group-hover:bg-violet-500/10 transition-all`}>
                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
                                 </svg>
@@ -1334,9 +1365,9 @@ const HomeTemplate2 = () => {
                     </div>
 
                     {/* Bottom bar */}
-                    <div className="border-t border-white/[0.05] pt-8">
+                    <div className={`border-t ${isDarkMode ? 'border-white/[0.05]' : 'border-slate-200'} pt-8`}>
                         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-                            <p className="text-sm text-white/30">
+                            <p className={`text-sm ${isDarkMode ? 'text-white/30' : 'text-slate-400'}`}>
                                 © {new Date().getFullYear()} {headerData.title}. All rights reserved.
                             </p>
                             <div className="flex items-center gap-2">
@@ -1344,7 +1375,7 @@ const HomeTemplate2 = () => {
                                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                                     <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
                                 </span>
-                                <span className="text-sm text-white/30">Available for work</span>
+                                <span className={`text-sm ${isDarkMode ? 'text-white/30' : 'text-slate-400'}`}>Available for work</span>
                             </div>
                         </div>
                     </div>
